@@ -17,6 +17,8 @@ jar {
     version =  '0.1.0'
 }
 
+mainClassName = 'org.metplus.curriculum.Application'
+
 repositories {
     mavenCentral()
 }
@@ -25,9 +27,40 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-web")
-    testCompile("junit:junit")
-    testCompile("org.springframework.boot:spring-boot-starter-test")
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        compile('org.springframework.data:spring-data-mongodb:1.7.2.RELEASE')
+        testCompile("junit:junit")
+    }
+    test {
+        testLogging {
+            events "passed", "skipped", "failed", "standardOut", "standardError"
+        }
+        dependsOn 'cleanTest'
+    }
+}
+
+task copyLicense {
+    outputs.file new File("$buildDir/LICENSE.md")
+    doLast {
+        copy {
+            from "LICENSE"
+            into "$buildDir"
+        }
+    }
+}
+
+applicationDistribution.from(copyLicense) {
+    into ""
 }
 
 task wrapper(type: Wrapper) {
