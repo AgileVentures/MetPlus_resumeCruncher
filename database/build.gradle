@@ -1,0 +1,14 @@
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://repo.spring.io/release'
+    }
+}
+
+apply plugin: 'spring-boot'
+dependencies {
+    compile('org.springframework.data:spring-data-mongodb:1.7.2.RELEASE')
+    compile project(':core')
+    testCompile("junit:junit:4.12")
+}
+
