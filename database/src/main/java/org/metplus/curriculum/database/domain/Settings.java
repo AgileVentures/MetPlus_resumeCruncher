@@ -2,6 +2,7 @@ package org.metplus.curriculum.database.domain;
 
 
 import org.metplus.curriculum.database.exceptions.CruncherSettingsNotFound;
+import org.metplus.curriculum.database.exceptions.MandatorySettingNotPresent;
 import org.metplus.curriculum.database.exceptions.SettingNotFound;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -74,5 +75,20 @@ public class Settings extends AbstractDocument {
         if(null == result)
             throw new CruncherSettingsNotFound(name);
         return result;
+    }
+
+    /**
+     * Validate all the settings
+     * The method will check if all the mandatory settings are present
+     * for the application and also for the crunchers
+     * @return True if everything is ok
+     * @throws MandatorySettingNotPresent When is missing so attribute
+     */
+    public boolean validate() throws MandatorySettingNotPresent {
+        appSettings.isMandatoryPresent();
+        for(CruncherSettings settings: cruncherSettings.values()) {
+            settings.isMandatoryPresent();
+        }
+        return true;
     }
 }
