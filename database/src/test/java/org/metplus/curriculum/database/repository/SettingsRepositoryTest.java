@@ -29,14 +29,19 @@ public class SettingsRepositoryTest {
     }
 
     @Test
-    public void testFindByName() throws Exception {
+    public void testRepository() throws Exception {
         repository.save(new Settings());
         assertEquals(1, repository.count());
         Settings setting = repository.findAll().iterator().next();
         Setting<Integer> set = new Setting<>("Bamm", 10);
-        setting.addSetting(set);
-        repository.save(setting);assertEquals(1, repository.count());
+        setting.addApplicationSetting(set);
+        setting.addCruncherSettings("doit", new CruncherSettings("cruncher"));
+
+        repository.save(setting);
+        assertEquals(1, repository.count());
+
         setting = repository.findAll().iterator().next();
-        assertEquals(10, setting.getSetting("Bamm").getData());
+        assertEquals(10, setting.getApplicationSetting("Bamm").getData());
+        assertEquals("cruncher", setting.getCruncherSettings("doit").getName());
     }
 }

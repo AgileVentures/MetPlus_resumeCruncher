@@ -8,54 +8,24 @@ import java.util.List;
 /**
  * Created by Joao Pereira on 19/08/2015.
  */
-public class CruncherSettings {
-    /**
-     * Storage of all the settings
-     */
-    private HashMap<String, Setting> settings;
-
-    /**
-     * Mandatory settings
-     */
-    private List<String> mandatory;
-
-    /**
-     * Class constructor
-     */
+public class CruncherSettings extends SettingsList {
+    private final String NAME_SETTING = "Name";
     public CruncherSettings() {
-        settings = new HashMap<>();
-        mandatory = new ArrayList<>();
+        super();
+        addMandatorySetting(NAME_SETTING);
     }
 
-    /**
-     * Add a new setting
-     * @param setting New setting
-     */
-    public void addSetting(Setting setting) {
-        settings.put(setting.getName(), setting);
+    public CruncherSettings(String name) {
+        super();
+        addMandatorySetting(NAME_SETTING);
+        Setting setting = new Setting<>(NAME_SETTING, name);
+        addSetting(setting);
     }
 
-    /**
-     * Retrieve all the settings
-     * @return Collection with all settings
-     */
-    public Collection<Setting> getSetting() {
-        return settings.values();
+    public String getName() {
+        return (String)getSetting(NAME_SETTING).getData();
     }
-
-    /**
-     * Retrieve a setting
-     * @param name Name of the setting to retrieve
-     * @return The setting
-     */
-    public Setting getSetting(String name) {
-        return settings.get(name);
+    public void setName(String name) {
+        addSetting(new Setting<>(NAME_SETTING, name));
     }
-
-    /**
-     * Retrieve the amount of settings
-     * @return Amount of settings
-     */
-    public int size(){return settings.size();}
-
 }

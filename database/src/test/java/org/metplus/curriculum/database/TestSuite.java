@@ -16,11 +16,6 @@ import org.springframework.test.annotation.ProfileValueSource;
 import org.springframework.test.annotation.ProfileValueSourceConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-    CruncherSettingsTest.class,
-    SettingsRepositoryTest.class,
-    SettingsTest.class
-})
+
 public class TestSuite {
 }
