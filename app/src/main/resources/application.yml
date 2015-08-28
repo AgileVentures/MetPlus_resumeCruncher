@@ -1,0 +1,35 @@
+spring:
+  profiles.active: development
+---
+spring:
+  profiles: development
+
+server:
+  port: 8443
+  ssl:
+    key-store: keystore.p12
+    key-store-password: mypassword
+    keyStoreType: PKCS12
+    keyAlias: tomcat
+---
+spring:
+  profiles: production
+
+server:
+  port: 8443
+  ssl:
+    key-store:
+    key-store-password:
+    keyStoreType:
+    keyAlias:
+---
+spring:
+  profiles: unit-test
+
+server:
+  port: 8443
+  ssl:
+    key-store: keystore.p12
+    key-store-password: mypassword
+    keyStoreType: PKCS12
+    keyAlias: tomcat

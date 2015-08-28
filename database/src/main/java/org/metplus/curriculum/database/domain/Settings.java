@@ -1,4 +1,4 @@
-package org.metplus.curriculum.database;
+package org.metplus.curriculum.database.domain;
 
 
 import org.springframework.data.annotation.TypeAlias;
@@ -8,13 +8,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @TypeAlias("settings")
 public class Settings extends AbstractDocument {
 
-    private CruncherSettings settings;
+    private CruncherSettings cruncherSettings;
 
     /**
      * Class constructor
      */
     public Settings() {
-        settings = new CruncherSettings();
+        cruncherSettings = new CruncherSettings();
     }
 
     /**
@@ -22,15 +22,15 @@ public class Settings extends AbstractDocument {
      * @return Settings object
      */
     public CruncherSettings getSettings() {
-        return settings;
+        return cruncherSettings;
     }
 
     /**
      * Retrieve all the settings
      * @return Settings object
      */
-    public CruncherSettings.Setting getSetting(String name) {
-        return settings.getSetting(name);
+    public Setting getSetting(String name) {
+        return cruncherSettings.getSetting(name);
     }
 
     /**
@@ -38,7 +38,7 @@ public class Settings extends AbstractDocument {
      * If it exists will override the previous
      * @param setting Setting to add
      */
-    public void addSetting(CruncherSettings.Setting setting) {
-        settings.addSetting(setting);
+    public void addSetting(Setting setting) {
+        cruncherSettings.addSetting(setting);
     }
 }

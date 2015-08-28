@@ -1,4 +1,4 @@
-package org.metplus.curriculum.database;
+package org.metplus.curriculum.database.domain;
 
 
 import java.math.BigInteger;
