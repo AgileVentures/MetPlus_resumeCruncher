@@ -9,7 +9,10 @@ import org.metplus.curriculum.database.repository.SettingsRepository;
 import org.metplus.curriculum.init.CruncherInitializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -17,6 +20,7 @@ import java.util.NoSuchElementException;
 /**
  * Created by Joao Pereira on 31/08/2015.
  */
+@Component
 @ConfigurationProperties(locations = "classpath:expressionCruncher.yml",prefix="config")
 public class ExpressionCruncher extends CruncherInitializer {
     private static final String IGNORE_LIST = "IgnoreList";
@@ -53,7 +57,9 @@ public class ExpressionCruncher extends CruncherInitializer {
 
     private CruncherImpl cruncherImpl;
     @Autowired private SettingsRepository repository;
+
     @Override
+    @PostConstruct
     public void init() {
         try {
             try {

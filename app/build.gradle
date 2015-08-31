@@ -12,6 +12,7 @@ mainClassName = 'org.metplus.curriculum.Application'
 dependencies {
     compile project(':database')
     compile project(':core')
+    compile project(':expressionCruncher')
     compile("org.springframework.boot:spring-boot-actuator")
     compile('org.springframework.boot:spring-boot-starter-security')
     compile("org.springframework.boot:spring-boot-starter-web")
