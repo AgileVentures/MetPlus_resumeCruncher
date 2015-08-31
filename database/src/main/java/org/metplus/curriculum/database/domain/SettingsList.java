@@ -1,7 +1,10 @@
 package org.metplus.curriculum.database.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.mongodb.DBObject;
 import org.metplus.curriculum.database.exceptions.MandatorySettingNotPresent;
+import org.metplus.curriculum.database.template.TemplatePackage;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 
 import java.util.ArrayList;
@@ -16,11 +19,13 @@ public class SettingsList extends AbstractDocument{
     /**
      * Storage of all the settings
      */
+    @JsonView(TemplatePackage.class)
     private HashMap<String, Setting> settings;
 
     /**
      * Mandatory settings
      */
+    @JsonView(TemplatePackage.class)
     private List<String> mandatory;
 
     /**
@@ -41,9 +46,18 @@ public class SettingsList extends AbstractDocument{
     }
 
     /**
+     * Add a List of new settings
+     * @param settings Collection of settings
+     */
+    public void setSettings(HashMap<String, Setting> settings) {
+        settings.values().forEach(this::addSetting);
+    }
+
+    /**
      * Retrieve all the settings
      * @return Collection with all settings
      */
+    @JsonIgnore
     public Collection<Setting> getSetting() {
         return settings.values();
     }
@@ -74,12 +88,27 @@ public class SettingsList extends AbstractDocument{
      * @throws MandatorySettingNotPresent When a mandatory setting is not present
      * @return True if all the mandatory settings are present
      */
+    @JsonIgnore
     public boolean isMandatoryPresent() throws MandatorySettingNotPresent {
         for(String name: mandatory) {
             if(settings.get(name) == null)
-                throw new MandatorySettingNotPresent(name);
+                throw new MandatorySettingNotPresent(name, this.getClass().getSimpleName());
         }
         return true;
     }
 
+    @Override
+    public String toString(){
+        String result = "SettingsList: {";
+        result += "settings: {";
+        for(String setting: settings.keySet()) {
+            result += setting + ": " + settings.get(setting) + ",";
+        }
+        result += "}, mandatory: [";
+        for(String setting: mandatory) {
+            result += setting + ",";
+        }
+        result += "]";
+        return result;
+    }
 }

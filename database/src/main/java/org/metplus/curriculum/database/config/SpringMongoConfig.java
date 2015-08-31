@@ -4,6 +4,7 @@ package org.metplus.curriculum.database.config;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import org.metplus.curriculum.config.DatabaseConfig;
+import org.metplus.curriculum.database.converters.ConvertersPackage;
 import org.metplus.curriculum.database.repository.RepositoryPackage;
 import org.metplus.curriculum.database.template.TemplatePackage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,17 +13,20 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.convert.CustomConversions;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import com.mongodb.MongoClient;
 import com.mongodb.WriteConcern;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 @Configuration
 @EnableMongoRepositories(basePackageClasses = RepositoryPackage.class)
-@ComponentScan(basePackageClasses=TemplatePackage.class)
+@ComponentScan(basePackageClasses={TemplatePackage.class, ConvertersPackage.class})
 @EnableAutoConfiguration
 public class SpringMongoConfig extends AbstractMongoConfiguration {
 
@@ -59,5 +63,4 @@ public class SpringMongoConfig extends AbstractMongoConfiguration {
     public MongoTemplate mongoTemplate() throws Exception {
         return new MongoTemplate(mongo(), getDatabaseName());
     }
-
 }

@@ -17,6 +17,12 @@ public class Setting<E> {
 
     /**
      * Class constructor
+     */
+    public Setting() {
+    }
+
+    /**
+     * Class constructor
      * @param name Name of the setting
      * @param data Data on the setting
      */

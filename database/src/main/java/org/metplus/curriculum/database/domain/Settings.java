@@ -1,20 +1,31 @@
 package org.metplus.curriculum.database.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonView;
 import org.metplus.curriculum.database.exceptions.CruncherSettingsNotFound;
 import org.metplus.curriculum.database.exceptions.MandatorySettingNotPresent;
 import org.metplus.curriculum.database.exceptions.SettingNotFound;
+import org.metplus.curriculum.database.template.TemplatePackage;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 @Document(collection="settings")
 @TypeAlias("settings")
-public class Settings extends AbstractDocument {
+public class Settings extends AbstractDocument implements Serializable{
+    private static final long serialVersionUID = -7788619177798124712L;
     private final String CRUNCHER_SETTINGS_NAME = "CRUNCHER_SETTINGS_NAME";
+    @JsonView(TemplatePackage.class)
     private HashMap<String, CruncherSettings> cruncherSettings;
+    @JsonView(TemplatePackage.class)
     private SettingsList appSettings;
 
     /**
@@ -24,6 +35,10 @@ public class Settings extends AbstractDocument {
         super();
         cruncherSettings = new HashMap<>();
         appSettings = new SettingsList();
+        appSettings.addMandatorySetting("test");
+        Setting<String> set = new Setting<>("test", "haha");
+        appSettings.addSetting(set);
+        cruncherSettings.put("bamm", new CruncherSettings("New cruncher"));
     }
 
     /**
@@ -90,5 +105,16 @@ public class Settings extends AbstractDocument {
             settings.isMandatoryPresent();
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        String result = "Settings: {";
+        result += "cruncher: { ";
+        for(String cruncher: cruncherSettings.keySet()) {
+            result += "'" + cruncher + "': " + cruncherSettings.get(cruncher) + ",";
+        }
+        result += "}, app: {" + appSettings + "}";
+        return result;
     }
 }
