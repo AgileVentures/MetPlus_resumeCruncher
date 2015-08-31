@@ -14,21 +14,19 @@ pets-db:
 spring:
   profiles: production
 
-pets:
-  db:
-    name:
-    host:
-    port:
-    username:
-    password:
+pets-db:
+  name:
+  host:
+  port:
+  username:
+  password:
 ---
 spring:
   profiles: unit-test
 
-pets:
-  db:
-    name: expression_counter_db
-    host: ds049651.mongolab.com
-    port: 49651
-    username: testing_user
-    password: testing_user
+pets-db:
+  name: expression_counter_db
+  host: ds049651.mongolab.com
+  port: 49651
+  username: testing_user
+  password: testing_user
