@@ -1,0 +1,16 @@
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://repo.spring.io/release'
+    }
+}
+
+apply plugin: 'spring-boot'
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile project(':core')
+    compile project(':database')
+    compile project(':app')
+    testCompile("junit:junit:4.12")
+}
+

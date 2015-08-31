@@ -68,10 +68,10 @@ public class SettingsTest {
     public void testGetCruncherSettingsException() throws Exception {
         Settings set = new Settings();
         try {
-            set.getCruncherSettings("bamm");
+            set.getCruncherSettings("it shall not exist");
             fail("CruncherSettingsNotFound exception should have been thrown!");
         } catch(CruncherSettingsNotFound e) {
-            assertEquals("Cruncher bamm is not present!", e.getMessage());
+            assertEquals("Cruncher it shall not exist is not present!", e.getMessage());
         }
     }
 

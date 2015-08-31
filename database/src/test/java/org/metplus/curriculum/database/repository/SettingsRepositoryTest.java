@@ -23,8 +23,12 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes = {SpringMongoConfig.class, DatabaseConfig.class})
 public class SettingsRepositoryTest {
     @Autowired private SettingsRepository repository;
-    @After
+    @Before
     public void setUp(){
+        repository.deleteAll();
+    }
+    @After
+    public void tearDown(){
         repository.deleteAll();
     }
 

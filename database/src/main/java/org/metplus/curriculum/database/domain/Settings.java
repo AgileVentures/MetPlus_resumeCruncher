@@ -107,6 +107,14 @@ public class Settings extends AbstractDocument implements Serializable{
         return true;
     }
 
+    /**
+     * Clear all the configuration
+     */
+    public void clear() {
+        cruncherSettings.clear();
+        appSettings.clear();
+    }
+
     @Override
     public String toString() {
         String result = "Settings: {";

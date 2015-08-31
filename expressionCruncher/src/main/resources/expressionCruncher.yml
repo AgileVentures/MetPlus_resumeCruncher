@@ -1,0 +1,15 @@
+config:
+    case-sensitive: false
+    merge-list:
+      "software development":
+        - "software development"
+        - "software development lifecycle"
+      "cook":
+        - "cook"
+        - "line cook"
+    ignore-list:
+      - "a"
+      - "or"
+      - "and"
+      - "then"
+      - "must"

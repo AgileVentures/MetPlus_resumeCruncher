@@ -1,3 +1,4 @@
 rootProject.name = 'cruncher'
 include 'database', 'app', 'core'
+include 'expressionCruncher'
 

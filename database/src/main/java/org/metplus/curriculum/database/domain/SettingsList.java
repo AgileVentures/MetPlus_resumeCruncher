@@ -97,6 +97,14 @@ public class SettingsList extends AbstractDocument{
         return true;
     }
 
+    /**
+     * Clear all the settings
+     */
+    public void clear() {
+        settings.clear();
+        mandatory.clear();
+    }
+
     @Override
     public String toString(){
         String result = "SettingsList: {";
