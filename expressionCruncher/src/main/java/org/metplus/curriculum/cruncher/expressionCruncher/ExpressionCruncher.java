@@ -76,13 +76,14 @@ public class ExpressionCruncher extends CruncherInitializer {
             System.out.println("===================================================================");
             cruncherImpl = new CruncherImpl(ignoreList, mergeList);
             cruncherImpl.setCaseSensitive(caseSensitive);
-            CruncherSettings cSettings = new CruncherSettings(CruncherImpl.CRUNCHER_NAME);
+            /*CruncherSettings cSettings = new CruncherSettings(CruncherImpl.CRUNCHER_NAME);
             cSettings.addSetting(new Setting<>(CASE_SENSITIVE, cruncherImpl.isCaseSensitive()));
             cSettings.addSetting(new Setting<>(IGNORE_LIST, cruncherImpl.getIgnoreList()));
             cSettings.addSetting(new Setting<>(MERGE_LIST, cruncherImpl.getMergeList()));
             Settings globalSettings = repository.findAll().iterator().next();
             globalSettings.addCruncherSettings(CruncherImpl.CRUNCHER_NAME, cSettings);
-            repository.save(globalSettings);
+            repository.save(globalSettings);*/
+            save();
         }
     }
 
@@ -94,6 +95,21 @@ public class ExpressionCruncher extends CruncherInitializer {
     @Override
     public Cruncher getCruncher() {
         return cruncherImpl;
+    }
+
+    public void save() {
+        CruncherSettings cSettings = null;
+        try {
+            cSettings = repository.findAll().iterator().next().getCruncherSettings(CruncherImpl.CRUNCHER_NAME);
+        } catch (CruncherSettingsNotFound cruncherSettingsNotFound) {
+            cSettings = new CruncherSettings(CruncherImpl.CRUNCHER_NAME);
+        }
+        cSettings.addSetting(new Setting<>(CASE_SENSITIVE, cruncherImpl.isCaseSensitive()));
+        cSettings.addSetting(new Setting<>(IGNORE_LIST, cruncherImpl.getIgnoreList()));
+        cSettings.addSetting(new Setting<>(MERGE_LIST, cruncherImpl.getMergeList()));
+        Settings globalSettings = repository.findAll().iterator().next();
+        globalSettings.addCruncherSettings(CruncherImpl.CRUNCHER_NAME, cSettings);
+        repository.save(globalSettings);
     }
 
 }

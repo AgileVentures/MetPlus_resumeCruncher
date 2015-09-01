@@ -15,6 +15,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 @ActiveProfiles("development")
@@ -38,7 +40,7 @@ public class ExpressionCruncherImplTest {
 
 
     @Test
-    public void testBasic() throws CruncherSettingsNotFound {
+    public void checkDefaultSettings() throws CruncherSettingsNotFound {
         Settings set = repository.findAll().iterator().next();
         CruncherSettings cSettings = set.getCruncherSettings(CruncherImpl.CRUNCHER_NAME);
         CruncherImpl cruncherImpl = (CruncherImpl)cruncher.getCruncher();
@@ -46,5 +48,23 @@ public class ExpressionCruncherImplTest {
         assertEquals(2, cruncherImpl.getMergeList().size());
         assertEquals(2, cruncherImpl.getMergeList().get("cook").size());
         assertEquals(5, cruncherImpl.getIgnoreList().size());
+    }
+
+    @Test
+    public void changeDefault() throws CruncherSettingsNotFound {
+        Settings set = repository.findAll().iterator().next();
+        CruncherSettings cSettings = set.getCruncherSettings(CruncherImpl.CRUNCHER_NAME);
+        List<String> ignore = cruncher.getIgnoreList();
+        int totalIgnore = ignore.size();
+        ignore.add("bamm");
+        ignore.add("test");
+        ignore.add("test1");
+        cruncher.setIgnoreList(ignore);
+        cruncher.save();
+        CruncherImpl cruncherImpl = (CruncherImpl)cruncher.getCruncher();
+        assertEquals(false, cruncherImpl.isCaseSensitive());
+        assertEquals(2, cruncherImpl.getMergeList().size());
+        assertEquals(2, cruncherImpl.getMergeList().get("cook").size());
+        assertEquals(totalIgnore+3, cruncherImpl.getIgnoreList().size());
     }
 }
