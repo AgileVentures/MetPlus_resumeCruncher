@@ -30,6 +30,12 @@ task copyLicense {
     }
 }
 
+
+task startCruncher <<{
+    bootRun { systemProperty "spring.profiles.active", System.env.SPRING_PROFILES_ACTIVE != null ? System.env.SPRING_PROFILES_ACTIVE : "development" }
+}
+startCruncher.finalizedBy bootRun
+
 applicationDistribution.from(copyLicense) {
     into ""
 }

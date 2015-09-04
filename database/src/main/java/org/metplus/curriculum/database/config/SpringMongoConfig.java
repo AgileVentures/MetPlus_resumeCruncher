@@ -40,14 +40,28 @@ public class SpringMongoConfig extends AbstractMongoConfiguration {
     @Override
     @Bean
     public MongoClient mongo() throws Exception {
+        if(dbConfig.asAuthentication())
+            return withAuthentication();
+        else
+            return withoutAuthentication();
+    }
+    private MongoClient withAuthentication()  throws Exception {
         MongoCredential a = MongoCredential.createCredential(dbConfig.getUsername(),
-                                                             getDatabaseName(),
-                                                             dbConfig.getPassword().toCharArray());
+                getDatabaseName(),
+                dbConfig.getPassword().toCharArray());
         ArrayList<MongoCredential> arr = new ArrayList<>();
         arr.add(a);
         ServerAddress addr = new ServerAddress(dbConfig.getHost(),
-                                               dbConfig.getPort());
+                dbConfig.getPort());
+
         MongoClient client = new MongoClient(addr, arr);
+        client.setWriteConcern(WriteConcern.SAFE);
+        return client;
+    }
+    private MongoClient withoutAuthentication()  throws Exception {
+        ServerAddress addr = new ServerAddress(dbConfig.getHost(),
+                dbConfig.getPort());
+        MongoClient client = new MongoClient(addr);
         client.setWriteConcern(WriteConcern.SAFE);
         return client;
     }

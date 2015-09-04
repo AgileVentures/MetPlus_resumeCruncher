@@ -30,6 +30,8 @@ targetCompatibility = 1.8
 dependencies {
 }
 
+//System.env.SPRING_PROFILES_ACTIVE = System.env.SPRING_PROFILES_ACTIVE != null ? System.env.SPRING_PROFILES_ACTIVE : "development"
+
 subprojects {
     apply plugin: 'java'
     apply plugin: 'idea'
@@ -44,19 +46,21 @@ subprojects {
     dependencies {
         compile('org.springframework.data:spring-data-mongodb:1.7.2.RELEASE')
         testCompile("junit:junit")
-        compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.3'
-        compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.3'
+        //compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.3'
+        //compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.3'
         //testCompile group: 'org.springframework', name: 'spring-test', version: springversion
         testCompile("org.springframework:spring-test:4.2.0.RELEASE")
 
     }
     test {
+        environment 'SPRING_PROFILES_ACTIVE', System.env.SPRING_PROFILES_ACTIVE != null ? System.env.SPRING_PROFILES_ACTIVE : "development"
         testLogging {
             events "passed", "skipped", "failed", "standardOut", "standardError"
         }
         dependsOn 'cleanTest'
     }
 }
+
 
 task copyLicense {
     outputs.file new File("$buildDir/LICENSE.md")
@@ -67,6 +71,7 @@ task copyLicense {
         }
     }
 }
+
 
 applicationDistribution.from(copyLicense) {
     into ""

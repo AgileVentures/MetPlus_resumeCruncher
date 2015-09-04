@@ -21,7 +21,6 @@ import java.util.Collection;
 /**
  * Created by Joao Pereira on 19/08/2015.
  */
-@ActiveProfiles("development")
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {SpringMongoConfig.class, DatabaseConfig.class})
 public class CruncherSettingsTest {
