@@ -1,0 +1,14 @@
+language: java
+
+jdk:
+  - oraclejdk8
+
+os:
+  - linux
+
+services:
+  - mongodb
+
+env:
+  global:
+    - SPRING_PROFILES_ACTIVE="unit-test"
