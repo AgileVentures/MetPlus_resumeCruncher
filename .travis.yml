@@ -12,3 +12,6 @@ services:
 env:
   global:
     - SPRING_PROFILES_ACTIVE="unit-test"
+
+before_install:
+ - chmod +x gradlew
