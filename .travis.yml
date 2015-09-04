@@ -16,4 +16,4 @@ env:
 before_install:
  - chmod +x gradlew
 
-install: gradlew :app:assemble
+install: ./gradlew :app:assemble
