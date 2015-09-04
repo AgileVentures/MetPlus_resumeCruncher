@@ -22,13 +22,11 @@ public class CruncherSettings extends SettingsList {
     public CruncherSettings() {
         super();
         addMandatorySetting(NAME_SETTING);
-        LOG.info("Called default constructor");
     }
 
     public CruncherSettings(String name) {
         super();
         addMandatorySetting(NAME_SETTING);
-        LOG.info("Called other constructor");
         Setting setting = new Setting<>(NAME_SETTING, name);
         addSetting(setting);
     }

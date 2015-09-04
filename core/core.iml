@@ -12,10 +12,9 @@
       <excludeFolder url="file://$MODULE_DIR$/.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
     </content>
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="Gradle: org.springframework.data:spring-data-mongodb:1.7.2.RELEASE" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: org.apache.logging.log4j:log4j-api:2.3" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: org.apache.logging.log4j:log4j-core:2.3" level="project" />
     <orderEntry type="library" exported="" name="Gradle: org.springframework.boot:spring-boot-starter-web:1.2.5.RELEASE" level="project" />
     <orderEntry type="library" exported="" name="Gradle: org.springframework:spring-tx:4.0.9.RELEASE" level="project" />
     <orderEntry type="library" exported="" name="Gradle: org.springframework.data:spring-data-commons:1.10.2.RELEASE" level="project" />

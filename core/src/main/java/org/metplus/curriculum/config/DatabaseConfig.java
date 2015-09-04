@@ -11,7 +11,7 @@ import javax.annotation.PostConstruct;
  * Created by Joao Pereira on 27/08/2015.
  */
 @Component
-@ConfigurationProperties(locations = "classpath:database.yml",prefix="pets-db")
+@ConfigurationProperties(locations = {"classpath:database.yml"},prefix="pets-db")
 public class DatabaseConfig {
 
     private String name;
@@ -66,8 +66,4 @@ public class DatabaseConfig {
     public boolean asAuthentication() {return !(username == null);}
 
     private static final Logger LOG = LoggerFactory.getLogger(DatabaseConfig.class);
-    @PostConstruct
-    public void xxx() {
-        LOG.info("Initialized [{}] [{}]", username, password);
-    }
 }

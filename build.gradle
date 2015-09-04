@@ -46,8 +46,8 @@ subprojects {
     dependencies {
         compile('org.springframework.data:spring-data-mongodb:1.7.2.RELEASE')
         testCompile("junit:junit")
-        compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.3'
-        compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.3'
+        //compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.3'
+        //compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.3'
         //testCompile group: 'org.springframework', name: 'spring-test', version: springversion
         testCompile("org.springframework:spring-test:4.2.0.RELEASE")
 
