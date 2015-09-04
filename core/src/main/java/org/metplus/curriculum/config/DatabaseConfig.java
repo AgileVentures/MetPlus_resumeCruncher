@@ -63,6 +63,8 @@ public class DatabaseConfig {
         return host;
     }
 
+    public boolean asAuthentication() {return !(username == null);}
+
     private static final Logger LOG = LoggerFactory.getLogger(DatabaseConfig.class);
     @PostConstruct
     public void xxx() {

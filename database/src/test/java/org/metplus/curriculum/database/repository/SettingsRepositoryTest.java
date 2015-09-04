@@ -16,9 +16,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import static org.junit.Assert.*;
-
-
-@ActiveProfiles("development")
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {SpringMongoConfig.class, DatabaseConfig.class})
 public class SettingsRepositoryTest {

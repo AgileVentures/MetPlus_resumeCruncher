@@ -30,6 +30,8 @@ targetCompatibility = 1.8
 dependencies {
 }
 
+//System.env.SPRING_PROFILES_ACTIVE = System.env.SPRING_PROFILES_ACTIVE != null ? System.env.SPRING_PROFILES_ACTIVE : "development"
+
 subprojects {
     apply plugin: 'java'
     apply plugin: 'idea'
@@ -51,12 +53,14 @@ subprojects {
 
     }
     test {
+        environment 'SPRING_PROFILES_ACTIVE', System.env.SPRING_PROFILES_ACTIVE != null ? System.env.SPRING_PROFILES_ACTIVE : "development"
         testLogging {
             events "passed", "skipped", "failed", "standardOut", "standardError"
         }
         dependsOn 'cleanTest'
     }
 }
+
 
 task copyLicense {
     outputs.file new File("$buildDir/LICENSE.md")
@@ -67,6 +71,7 @@ task copyLicense {
         }
     }
 }
+
 
 applicationDistribution.from(copyLicense) {
     into ""
