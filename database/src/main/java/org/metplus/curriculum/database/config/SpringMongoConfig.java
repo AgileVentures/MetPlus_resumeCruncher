@@ -37,6 +37,7 @@ public class SpringMongoConfig extends AbstractMongoConfiguration {
         return dbConfig.getName();
     }
 
+
     @Override
     @Bean
     public MongoClient mongo() throws Exception {
