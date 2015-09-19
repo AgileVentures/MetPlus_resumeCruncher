@@ -50,6 +50,7 @@ subprojects {
         //compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.3'
         //testCompile group: 'org.springframework', name: 'spring-test', version: springversion
         testCompile("org.springframework:spring-test:4.2.0.RELEASE")
+        testCompile('org.mockito:mockito-all:1.10.19')
 
     }
     test {

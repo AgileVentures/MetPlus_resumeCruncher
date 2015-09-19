@@ -8,6 +8,8 @@ repositories {
 apply plugin: 'spring-boot'
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.apache.tika:tika-parsers:1.10")
+    testCompile('com.google.guava:guava:18.0')
     testCompile("junit:junit:4.12")
 }
 
