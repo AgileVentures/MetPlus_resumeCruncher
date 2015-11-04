@@ -40,14 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
-/**
- * Created by Joao Pereira on 31/08/2015.
- */
-@ActiveProfiles("development")
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {SpringMongoConfig.class, DatabaseConfig.class, AdminController.class})
-@WebAppConfiguration
-public class AdminControllerTest {
+public class AdminControllerTest  extends BaseControllerTest {
 
     public static final Logger logger = LoggerFactory.getLogger(AdminControllerTest.class);
     @Autowired private SettingsRepository repository;
@@ -56,6 +49,7 @@ public class AdminControllerTest {
     private WebApplicationContext ctx;
 
     private Settings before;
+
     @Before
     public void setUp() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
