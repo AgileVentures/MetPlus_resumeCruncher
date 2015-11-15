@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 
 import static org.junit.Assert.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -38,19 +39,20 @@ public class CurriculumControllerTest extends BaseControllerTest{
     @Test
     public void testUploadCurriculum() throws Exception {
         final InputStream file = getClass().getClassLoader().getResourceAsStream("line_with_bold.pdf");
-        final MockMultipartFile multipartFile = new MockMultipartFile("aMultiPartFile.txt", file);
+        final MockMultipartFile multipartFile = new MockMultipartFile("file", file);
 
         MockHttpServletResponse response = mockMvc
-                .perform(post("/api/v1/curriculum/upload")
+                .perform(fileUpload("/api/v1/curriculum/upload")
+                        .file(multipartFile)
                         .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .requestAttr("userId", "asdasdasd")
-                        .requestAttr("name", "line_with_bold.pdf")
-                        .requestAttr("file", multipartFile.getBytes()))
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .param("userId", "asdasdasd")
+                        .param("name", "line_with_bold.pdf")
+                        )
                 .andReturn()
                 .getResponse();
         System.out.println("bamm:" + response.getStatus());
         System.out.println("bamm:" + response.getContentAsString());
-        System.out.println();
+        System.out.println("bamm:" + response.getErrorMessage());
     }
 }
