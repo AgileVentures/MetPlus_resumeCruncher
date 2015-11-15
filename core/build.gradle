@@ -13,3 +13,6 @@ dependencies {
     testCompile("junit:junit:4.12")
 }
 
+test {
+    exclude '**/BaseControllerTest.class'
+}
