@@ -21,6 +21,8 @@ import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Created by Joao Pereira on 03/11/2015.
@@ -49,8 +51,13 @@ public class CurriculumControllerTest extends BaseControllerTest{
                         .param("userId", "asdasdasd")
                         .param("name", "line_with_bold.pdf")
                         )
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
+
+        assertEquals("The status of not the expected", 200, response.getStatus());
+
         System.out.println("bamm:" + response.getStatus());
         System.out.println("bamm:" + response.getContentAsString());
         System.out.println("bamm:" + response.getErrorMessage());
