@@ -32,6 +32,7 @@ public class SpringMongoConfig extends AbstractMongoConfiguration {
 
     @Autowired
     private DatabaseConfig dbConfig;
+
     @Override
     protected String getDatabaseName() {
         return dbConfig.getName();

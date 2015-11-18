@@ -1,9 +1,12 @@
 package org.metplus.curriculum.web.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.ByteStreams;
 import org.junit.Before;
 import org.junit.Test;
 import org.metplus.curriculum.database.domain.Setting;
+import org.metplus.curriculum.web.GenericAnswer;
+import org.metplus.curriculum.web.ResultCodes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -52,14 +55,13 @@ public class CurriculumControllerTest extends BaseControllerTest{
                         .param("name", "line_with_bold.pdf")
                         )
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                 .andReturn()
                 .getResponse();
 
         assertEquals("The status of not the expected", 200, response.getStatus());
 
-        System.out.println("bamm:" + response.getStatus());
-        System.out.println("bamm:" + response.getContentAsString());
-        System.out.println("bamm:" + response.getErrorMessage());
+        GenericAnswer answer = new ObjectMapper().readValue(response.getContentAsString(), GenericAnswer.class);
+        assertEquals("Result code is not correct", ResultCodes.SUCCESS, answer.getResultCode());
     }
 }

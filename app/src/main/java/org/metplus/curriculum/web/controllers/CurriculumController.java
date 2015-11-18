@@ -33,6 +33,7 @@ public class CurriculumController {
 
         Resume resume = resumeRepository.findOne(id);
         if(resume == null) {
+            LOG.debug("No previous resume on the system");
             resume = new Resume(id);
         }
         if (!file.isEmpty()) {
@@ -43,10 +44,14 @@ public class CurriculumController {
                 answer.setMessage("File uploaded successfully");
                 answer.setResultCode(ResultCodes.SUCCESS);
             } catch (Exception e) {
+                System.out.println(e.getStackTrace());
+                e.printStackTrace();
                 answer.setMessage("Error uploading the file: " + e.getMessage());
                 answer.setResultCode(ResultCodes.FATAL_ERROR);
+                LOG.warn("Error uploading file: '" + name + "' of user: '" + id + "': " + e.getMessage());
             }
         } else {
+            LOG.info("File: '" + name + "' of user: '" + id + "' is empty!");
             answer.setResultCode(ResultCodes.FATAL_ERROR);
             answer.setMessage("File is empty");
         }

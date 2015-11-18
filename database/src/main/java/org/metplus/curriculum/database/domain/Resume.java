@@ -88,6 +88,7 @@ public class Resume extends AbstractDocument {
             inputFile.setFilename(filename);
             inputFile.save();
         } catch (Exception e) {
+            e.printStackTrace();
             throw new CurriculumException("Error while saving the resume to the database: " + e.getMessage());
         }
     }
