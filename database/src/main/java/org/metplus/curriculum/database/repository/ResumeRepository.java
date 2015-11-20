@@ -1,6 +1,5 @@
 package org.metplus.curriculum.database.repository;
 
-import org.metplus.curriculum.database.domain.CruncherSettings;
 import org.metplus.curriculum.database.domain.Resume;
 import org.springframework.data.repository.CrudRepository;
 

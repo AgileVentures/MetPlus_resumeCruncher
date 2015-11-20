@@ -26,8 +26,8 @@ import java.util.Collections;
 
 @Configuration
 @EnableMongoRepositories(basePackageClasses = RepositoryPackage.class)
-@ComponentScan(basePackageClasses={TemplatePackage.class, ConvertersPackage.class})
 @EnableAutoConfiguration
+@ComponentScan(basePackages={"org.metplus.curriculum.database"})
 public class SpringMongoConfig extends AbstractMongoConfiguration {
 
     @Autowired

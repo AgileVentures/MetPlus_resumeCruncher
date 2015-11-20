@@ -2,8 +2,11 @@ package org.metplus.curriculum.web.controllers;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.metplus.curriculum.Application;
 import org.metplus.curriculum.config.DatabaseConfig;
 import org.metplus.curriculum.database.config.SpringMongoConfig;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -17,6 +20,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {SpringMongoConfig.class, DatabaseConfig.class, AdminController.class, CurriculumController.class})
 @WebAppConfiguration
+@SpringBootApplication
+@SpringApplicationConfiguration(classes = Application.class)
 public class BaseControllerTest {
 
     @Test
