@@ -7,5 +7,6 @@ public enum ResultCodes {
 
     SUCCESS,
     ACCESS_DENIED,
-    FATAL_ERROR;
+    FATAL_ERROR,
+    RESUME_NOT_FOUND;
 }

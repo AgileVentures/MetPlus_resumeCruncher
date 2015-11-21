@@ -28,10 +28,6 @@ public class Resume extends AbstractDocument {
 
     private HashMap<String, HashMap<String, MetaDataField>> metaData;
 
-
-    @Autowired
-    SpringMongoConfig dbConfig;
-
     @Autowired
     private GridFsOperations gridOperation;
 
@@ -46,7 +42,7 @@ public class Resume extends AbstractDocument {
      * @throws ResumeNotFound When the resume is not found
      * @throws ResumeReadException When a error occur while reading file from disk
      */
-    public ByteArrayOutputStream getResume() throws ResumeNotFound, ResumeReadException {
+    public ByteArrayOutputStream getResume(SpringMongoConfig dbConfig) throws ResumeNotFound, ResumeReadException {
         try {
             BasicDBObject query = new BasicDBObject();
             query.put("_id", userId);
@@ -79,7 +75,7 @@ public class Resume extends AbstractDocument {
      * @param fileInputStream File content
      * @throws CurriculumException When an error is raised while saving
      */
-    public void setResume(InputStream fileInputStream) throws CurriculumException {
+    public void setResume(InputStream fileInputStream, SpringMongoConfig dbConfig) throws CurriculumException {
         try {
             GridFS fileStore = new GridFS(dbConfig.mongoTemplate().getDb(), "filestore");
             BasicDBObject query = new BasicDBObject();
