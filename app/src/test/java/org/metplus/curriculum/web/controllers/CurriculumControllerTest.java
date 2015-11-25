@@ -64,4 +64,29 @@ public class CurriculumControllerTest extends BaseControllerTest{
         GenericAnswer answer = new ObjectMapper().readValue(response.getContentAsString(), GenericAnswer.class);
         assertEquals("Result code is not correct", ResultCodes.SUCCESS, answer.getResultCode());
     }
+    @Test
+    public void testDownloadCurriculum() throws Exception {
+        final InputStream file = getClass().getClassLoader().getResourceAsStream("line_with_bold.pdf");
+        final MockMultipartFile multipartFile = new MockMultipartFile("file", file);
+
+        MockHttpServletResponse response = mockMvc.perform(
+                        get("/api/v1/curriculum/asdasdasd"))
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType("application/octet-stream"))
+                    .andReturn().getResponse();
+        assertEquals("The status of not the expected", 200, response.getStatus());
+
+    }
+
+    @Test
+    public void testUnableToFindCurriculumDownloadCurriculum() throws Exception {
+
+        MockHttpServletResponse response = mockMvc.perform(get("/api/v1/curriculum/notpresentuser"))
+                    .andExpect(status().isOk())
+                    .andReturn().getResponse();
+
+
+        GenericAnswer answer = new ObjectMapper().readValue(response.getContentAsString(), GenericAnswer.class);
+        assertEquals("Result code is not correct", ResultCodes.RESUME_NOT_FOUND, answer.getResultCode());
+    }
 }
