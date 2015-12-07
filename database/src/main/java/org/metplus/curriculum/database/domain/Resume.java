@@ -11,6 +11,7 @@ import org.metplus.curriculum.database.exceptions.ResumeReadException;
 import org.metplus.curriculum.exceptions.CurriculumException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.gridfs.GridFsOperations;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -27,9 +28,8 @@ public class Resume extends AbstractDocument {
 
     private HashMap<String, HashMap<String, MetaDataField>> metaData;
 
-
     @Autowired
-    SpringMongoConfig dbConfig;
+    private GridFsOperations gridOperation;
 
     public Resume(String userId) {
         super();
@@ -42,7 +42,7 @@ public class Resume extends AbstractDocument {
      * @throws ResumeNotFound When the resume is not found
      * @throws ResumeReadException When a error occur while reading file from disk
      */
-    public ByteArrayOutputStream getResume() throws ResumeNotFound, ResumeReadException {
+    public ByteArrayOutputStream getResume(SpringMongoConfig dbConfig) throws ResumeNotFound, ResumeReadException {
         try {
             BasicDBObject query = new BasicDBObject();
             query.put("_id", userId);
@@ -75,7 +75,7 @@ public class Resume extends AbstractDocument {
      * @param fileInputStream File content
      * @throws CurriculumException When an error is raised while saving
      */
-    public void setResume(InputStream fileInputStream) throws CurriculumException {
+    public void setResume(InputStream fileInputStream, SpringMongoConfig dbConfig) throws CurriculumException {
         try {
             GridFS fileStore = new GridFS(dbConfig.mongoTemplate().getDb(), "filestore");
             BasicDBObject query = new BasicDBObject();
@@ -88,6 +88,7 @@ public class Resume extends AbstractDocument {
             inputFile.setFilename(filename);
             inputFile.save();
         } catch (Exception e) {
+            e.printStackTrace();
             throw new CurriculumException("Error while saving the resume to the database: " + e.getMessage());
         }
     }
