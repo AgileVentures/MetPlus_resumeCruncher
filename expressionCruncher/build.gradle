@@ -10,7 +10,6 @@ dependencies {
     testCompile("org.springframework.boot:spring-boot-starter-web")
     compile project(':core')
     compile project(':database')
-    testCompile project(':app')
     testCompile("junit:junit:4.12")
 }
 

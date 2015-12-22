@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/admin")
+@RequestMapping(BaseController.baseUrl + "/admin")
 public class AdminController {
     private static final Logger LOG = LoggerFactory.getLogger(AdminController.class);
     @Autowired

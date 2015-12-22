@@ -8,14 +8,15 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 
 public abstract class AbstractDocument {
-    @Id private BigInteger documentId;
+    @Id
+    private BigInteger _id;
 
     public void setId(BigInteger id) {
-        this.documentId = id;
+        this._id = id;
     }
 
     public BigInteger getId() {
-        return documentId;
+        return _id;
     }
 
 }

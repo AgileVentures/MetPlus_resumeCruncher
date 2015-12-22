@@ -39,15 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
-
-/**
- * Created by Joao Pereira on 31/08/2015.
- */
-@ActiveProfiles("development")
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {SpringMongoConfig.class, DatabaseConfig.class, AdminController.class})
-@WebAppConfiguration
-public class AdminControllerTest {
+public class AdminControllerTest  extends BaseControllerTest {
 
     public static final Logger logger = LoggerFactory.getLogger(AdminControllerTest.class);
     @Autowired private SettingsRepository repository;
@@ -56,6 +48,7 @@ public class AdminControllerTest {
     private WebApplicationContext ctx;
 
     private Settings before;
+
     @Before
     public void setUp() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
@@ -70,7 +63,7 @@ public class AdminControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        MockHttpServletResponse response = mockMvc.perform(get("/admin/settings").accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+        MockHttpServletResponse response = mockMvc.perform(get("/api/v1/admin/settings").accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
         Settings set = mapper.readValue(response.getContentAsByteArray(), Settings.class);
 
         assertEquals("Value", set.getApplicationSetting("simple test").getData());
@@ -82,10 +75,10 @@ public class AdminControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        MockHttpServletResponse response = mockMvc.perform(get("/admin/settings").accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+        MockHttpServletResponse response = mockMvc.perform(get("/api/v1/admin/settings").accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
         Settings set = mapper.readValue(response.getContentAsByteArray(), Settings.class);
         String strSet = mapper.writeValueAsString(set);
-        mockMvc.perform(post("/admin/settings").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/api/v1/admin/settings").contentType(MediaType.APPLICATION_JSON)
                         .content(strSet))
                 .andExpect(status().isOk());
 
@@ -97,11 +90,11 @@ public class AdminControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        MockHttpServletResponse response = mockMvc.perform(get("/admin/settings").accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+        MockHttpServletResponse response = mockMvc.perform(get("/api/v1/admin/settings").accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
         Settings set = mapper.readValue(response.getContentAsByteArray(), Settings.class);
         set.addApplicationSetting(new Setting<>("shall update", 1));
         String strSet = mapper.writeValueAsString(set);
-        mockMvc.perform(post("/admin/settings").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/api/v1/admin/settings").contentType(MediaType.APPLICATION_JSON)
                 .content(strSet))
                 .andExpect(status().isOk());
 
@@ -116,12 +109,12 @@ public class AdminControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        MockHttpServletResponse response = mockMvc.perform(get("/admin/settings").accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+        MockHttpServletResponse response = mockMvc.perform(get("/api/v1/admin/settings").accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
         Settings set = mapper.readValue(response.getContentAsByteArray(), Settings.class);
         set.addCruncherSettings("error not found", new CruncherSettings());
         String strSet = mapper.writeValueAsString(set);
 
-        mockMvc.perform(post("/admin/settings").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/api/v1/admin/settings").contentType(MediaType.APPLICATION_JSON)
                 .content(strSet))
                 .andExpect(status().is4xxClientError());
 
