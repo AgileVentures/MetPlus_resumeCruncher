@@ -30,6 +30,9 @@ task copyLicense {
     }
 }
 
+group: "org.metplus"
+name: "curriculum"
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
