@@ -5,6 +5,10 @@ spring:
     log4j.logger.org.hibernate: ERROR
     log4j.logger.com.mongodb: SEVERE
 
+backend.admin.username: backend_admin
+backend.admin.password: backendpassword
+backend.admin.role: BACKEND_ADMIN
+
 ---
 
 spring:
@@ -16,7 +20,7 @@ server:
     key-store: keystore.p12
     key-store-password: mypassword
     keyStoreType: PKCS12
-    keyAlias: tomcat
+    keyAlias: tcserver
 
 ---
 spring:

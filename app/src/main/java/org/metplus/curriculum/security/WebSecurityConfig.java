@@ -9,7 +9,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 /**
  * Created by Joao Pereira on 28/08/2015.
  */
-@Configuration
+//  @Configuration
 public class WebSecurityConfig {
 
     @Bean
