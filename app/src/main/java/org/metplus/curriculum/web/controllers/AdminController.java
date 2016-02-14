@@ -16,7 +16,6 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping(BaseController.baseUrl + "/admin")
-@PreAuthorize("hasAuthority('ROLE_DOMAIN_USER')")
 public class AdminController {
     private static final Logger LOG = LoggerFactory.getLogger(AdminController.class);
     @Autowired
@@ -25,6 +24,7 @@ public class AdminController {
     @RequestMapping(value = "/settings", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Settings> mainPage() {
+        LOG.debug("mainPage()");
         if(0 == repository.count()){
             repository.save(new Settings());
         }
