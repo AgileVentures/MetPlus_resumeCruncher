@@ -26,7 +26,6 @@ public class BackendAdminUsernamePasswordAuthenticationProvider implements Authe
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         Optional<String> username = (Optional) authentication.getPrincipal();
         Optional<String> password = (Optional) authentication.getCredentials();
-        logger.info("Authenticate({}, {})", username, password);
 
         if (credentialsMissing(username, password) || credentialsInvalid(username, password)) {
             throw new BadCredentialsException(INVALID_BACKEND_ADMIN_CREDENTIALS);
@@ -41,15 +40,10 @@ public class BackendAdminUsernamePasswordAuthenticationProvider implements Authe
     }
 
     private boolean credentialsInvalid(Optional<String> username, Optional<String> password) {
-        logger.info("Authenticate({}, {})", username, password);
-        logger.info("is user admin? {}", !isBackendAdmin(username.get()));
-        logger.info("is password admin? {}", !password.get().equals(backendAdminPassword));
         return !isBackendAdmin(username.get()) || !password.get().equals(backendAdminPassword);
     }
 
     private boolean isBackendAdmin(String username) {
-        logger.info("isBackendAdmin({})", username);
-        logger.info("is admin? {}", backendAdminUsername.equals(username));
         return backendAdminUsername.equals(username);
     }
 
