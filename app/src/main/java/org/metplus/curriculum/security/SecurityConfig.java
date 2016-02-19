@@ -1,6 +1,6 @@
 package org.metplus.curriculum.security;
 
-import org.metplus.curriculum.web.BasicUserAuthenticator;
+import org.metplus.curriculum.security.service.BasicUserAuthenticator;
 import org.metplus.curriculum.web.controllers.BaseController;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -1,4 +1,4 @@
-package org.metplus.curriculum.web;
+package org.metplus.curriculum.security.service;
 
 import org.metplus.curriculum.security.AuthenticationWithToken;
 import org.springframework.security.core.GrantedAuthority;

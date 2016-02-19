@@ -40,7 +40,10 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 task startCruncher <<{
-    bootRun { systemProperty "spring.profiles.active", System.env.SPRING_PROFILES_ACTIVE != null ? System.env.SPRING_PROFILES_ACTIVE : "development" }
+    bootRun { 
+        systemProperties = System.properties
+	systemProperty "spring.profiles.active", System.env.SPRING_PROFILES_ACTIVE != null ? System.env.SPRING_PROFILES_ACTIVE : "development" 
+    }
 }
 startCruncher.finalizedBy bootRun
 

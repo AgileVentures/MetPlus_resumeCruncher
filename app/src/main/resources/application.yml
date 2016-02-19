@@ -20,6 +20,10 @@ server:
     keyStoreType: PKCS12
     keyAlias: tcserver
 
+backend:
+  admin:
+    username: backend_admin
+    password: backendpassword
 ---
 spring:
   profiles: production
@@ -31,6 +35,12 @@ server:
     key-store-password:
     keyStoreType:
     keyAlias:
+
+backend:
+  admin:
+    username: ${username}
+    password: ${password}
+
 ---
 spring:
   profiles: unit-test
@@ -42,5 +52,8 @@ server:
     key-store-password: mypassword
     keyStoreType: PKCS12
     keyAlias: tomcat
-backend.admin.username: backend_admin
-backend.admin.password: backendpassword
+
+backend:
+  admin:
+    username: backend_admin
+    password: backendpassword

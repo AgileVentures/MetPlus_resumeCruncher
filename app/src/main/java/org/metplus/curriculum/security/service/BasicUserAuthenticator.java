@@ -1,13 +1,10 @@
-package org.metplus.curriculum.web;
+package org.metplus.curriculum.security.service;
 
-import com.google.common.base.Optional;
 import org.metplus.curriculum.security.AuthenticationWithToken;
-import org.metplus.curriculum.security.BackendAdminUsernamePasswordAuthenticationProvider;
 import org.metplus.curriculum.security.ExternalServiceAuthenticator;
 import org.metplus.curriculum.web.controllers.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.authority.AuthorityUtils;
