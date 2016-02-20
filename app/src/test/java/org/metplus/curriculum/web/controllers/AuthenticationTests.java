@@ -17,7 +17,7 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class AuthenticationTests {
+public class AuthenticationTests extends BaseControllerTest {
 
     public static final Logger logger = LoggerFactory.getLogger(AdminControllerTest.class);
     @Autowired
@@ -33,6 +33,6 @@ public class AuthenticationTests {
 
         MockHttpServletResponse response = mockMvc.perform(get("/api/v1/authenticate")
                                     .accept(MediaType.APPLICATION_JSON))
-                                    .andExpect(status().isOk()).andReturn().getResponse();
+                                    .andExpect(status().is4xxClientError()).andReturn().getResponse();
     }
 }
