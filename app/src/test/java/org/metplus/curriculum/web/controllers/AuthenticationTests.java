@@ -29,10 +29,25 @@ public class AuthenticationTests extends BaseControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    public void test() throws Exception {
-
+    public void noUserNoPassword() throws Exception {
         MockHttpServletResponse response = mockMvc.perform(get("/api/v1/authenticate")
                                     .accept(MediaType.APPLICATION_JSON))
                                     .andExpect(status().is4xxClientError()).andReturn().getResponse();
+    }
+    @Test
+    public void userNoPassword() throws Exception {
+        MockHttpServletResponse response = mockMvc.perform(get("/api/v1/authenticate")
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .header("X-Auth-Username", "backend_admin"))
+                                    .andExpect(status().is4xxClientError()).andReturn().getResponse();
+    }
+    @Test
+    public void userPassword() throws Exception {
+        MockHttpServletResponse response = mockMvc.perform(get("/api/v1/authenticate")
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .header("X-Auth-Username", "backend_admin")
+                                    .header("X-Auth-Password", "backendpassword"))
+                                    .andExpect(status().is2xxSuccessful())
+                                    .andReturn().getResponse();
     }
 }
