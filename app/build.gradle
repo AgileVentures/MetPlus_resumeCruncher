@@ -16,6 +16,12 @@ dependencies {
     compile("org.springframework.boot:spring-boot-actuator")
     compile('org.springframework.boot:spring-boot-starter-security')
     compile("org.springframework.boot:spring-boot-starter-web")
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
+    compile 'org.springframework.boot:spring-boot-starter-aop'
+    compile('net.sf.ehcache:ehcache-core:2.6.9') {
+        exclude group: 'commons-logging'
+    }
+    compile 'com.google.guava:guava:18.0'
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
 
@@ -34,7 +40,10 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 task startCruncher <<{
-    bootRun { systemProperty "spring.profiles.active", System.env.SPRING_PROFILES_ACTIVE != null ? System.env.SPRING_PROFILES_ACTIVE : "development" }
+    bootRun { 
+        systemProperties = System.properties
+	systemProperty "spring.profiles.active", System.env.SPRING_PROFILES_ACTIVE != null ? System.env.SPRING_PROFILES_ACTIVE : "development" 
+    }
 }
 startCruncher.finalizedBy bootRun
 

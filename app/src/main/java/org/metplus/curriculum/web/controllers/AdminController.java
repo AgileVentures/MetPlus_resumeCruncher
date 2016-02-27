@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -23,6 +24,7 @@ public class AdminController {
     @RequestMapping(value = "/settings", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Settings> mainPage() {
+        LOG.debug("mainPage()");
         if(0 == repository.count()){
             repository.save(new Settings());
         }
