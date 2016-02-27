@@ -24,7 +24,8 @@ public class BasicUserAuthenticator implements ExternalServiceAuthenticator {
     private String backendAdminPassword;
     @Override
     public AuthenticationWithToken authenticate(String username, String password) {
-        logger.info("authenticate({}, {})", username, password);
+        logger.error("authenticate({}, {})", username, password);
+        System.out.println("authenticate(" + username + ", " + password+ ")");
         if(credentialsInvalid(username, password)) {
             throw new BadCredentialsException(INVALID_BACKEND_ADMIN_CREDENTIALS);
         }
