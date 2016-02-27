@@ -1,5 +1,6 @@
 package org.metplus.curriculum.web.controllers;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.metplus.curriculum.Application;

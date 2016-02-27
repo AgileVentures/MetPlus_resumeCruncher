@@ -1,4 +1,4 @@
-rootProject.name = 'cruncher'
+rootProject.name = 'org.metplus.cruncher'
 include 'database', 'app', 'core'
 include 'expressionCruncher'
 

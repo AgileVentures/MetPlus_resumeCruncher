@@ -4,16 +4,23 @@ package org.metplus.curriculum.web.controllers;
  * Created by joao on 2/18/16.
  */
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.restdocs.RestDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -23,9 +30,16 @@ public class AuthenticationTests extends BaseControllerTest {
     public static final Logger logger = LoggerFactory.getLogger(AdminControllerTest.class);
     @Autowired
     private WebApplicationContext ctx;
+    @Rule
+    public RestDocumentation restDocumentation = new RestDocumentation("build/generated-snippets");
     @Before
     public void setUp() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx)
+                .apply(documentationConfiguration(this.restDocumentation))
+                .alwaysDo(document("{method-name}/{step}/",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint())))
+                .build();
     }
     private MockMvc mockMvc;
 

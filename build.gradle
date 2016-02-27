@@ -26,6 +26,8 @@ repositories {
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+group = 'org.metplus'
+version = '0.1.0'
 
 dependencies {
 }
@@ -82,4 +84,6 @@ applicationDistribution.from(copyLicense) {
 task wrapper(type: Wrapper) {
     gradleVersion = '2.3'
 }
+
+
 

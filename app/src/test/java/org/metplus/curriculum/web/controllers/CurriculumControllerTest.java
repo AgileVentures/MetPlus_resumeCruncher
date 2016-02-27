@@ -3,6 +3,7 @@ package org.metplus.curriculum.web.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.ByteStreams;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.metplus.curriculum.database.domain.Setting;
 import org.metplus.curriculum.web.GenericAnswer;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.restdocs.RestDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -21,6 +23,11 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 
 import static org.junit.Assert.*;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -36,10 +43,17 @@ public class CurriculumControllerTest extends BaseControllerTest{
     private WebApplicationContext ctx;
 
     private MockMvc mockMvc;
+    @Rule
+    public RestDocumentation restDocumentation = new RestDocumentation("build/generated-snippets");
 
     @Before
     public void setUp() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx)
+                .apply(documentationConfiguration(this.restDocumentation))
+                .alwaysDo(document("curriculum/{method-name}/{step}/",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint())))
+                .build();
     }
     @Test
     public void testUploadCurriculum() throws Exception {
@@ -53,6 +67,7 @@ public class CurriculumControllerTest extends BaseControllerTest{
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                         .param("userId", "asdasdasd")
                         .param("name", "line_with_bold.pdf")
+                        .header("X-Auth-Token", "123123123")
                         )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
@@ -70,7 +85,8 @@ public class CurriculumControllerTest extends BaseControllerTest{
         final MockMultipartFile multipartFile = new MockMultipartFile("file", file);
 
         MockHttpServletResponse response = mockMvc.perform(
-                        get("/api/v1/curriculum/asdasdasd"))
+                        get("/api/v1/curriculum/asdasdasd")
+                            .header("X-Auth-Token", "123123123"))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType("application/octet-stream"))
                     .andReturn().getResponse();
@@ -81,7 +97,8 @@ public class CurriculumControllerTest extends BaseControllerTest{
     @Test
     public void testUnableToFindCurriculumDownloadCurriculum() throws Exception {
 
-        MockHttpServletResponse response = mockMvc.perform(get("/api/v1/curriculum/notpresentuser"))
+        MockHttpServletResponse response = mockMvc.perform(get("/api/v1/curriculum/notpresentuser")
+                            .header("X-Auth-Token", "123123123"))
                     .andExpect(status().isOk())
                     .andReturn().getResponse();
 

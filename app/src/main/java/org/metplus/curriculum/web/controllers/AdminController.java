@@ -21,7 +21,12 @@ public class AdminController {
     @Autowired
     private SettingsRepository repository;
 
-    @RequestMapping(value = "/settings", method = RequestMethod.GET)
+    /**
+     * Retrieve all the settings of the cruncher
+     * @summary Retrieve Cruncher settings
+     * @return A list of settings
+     */
+    @RequestMapping(value = "/settings", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public ResponseEntity<Settings> mainPage() {
         LOG.debug("mainPage()");
@@ -32,7 +37,12 @@ public class AdminController {
         return new ResponseEntity<>(repository.findAll().iterator().next(), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/settings", method = RequestMethod.POST)
+    /**
+     * Save all the settings
+     * @summary Save settings
+     * @return The answer stating if the settings were saved or not
+     */
+    @RequestMapping(value = "/settings", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     @ResponseBody
     public ResponseEntity<Settings> save(@RequestBody Settings settings) throws MandatorySettingNotPresent {
         LOG.info("Post is: " + settings);

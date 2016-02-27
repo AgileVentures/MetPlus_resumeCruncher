@@ -1,0 +1,23 @@
+=== Upload Resume
+
+Request
+include::{snippets}/curriculum/test-upload-curriculum/1/http-request.adoc[]
+
+Response
+include::{snippets}/curriculum/test-upload-curriculum/1/http-response.adoc[]
+
+=== Download Resume
+
+Request
+include::{snippets}/curriculum/test-download-curriculum/1/http-request.adoc[]
+
+Response
+include::{snippets}/curriculum/test-download-curriculum/1/http-response.adoc[]
+
+=== Cannot find resume Resume
+
+Request
+include::{snippets}/curriculum/test-unable-to-find-curriculum-download-curriculum/1/http-request.adoc[]
+
+Response
+include::{snippets}/curriculum/test-unable-to-find-curriculum-download-curriculum/1/http-response.adoc[]

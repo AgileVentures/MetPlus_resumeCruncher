@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AuthenticationController extends BaseController {
 
+    // tag::authenticate[]
     @RequestMapping(value = authenticationUrl, method = RequestMethod.POST)
     public String authenticate() {
         return "This is just for in-code-documentation purposes and Rest API reference documentation." +
@@ -21,4 +22,5 @@ public class AuthenticationController extends BaseController {
                 "This token must be present in X-Auth-Token header in all requests for all other URLs, including logout." +
                 "Authentication can be issued multiple times and each call results in new ticket.";
     }
+    // end::authenticate[]
 }
