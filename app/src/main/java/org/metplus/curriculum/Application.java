@@ -14,14 +14,14 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
 @SpringBootApplication
-@EnableSwagger2 //Enable swagger 2.0 spec
+//@EnableSwagger2 //Enable swagger 2.0 spec
 @ComponentScan
 public class Application  extends WebMvcConfigurerAdapter {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
 
-    @Bean
+    /**@Bean
     public Docket petApi() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .groupName("full-petstore-api")
@@ -47,5 +47,5 @@ public class Application  extends WebMvcConfigurerAdapter {
                 .version("2.0")
                 .build();
     }
-
+**/
 }

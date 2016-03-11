@@ -14,11 +14,6 @@ spring:
 
 server:
   port: 8443
-  ssl:
-    key-store: keystore.p12
-    key-store-password: mypassword
-    keyStoreType: PKCS12
-    keyAlias: tcserver
 
 backend:
   admin:
@@ -30,11 +25,6 @@ spring:
 
 server:
   port: 8443
-  ssl:
-    key-store:
-    key-store-password:
-    keyStoreType:
-    keyAlias:
 
 backend:
   admin:
@@ -47,11 +37,6 @@ spring:
 
 server:
   port: 8443
-  ssl:
-    key-store: keystore.p12
-    key-store-password: mypassword
-    keyStoreType: PKCS12
-    keyAlias: tomcat
 
 backend:
   admin:

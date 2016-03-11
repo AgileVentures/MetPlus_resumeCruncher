@@ -113,3 +113,17 @@ jar {
         into 'static/docs'
     }
 }
+
+
+task stage(type: Copy, dependsOn: [clean, build]) {
+    //from jar.archivePath
+    //into project.rootDir 
+    //rename {
+    //       'cruncher.jar'
+    //}
+}
+stage.mustRunAfter(clean)
+
+clean << {
+    project.file('cruncher.jar').delete()
+}

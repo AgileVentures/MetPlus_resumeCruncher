@@ -85,5 +85,6 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.3'
 }
 
-
-
+task stage {
+}
+stage.dependsOn(":app:stage")
