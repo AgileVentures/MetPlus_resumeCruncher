@@ -6,6 +6,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
 
 /**
  * Created by Joao Pereira on 27/08/2015.
@@ -19,6 +22,8 @@ public class DatabaseConfig {
     private String password;
     private int port;
     private String host;
+
+    private String uri = null;
     public DatabaseConfig(){}
 
     public void setName(String name) {
@@ -64,6 +69,24 @@ public class DatabaseConfig {
     }
 
     public boolean asAuthentication() {return !(username == null);}
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+        try {
+            URI uriMongo = new URI(this.uri);
+            this.host = uriMongo.getHost();
+            this.port = uriMongo.getPort();
+            this.username = uriMongo.getUserInfo().split(":")[0];
+            this.password = uriMongo.getUserInfo().split(":")[1];
+            this.name = uriMongo.getPath().substring(1);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(DatabaseConfig.class);
 }

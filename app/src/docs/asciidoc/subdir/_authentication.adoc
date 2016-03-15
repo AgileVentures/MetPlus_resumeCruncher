@@ -1,0 +1,7 @@
+== Authentication
+
+Request
+include::{snippets}/user-password/1/http-request.adoc[]
+
+Response
+include::{snippets}/user-password/1/http-response.adoc[]

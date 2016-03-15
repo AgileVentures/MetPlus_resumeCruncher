@@ -1,40 +1,44 @@
 spring:
-  profiles.active: development
+    profiles.active: development
 
-log4j.logger: ERROR
-log4j.logger.org.hibernate: ERROR
-log4j.logger.com.mongodb: SEVERE
+    log4j.logger: DEBUG
+    log4j.logger.org.hibernate: ERROR
+    log4j.logger.com.mongodb: SEVERE
+
+backend.admin.role: BACKEND_ADMIN
+
 ---
+
 spring:
   profiles: development
 
 server:
   port: 8443
-  ssl:
-    key-store: keystore.p12
-    key-store-password: mypassword
-    keyStoreType: PKCS12
-    keyAlias: tomcat
 
+backend:
+  admin:
+    username: backend_admin
+    password: backendpassword
 ---
 spring:
   profiles: production
 
 server:
   port: 8443
-  ssl:
-    key-store:
-    key-store-password:
-    keyStoreType:
-    keyAlias:
+
+backend:
+  admin:
+    username: ${username}
+    password: ${password}
+
 ---
 spring:
   profiles: unit-test
 
 server:
   port: 8443
-  ssl:
-    key-store: keystore.p12
-    key-store-password: mypassword
-    keyStoreType: PKCS12
-    keyAlias: tomcat
+
+backend:
+  admin:
+    username: backend_admin
+    password: backendpassword

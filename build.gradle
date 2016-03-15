@@ -26,6 +26,8 @@ repositories {
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+group = 'org.metplus'
+version = '0.1.0'
 
 dependencies {
 }
@@ -44,12 +46,11 @@ subprojects {
         }
     }
     dependencies {
-        compile('org.springframework.data:spring-data-mongodb:1.7.2.RELEASE')
+        //compile('org.springframework.data:spring-data-mongodb:1.7.2.RELEASE')
+        compile('org.springframework.data:spring-data-mongodb')
         testCompile("junit:junit")
-        //compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.3'
-        //compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.3'
-        //testCompile group: 'org.springframework', name: 'spring-test', version: springversion
-        testCompile("org.springframework:spring-test:4.2.0.RELEASE")
+        testCompile("org.springframework.boot:spring-boot-starter-test")
+        testCompile('org.mockito:mockito-all:1.10.19')
 
     }
     test {
@@ -59,6 +60,9 @@ subprojects {
         }
         dependsOn 'cleanTest'
     }
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
 }
 
 
@@ -81,3 +85,6 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.3'
 }
 
+task stage {
+}
+stage.dependsOn(":app:stage")

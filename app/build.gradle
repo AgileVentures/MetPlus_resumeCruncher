@@ -1,3 +1,24 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url 'https://repo.spring.io/release'
+        }
+        jcenter()
+        maven {
+            url 'http://repo.spring.io/milestone'
+        }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.5.RELEASE")
+        classpath "org.asciidoctor:asciidoctor-gradle-plugin:1.5.2"
+        classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.6'
+    }
+}
+
+plugins {
+    id "org.asciidoctor.convert" version "1.5.3"
+}
 
 repositories {
     mavenCentral()
@@ -5,8 +26,10 @@ repositories {
         url 'https://repo.spring.io/release'
     }
 }
+
 apply plugin: 'application'
 apply plugin: 'spring-boot'
+apply plugin: 'org.asciidoctor.convert'
 mainClassName = 'org.metplus.curriculum.Application'
 
 dependencies {
@@ -16,8 +39,20 @@ dependencies {
     compile("org.springframework.boot:spring-boot-actuator")
     compile('org.springframework.boot:spring-boot-starter-security')
     compile("org.springframework.boot:spring-boot-starter-web")
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
+    compile 'org.springframework.boot:spring-boot-starter-aop'
+
+    compile 'io.springfox:springfox-swagger2:2.3.1'
+    compile 'io.springfox:springfox-swagger-ui:2.3.1'
+
+    compile('net.sf.ehcache:ehcache-core:2.6.9') {
+        exclude group: 'commons-logging'
+    }
+    compile 'com.google.guava:guava:18.0'
     testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile 'org.springframework.restdocs:spring-restdocs-mockmvc:1.0.1.RELEASE'
 }
+
 
 
 task copyLicense {
@@ -30,12 +65,65 @@ task copyLicense {
     }
 }
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 task startCruncher <<{
-    bootRun { systemProperty "spring.profiles.active", System.env.SPRING_PROFILES_ACTIVE != null ? System.env.SPRING_PROFILES_ACTIVE : "development" }
+    bootRun { 
+        systemProperties = System.properties
+	systemProperty "spring.profiles.active", System.env.SPRING_PROFILES_ACTIVE != null ? System.env.SPRING_PROFILES_ACTIVE : "development" 
+    }
 }
 startCruncher.finalizedBy bootRun
 
 applicationDistribution.from(copyLicense) {
     into ""
+}
+
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+
+test {
+    outputs.dir snippetsDir
+}
+asciidoctorj {
+    version = '1.5.2'
+}
+asciidoctor {
+    attributes 'snippets': snippetsDir
+    inputs.dir snippetsDir
+    dependsOn test
+    backends    'html5'
+    attributes	'build-gradle': file('build.gradle'),
+            'sourcedir': project.sourceSets.main.java.srcDirs[0],
+            'endpoint-url': 'http://example.org',
+            'source-highlighter' : 'coderay',
+            'imagesdir': './images',
+            'toc':'left',
+            'icons': 'font',
+            'setanchors':'true',
+            'idprefix':'',
+            'idseparator':'-',
+            'docinfo1':'true'
+}
+jar {
+    dependsOn asciidoctor
+    from ("${asciidoctor.outputDir}/html5") {
+        into 'static/docs'
+    }
+}
+
+
+task stage(type: Copy, dependsOn: [clean, build]) {
+    //from jar.archivePath
+    //into project.rootDir 
+    //rename {
+    //       'cruncher.jar'
+    //}
+}
+stage.mustRunAfter(clean)
+
+clean << {
+    project.file('cruncher.jar').delete()
 }

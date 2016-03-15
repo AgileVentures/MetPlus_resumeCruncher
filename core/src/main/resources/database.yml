@@ -13,7 +13,9 @@ pets-db:
 ---
 spring:
   profiles: production
-
+---
+spring:
+  profiles: bamm
 pets-db:
   name:
   host:
