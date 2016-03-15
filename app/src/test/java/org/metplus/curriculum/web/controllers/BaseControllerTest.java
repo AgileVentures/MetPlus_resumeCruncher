@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.metplus.curriculum.Application;
 import org.metplus.curriculum.config.DatabaseConfig;
 import org.metplus.curriculum.database.config.SpringMongoConfig;
+import org.metplus.curriculum.security.SecurityConfig;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.ActiveProfiles;
