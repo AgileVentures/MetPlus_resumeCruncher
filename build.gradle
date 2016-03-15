@@ -26,6 +26,8 @@ repositories {
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+group = 'org.metplus'
+version = '0.1.0'
 
 dependencies {
 }
@@ -83,3 +85,6 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.3'
 }
 
+task stage {
+}
+stage.dependsOn(":app:stage")
