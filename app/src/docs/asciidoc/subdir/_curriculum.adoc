@@ -1,23 +1,45 @@
-=== Upload Resume
+*Upload Resume*
 
 Request
-include::{snippets}/curriculum/test-upload-curriculum/1/http-request.adoc[]
+[source,http]
+----
+POST /api/v1/curriculum/upload HTTP/1.1
+Content-Type: multipart/form-data
+Accept: application/json
+----
+Headers
+include::{snippets}/curriculum/upload/request-headers.adoc[]
+Parameters
+include::{snippets}/curriculum/upload/request-parameters.adoc[]
 
 Response
-include::{snippets}/curriculum/test-upload-curriculum/1/http-response.adoc[]
+include::{snippets}/curriculum/upload/http-response.adoc[]
+Parameters on response
+include::{snippets}/curriculum/upload/response-fields.adoc[]
 
-=== Download Resume
+*Download Resume*
 
 Request
-include::{snippets}/curriculum/test-download-curriculum/1/http-request.adoc[]
+include::{snippets}/curriculum/download/http-request.adoc[]
+Headers
+include::{snippets}/curriculum/download/request-headers.adoc[]
 
 Response
-include::{snippets}/curriculum/test-download-curriculum/1/http-response.adoc[]
+[source,http]
+----
+HTTP/1.1 200 OK
+Content-Type: application/octet-stream
+Content-Disposition: inline; filename="line_with_bold.pdf"
+----
 
-=== Cannot find resume Resume
+*Cannot find resume Resume*
 
 Request
-include::{snippets}/curriculum/test-unable-to-find-curriculum-download-curriculum/1/http-request.adoc[]
+include::{snippets}/curriculum/download-error/http-request.adoc[]
+Headers
+include::{snippets}/curriculum/download-error/request-headers.adoc[]
 
 Response
-include::{snippets}/curriculum/test-unable-to-find-curriculum-download-curriculum/1/http-response.adoc[]
+include::{snippets}/curriculum/download-error/http-response.adoc[]
+Parameters on response
+include::{snippets}/curriculum/download-error/response-fields.adoc[]

@@ -1,7 +1,16 @@
 == Authentication
 
 Request
-include::{snippets}/user-password/1/http-request.adoc[]
+include::{snippets}/authentication/userPassword/http-request.adoc[]
+include::{snippets}/authentication/userPassword/request-headers.adoc[]
 
 Response
-include::{snippets}/user-password/1/http-response.adoc[]
+[source,http]
+----
+HTTP/1.1 200 OK
+{
+  "token": "1231-12312-12312"
+}
+----
+
+The token variable should be used in all the subsequent requests.

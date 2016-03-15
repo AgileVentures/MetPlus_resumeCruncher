@@ -49,8 +49,9 @@ public class AuthenticationFilter extends GenericFilterBean {
         String resourcePath = new UrlPathHelper().getPathWithinApplication(httpRequest);
 
         try {
+            logger.error("BAMMMMMMM {} by X-Auth-Username method", username);
             if (postToAuthenticate(httpRequest, resourcePath)) {
-                logger.debug("Trying to authenticate user {} by X-Auth-Username method", username);
+                logger.error("Trying to authenticate user {} by X-Auth-Username method", username);
                 processUsernamePasswordAuthentication(httpResponse, username, password);
                 return;
             }

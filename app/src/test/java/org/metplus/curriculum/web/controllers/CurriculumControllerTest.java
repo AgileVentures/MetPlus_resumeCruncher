@@ -23,11 +23,17 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 
 import static org.junit.Assert.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -71,6 +77,18 @@ public class CurriculumControllerTest extends BaseControllerTest{
                         )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
+                .andDo(document("curriculum/upload",
+                        requestHeaders(headerWithName("X-Auth-Token")
+                                        .description("Authentication token retrieved from the authentication")),
+                        requestParameters(
+                                parameterWithName("userId").description("Identifier of the curriculum"),
+                                parameterWithName("name").description("Name of the curriculum file")
+                                ),
+                        responseFields(
+                                fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
+                                fieldWithPath("message").description("Message associated with the result code")
+                        )
+                ))
                 .andReturn()
                 .getResponse();
 
@@ -89,6 +107,10 @@ public class CurriculumControllerTest extends BaseControllerTest{
                             .header("X-Auth-Token", "123123123"))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType("application/octet-stream"))
+                    .andDo(document("curriculum/download",
+                        requestHeaders(headerWithName("X-Auth-Token")
+                                        .description("Authentication token retrieved from the authentication"))
+                ))
                     .andReturn().getResponse();
         assertEquals("The status of not the expected", 200, response.getStatus());
 
@@ -100,6 +122,14 @@ public class CurriculumControllerTest extends BaseControllerTest{
         MockHttpServletResponse response = mockMvc.perform(get("/api/v1/curriculum/notpresentuser")
                             .header("X-Auth-Token", "123123123"))
                     .andExpect(status().isOk())
+                    .andDo(document("curriculum/download-error",
+                            requestHeaders(headerWithName("X-Auth-Token")
+                                    .description("Authentication token retrieved from the authentication")),
+                            responseFields(
+                                    fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
+                                    fieldWithPath("message").description("Message associated with the result code")
+                            )
+                    ))
                     .andReturn().getResponse();
 
 
