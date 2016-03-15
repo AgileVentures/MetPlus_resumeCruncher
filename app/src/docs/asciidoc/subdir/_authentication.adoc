@@ -1,4 +1,4 @@
-== Authentication
+*Authentication Success*
 
 Request
 include::{snippets}/authentication/userPassword/http-request.adoc[]
@@ -14,3 +14,22 @@ HTTP/1.1 200 OK
 ----
 
 The token variable should be used in all the subsequent requests.
+
+*Authentication error*
+
+Request
+include::{snippets}/authentication/userPassword/http-request.adoc[]
+include::{snippets}/authentication/userPassword/request-headers.adoc[]
+
+Response
+[source,http]
+----
+HTTP/1.1 401 Unauthorized
+{
+  "timestamp": 1458079772296,
+  "status": 401,
+  "error": "Unauthorized",
+  "message": "Invalid Backend Admin Credentials",
+  "path": "/api/v1/authenticate"
+}
+----
