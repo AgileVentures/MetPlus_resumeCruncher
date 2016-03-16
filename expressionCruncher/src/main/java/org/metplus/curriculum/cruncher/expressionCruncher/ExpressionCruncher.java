@@ -58,11 +58,12 @@ public class ExpressionCruncher extends CruncherInitializer {
     private CruncherImpl cruncherImpl;
     @Autowired private SettingsRepository repository;
 
-    @Override
     @PostConstruct
+    @Override
     public void init() {
         try {
             try {
+                System.out.println("TESTING=======================================");
                 repository.findAll().iterator().next().getCruncherSettings(CruncherImpl.CRUNCHER_NAME);
             } catch(NoSuchElementException e) {
                 repository.save(new Settings());

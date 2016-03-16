@@ -1,6 +1,8 @@
 package org.metplus.curriculum.cruncher.expressionCruncher;
 
 import org.metplus.curriculum.cruncher.Cruncher;
+import org.metplus.curriculum.cruncher.CruncherMetaData;
+import org.metplus.curriculum.database.domain.Resume;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -159,5 +161,17 @@ public class CruncherImpl implements Cruncher {
         }
 
         return result;
+    }
+
+    @Override
+    public CruncherMetaData crunch(String data) {
+        Map<String, Integer> result = calculate(data);
+
+        return null;
+    }
+
+    @Override
+    public String getCruncherName() {
+        return CRUNCHER_NAME;
     }
 }

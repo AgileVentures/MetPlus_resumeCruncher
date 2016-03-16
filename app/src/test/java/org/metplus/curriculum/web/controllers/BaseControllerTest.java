@@ -7,6 +7,7 @@ import org.metplus.curriculum.Application;
 import org.metplus.curriculum.config.DatabaseConfig;
 import org.metplus.curriculum.database.config.SpringMongoConfig;
 import org.metplus.curriculum.security.SecurityConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.ActiveProfiles;
@@ -26,6 +27,8 @@ import org.metplus.curriculum.web.controllers.auth.AuthenticationController;
 @SpringBootApplication
 @SpringApplicationConfiguration(classes = Application.class)
 public class BaseControllerTest {
+
+    @Autowired
 
     @Test
     public void dummy() throws Exception {
