@@ -27,6 +27,7 @@ public class ResumeCruncher {
     private static final Logger logger = LoggerFactory.getLogger(ResumeCruncher.class);
     private Thread cruncher;
     Deque<Resume> resumes;
+    private boolean keepRunning = true;
     @Autowired
     private CrunchersList allCrunchers;
     @Autowired
@@ -41,7 +42,7 @@ public class ResumeCruncher {
     }
 
     public void run() {
-        while(true) {
+        do {
             logger.debug("Going to check resumes");
             Resume resume = null;
             while ((resume = nextResume()) != null) {
@@ -62,7 +63,6 @@ public class ResumeCruncher {
                     logger.error("Unable to find the resume: " + resume);
                 } catch (ResumeReadException e) {
                     logger.error("Problem reading the resume: " + resume + ". " + e);
-                    resumes.addLast(resume);
                 } catch (DocumentParseException e) {
                     logger.error("Problem Parsing the resume: " + resume + ". " + e);
                 }
@@ -70,9 +70,15 @@ public class ResumeCruncher {
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
             }
-        }
+        } while(keepRunning);
+    }
+    public void stop(){
+        setKeepRunning(false);
+        cruncher.interrupt();
+    }
+    public void setKeepRunning(boolean keepRunning) {
+        this.keepRunning = keepRunning;
     }
     public void start() {
         cruncher = new Thread(){
