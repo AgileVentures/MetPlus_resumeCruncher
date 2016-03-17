@@ -18,6 +18,9 @@ import org.springframework.restdocs.RestDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.util.NoSuchElementException;
+
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 
@@ -50,7 +53,11 @@ public class AdminControllerTest  extends BaseControllerTest {
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint())))
                 .build();
-        before = repository.findAll().iterator().next();
+        try {
+            before = repository.findAll().iterator().next();
+        } catch(NoSuchElementException exp) {
+            before = new Settings();
+        }
         before.addApplicationSetting(new Setting<>("simple test", "Value"));
         repository.save(before);
     }

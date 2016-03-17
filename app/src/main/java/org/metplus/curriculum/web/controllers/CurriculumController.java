@@ -6,6 +6,7 @@ import org.metplus.curriculum.database.domain.Resume;
 import org.metplus.curriculum.database.exceptions.ResumeNotFound;
 import org.metplus.curriculum.database.exceptions.ResumeReadException;
 import org.metplus.curriculum.database.repository.ResumeRepository;
+import org.metplus.curriculum.process.ResumeCruncher;
 import org.metplus.curriculum.web.GenericAnswer;
 import org.metplus.curriculum.web.ResultCodes;
 import  org.apache.log4j.Logger;
@@ -28,6 +29,9 @@ import java.io.IOException;
 @PreAuthorize("hasAuthority('ROLE_DOMAIN_USER')")
 public class CurriculumController {
     private static final Logger LOG = Logger.getLogger(CurriculumController.class);
+
+    @Autowired
+    private ResumeCruncher resumeCruncher;
 
     @Autowired
     ResumeRepository resumeRepository;
@@ -59,6 +63,7 @@ public class CurriculumController {
                 resumeRepository.save(resume);
                 answer.setMessage("File uploaded successfully");
                 answer.setResultCode(ResultCodes.SUCCESS);
+                resumeCruncher.addResume(resume);
             } catch (Exception e) {
                 System.out.println(e.getStackTrace());
                 e.printStackTrace();

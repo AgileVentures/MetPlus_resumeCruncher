@@ -13,9 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /**
  * Created by Joao Pereira on 31/08/2015.
@@ -28,7 +26,7 @@ public class ExpressionCruncher extends CruncherInitializer {
     private static final String CASE_SENSITIVE = "CaseSensitive";
 
     private boolean caseSensitive;
-    private Hashtable<String, List<String>> mergeList;
+    private Map<String, List<String>> mergeList;
     private List<String> ignoreList;
 
     public boolean isCaseSensitive() {
@@ -39,11 +37,11 @@ public class ExpressionCruncher extends CruncherInitializer {
         this.caseSensitive = caseSensitive;
     }
 
-    public Hashtable<String, List<String>> getMergeList() {
+    public Map<String, List<String>> getMergeList() {
         return mergeList;
     }
 
-    public void setMergeList(Hashtable<String, List<String>> mergeList) {
+    public void setMergeList(Map<String, List<String>> mergeList) {
         this.mergeList = mergeList;
     }
 
@@ -58,17 +56,23 @@ public class ExpressionCruncher extends CruncherInitializer {
     private CruncherImpl cruncherImpl;
     @Autowired private SettingsRepository repository;
 
-    @PostConstruct
     @Override
     public void init() {
         try {
+            CruncherSettings settings = null;
             try {
                 System.out.println("TESTING=======================================");
-                repository.findAll().iterator().next().getCruncherSettings(CruncherImpl.CRUNCHER_NAME);
+                settings = repository.findAll().iterator().next().getCruncherSettings(CruncherImpl.CRUNCHER_NAME);
             } catch(NoSuchElementException e) {
                 repository.save(new Settings());
-                repository.findAll().iterator().next().getCruncherSettings(CruncherImpl.CRUNCHER_NAME);
+                settings = repository.findAll().iterator().next().getCruncherSettings(CruncherImpl.CRUNCHER_NAME);
             }
+            ignoreList = (List)settings.getSetting(IGNORE_LIST).getData();
+            caseSensitive = (boolean)settings.getSetting(CASE_SENSITIVE).getData();
+            mergeList = (Map) settings.getSetting(MERGE_LIST).getData();
+
+            cruncherImpl = new CruncherImpl(ignoreList, mergeList);
+            cruncherImpl.setCaseSensitive(caseSensitive);
         } catch (CruncherSettingsNotFound cruncherSettingsNotFound) {
             System.out.println("===================================================================");
             System.out.println("Case sensitive: " + caseSensitive);

@@ -11,6 +11,7 @@ import org.metplus.curriculum.database.exceptions.ResumeReadException;
 import org.metplus.curriculum.exceptions.CurriculumException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.gridfs.GridFsOperations;
 
 import java.io.ByteArrayOutputStream;
@@ -23,10 +24,14 @@ import java.util.Map;
  */
 @Document
 public class Resume extends AbstractDocument {
+    @Field
     private String filename;
+    @Field
     private String fileType;
+    @Field
     private String userId;
 
+    @Field
     private Map<String, MetaData> metaData;
 
     @Autowired

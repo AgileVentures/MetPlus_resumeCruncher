@@ -3,17 +3,15 @@ package org.metplus.curriculum.init;
 import org.metplus.curriculum.cruncher.Cruncher;
 import org.metplus.curriculum.cruncher.CrunchersList;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
 /**
  * Created by Joao Pereira on 31/08/2015.
  */
-@Component
 public abstract class CruncherInitializer {
     @Autowired
-    private CrunchersList allCrunchers;
+    private CrunchersList crunchersList;
     /**
      * Function used to initialize the cruncher holder bean
      */
@@ -21,7 +19,7 @@ public abstract class CruncherInitializer {
     public void postContructor() {
         System.out.println("BAMMM=================================================");
         init();
-        allCrunchers.addCruncher(getCruncher());
+        crunchersList.addCruncher(getCruncher());
     }
     public abstract void init();
 

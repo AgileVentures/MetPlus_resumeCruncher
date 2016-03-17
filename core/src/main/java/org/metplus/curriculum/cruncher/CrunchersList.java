@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by joao on 3/16/16.
  */
-@Component
+@Component("crunchersList")
 public class CrunchersList {
 
     List<Cruncher> allCrunchers;
