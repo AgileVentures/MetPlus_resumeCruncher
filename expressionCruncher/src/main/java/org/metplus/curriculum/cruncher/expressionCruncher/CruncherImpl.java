@@ -1,11 +1,12 @@
 package org.metplus.curriculum.cruncher.expressionCruncher;
 
 import org.metplus.curriculum.cruncher.Cruncher;
+import org.metplus.curriculum.cruncher.CruncherMetaData;
+import org.metplus.curriculum.database.domain.MetaData;
+import org.metplus.curriculum.database.domain.MetaDataField;
+import org.metplus.curriculum.database.domain.Resume;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Joao Pereira
@@ -17,15 +18,15 @@ public class CruncherImpl implements Cruncher {
     /**
      * Output saved
      */
-    private Hashtable<String, Integer> result = new Hashtable<String, Integer>();
+    private Map<String, Integer> result = new HashMap<>();
     /**
      * List with all the expressions that can be merged
      */
-    private Hashtable<String, List<String>> mergeList = new Hashtable<String, List<String>>();
+    private Map<String, List<String>> mergeList = new HashMap<>();
     /**
      * List with all the expressions to be ignored
      */
-    private List<String> ignoreList = new ArrayList<String>();
+    private List<String> ignoreList = new ArrayList<>();
 
     /**
      * Count using case sensitive
@@ -47,7 +48,7 @@ public class CruncherImpl implements Cruncher {
      * Class constructor
      * @param mergeList List of expressions that can be merged
      */
-    public CruncherImpl(Hashtable<String, List<String>> mergeList) {
+    public CruncherImpl(Map<String, List<String>> mergeList) {
         setMergeList(mergeList);
     }
 
@@ -64,7 +65,7 @@ public class CruncherImpl implements Cruncher {
      * @param ignoreList List of expressions that can be ignored
      * @param mergeList List of expressions that can be merged
      */
-    public CruncherImpl(List<String> ignoreList, Hashtable<String, List<String>> mergeList) {
+    public CruncherImpl(List<String> ignoreList, Map<String, List<String>> mergeList) {
         this.ignoreList = ignoreList;
         setMergeList(mergeList);
     }
@@ -89,8 +90,8 @@ public class CruncherImpl implements Cruncher {
      * Change the list of merge expressions
      * @param mergeList New list of merge expressions
      */
-    public void setMergeList(Hashtable<String, List<String>> mergeList) {
-        this.mergeList = new Hashtable<String, List<String>>();
+    public void setMergeList(Map<String, List<String>> mergeList) {
+        this.mergeList = new HashMap<String, List<String>>();
         for (Map.Entry<String, List<String>> newVal: mergeList.entrySet()) {
             this.mergeList.put(newVal.getKey().replaceAll(" ", SEP), newVal.getValue());
         }
@@ -100,7 +101,7 @@ public class CruncherImpl implements Cruncher {
      * Retrieve the list of merge expressions used
      * @return List of merge expressions
      */
-    public Hashtable<String, List<String>> getMergeList() {
+    public Map<String, List<String>> getMergeList() {
         return this.mergeList;
     }
 
@@ -116,7 +117,7 @@ public class CruncherImpl implements Cruncher {
      * Retrieve the last calculated result
      * @return Calculation result
      */
-    public Hashtable<String, Integer> getResult() {
+    public Map<String, Integer> getResult() {
         return result;
     }
 
@@ -125,7 +126,7 @@ public class CruncherImpl implements Cruncher {
      * @param expression Expression to be checked
      * @return Hash table with the accumulated results
      */
-    public Hashtable<String, Integer> calculate(String expression) {
+    public Map<String, Integer> calculate(String expression) {
         String auxExpression = expression;
 
         // Remove the expressions that should be ignored
@@ -159,5 +160,21 @@ public class CruncherImpl implements Cruncher {
         }
 
         return result;
+    }
+
+    @Override
+    public CruncherMetaData crunch(String data) {
+        Map<String, Integer> result = calculate(data);
+        MetaData allMetaData = new MetaData();
+        for(Map.Entry<String, Integer> metaData: result.entrySet()) {
+            MetaDataField<Integer> field = new MetaDataField<>(metaData.getValue());
+            allMetaData.addField(metaData.getKey(), field);
+        }
+        return allMetaData;
+    }
+
+    @Override
+    public String getCruncherName() {
+        return CRUNCHER_NAME;
     }
 }

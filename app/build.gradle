@@ -121,6 +121,8 @@ task stage(type: Copy, dependsOn: [clean, build]) {
     //rename {
     //       'cruncher.jar'
     //}
+    tasks.test.enabled = false
+    tasks.asciidoctor.enabled = false
 }
 stage.mustRunAfter(clean)
 

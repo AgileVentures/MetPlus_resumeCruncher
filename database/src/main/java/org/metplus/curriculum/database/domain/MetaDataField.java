@@ -28,4 +28,11 @@ public class MetaDataField<T> {
     public void setData(T data) {
         this.data = data;
     }
+
+    @Override
+    public String toString() {
+        String result = "MetaDataField: ";
+        result += "'" + data + "'";
+        return result;
+    }
 }

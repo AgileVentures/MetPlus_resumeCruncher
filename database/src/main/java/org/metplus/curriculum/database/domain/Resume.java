@@ -11,22 +11,28 @@ import org.metplus.curriculum.database.exceptions.ResumeReadException;
 import org.metplus.curriculum.exceptions.CurriculumException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.gridfs.GridFsOperations;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Class that will store the information of the resume
  */
 @Document
 public class Resume extends AbstractDocument {
+    @Field
     private String filename;
+    @Field
     private String fileType;
+    @Field
     private String userId;
 
-    private HashMap<String, HashMap<String, MetaDataField>> metaData;
+    @Field
+    private Map<String, MetaData> metaData;
 
     @Autowired
     private GridFsOperations gridOperation;
@@ -137,7 +143,7 @@ public class Resume extends AbstractDocument {
      * Retrieve all the meta data of the specific resume
      * @return Structure with all the meta data
      */
-    public HashMap<String, HashMap<String, MetaDataField>> getMetaData() {
+    public Map<String, MetaData> getMetaData() {
         return metaData;
     }
 
@@ -145,7 +151,7 @@ public class Resume extends AbstractDocument {
      * Over write all the meta data of this resume
      * @param metaData New meta data
      */
-    public void setMetaData(HashMap<String, HashMap<String, MetaDataField>> metaData) {
+    public void setMetaData(Map<String, MetaData> metaData) {
         this.metaData = metaData;
     }
 
@@ -164,7 +170,7 @@ public class Resume extends AbstractDocument {
      * @param cruncherName Name of the cruncher
      * @return Cruncher meta data
      */
-    public HashMap<String, MetaDataField> getCruncherData(String cruncherName) {
+    public MetaData getCruncherData(String cruncherName) {
         return metaData.get(cruncherName);
     }
 }
