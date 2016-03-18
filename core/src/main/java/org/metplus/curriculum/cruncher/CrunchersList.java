@@ -12,9 +12,19 @@ import java.util.List;
 public class CrunchersList {
 
     List<Cruncher> allCrunchers;
+
+    /**
+     * Add a new cruncher to the list of crunchers
+     * @param cruncher Cruncher to be added
+     */
     public void addCruncher(Cruncher cruncher) {
         getCrunchers().add(cruncher);
     }
+
+    /**
+     * Retrieve all crunchers
+     * @return List with all the crunchers registered
+     */
     public List<Cruncher> getCrunchers() {
         if(allCrunchers == null)
             allCrunchers = new ArrayList<>();

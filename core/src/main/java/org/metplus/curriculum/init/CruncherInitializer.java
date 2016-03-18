@@ -17,10 +17,14 @@ public abstract class CruncherInitializer {
      */
     @PostConstruct
     public void postContructor() {
-        System.out.println("BAMMM=================================================");
         init();
         crunchersList.addCruncher(getCruncher());
     }
+
+    /**
+     * Function called in the post constructor to initialize
+     * all the needed information of the cruncher
+     */
     public abstract void init();
 
     /**

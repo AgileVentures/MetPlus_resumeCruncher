@@ -26,7 +26,7 @@ import java.util.*;
 public class ResumeCruncher {
     private static final Logger logger = LoggerFactory.getLogger(ResumeCruncher.class);
     private Thread cruncher;
-    Deque<Resume> resumes;
+    private Deque<Resume> resumes;
     private boolean keepRunning = true;
     @Autowired
     private CrunchersList allCrunchers;
@@ -35,12 +35,20 @@ public class ResumeCruncher {
     @Autowired
     ResumeRepository resumeRepository;
 
+    /**
+     * Post constructor function
+     * The function will initialize the resumes and start
+     * the thread that will crunch the resumes
+     */
     @PostConstruct
     public void postConstructor() {
         resumes = new ArrayDeque<>();
         start();
     }
 
+    /**
+     * Main function that will be always running and crunching the resumes
+     */
     public void run() {
         do {
             logger.debug("Going to check resumes");
@@ -73,13 +81,26 @@ public class ResumeCruncher {
             }
         } while(keepRunning);
     }
+
+    /**
+     * Stop the thread
+     */
     public void stop(){
         setKeepRunning(false);
         cruncher.interrupt();
     }
+
+    /**
+     * Change the control variable of the thread
+     * @param keepRunning True if the thread should keep on running, false otherwise
+     */
     public void setKeepRunning(boolean keepRunning) {
         this.keepRunning = keepRunning;
     }
+
+    /**
+     * Function to start the thread
+     */
     public void start() {
         cruncher = new Thread(){
             public void run() {
@@ -88,9 +109,19 @@ public class ResumeCruncher {
         };
         cruncher.start();
     }
+
+    /**
+     * Add a new resume to be crunched by the thread
+     * @param resume Resume to be added
+     */
     public synchronized void addResume(Resume resume) {
         resumes.add(resume);
     }
+
+    /**
+     * Retrieve the next resume to be crunched
+     * @return Resume
+     */
     protected synchronized Resume nextResume() {
         try {
             return resumes.remove();
