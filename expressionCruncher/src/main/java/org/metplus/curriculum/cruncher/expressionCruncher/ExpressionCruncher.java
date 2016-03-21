@@ -1,10 +1,9 @@
 package org.metplus.curriculum.cruncher.expressionCruncher;
 
 import org.metplus.curriculum.cruncher.Cruncher;
-import org.metplus.curriculum.database.domain.CruncherSettings;
-import org.metplus.curriculum.database.domain.Setting;
-import org.metplus.curriculum.database.domain.Settings;
+import org.metplus.curriculum.database.domain.*;
 import org.metplus.curriculum.database.exceptions.CruncherSettingsNotFound;
+import org.metplus.curriculum.database.repository.ResumeRepository;
 import org.metplus.curriculum.database.repository.SettingsRepository;
 import org.metplus.curriculum.init.CruncherInitializer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +54,9 @@ public class ExpressionCruncher extends CruncherInitializer {
 
     private CruncherImpl cruncherImpl;
     @Autowired private SettingsRepository repository;
+
+    @Autowired
+    private ResumeRepository resumeRepository;
 
     @Override
     public void init() {
@@ -118,4 +120,19 @@ public class ExpressionCruncher extends CruncherInitializer {
         repository.save(globalSettings);
     }
 
+    public void check()  {
+        resumeRepository.resumesOnCriteria(new Comparator<Resume>() {
+            @Override
+            public int compare(Resume o1, Resume o2) {
+                o1.getCruncherData(getCruncher().getCruncherName()).getOrderedFields(new Comparator<Map.Entry<String, MetaDataField>>() {
+                    @Override
+                    public int compare(Map.Entry<String, MetaDataField> o1, Map.Entry<String, MetaDataField> o2) {
+                        o1.get
+                        return 0;
+                    }
+                })
+                return 0;
+            }
+        })
+    }
 }

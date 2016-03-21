@@ -1,12 +1,12 @@
 package org.metplus.curriculum.database.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.metplus.curriculum.cruncher.CruncherMetaData;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by joao on 3/16/16.
@@ -17,12 +17,22 @@ public class MetaData extends AbstractDocument implements CruncherMetaData {
     @Field
     private Map<String, MetaDataField> fields;
 
+    @JsonIgnore
+    private List<String> orderedFields;
+
     /**
      * Retrieve all the fields meta data
      * @return Map with all the fields
      */
     public Map<String, MetaDataField> getFields() {
         return fields;
+    }
+
+    public List<Map.Entry<String, MetaDataField>> getOrderedFields(Comparator<Map.Entry<String, MetaDataField>> comparator) {
+        Set<Map.Entry<String, MetaDataField>> bamm = fields.entrySet();
+        List<Map.Entry<String, MetaDataField>> bamm1 = new ArrayList<>(bamm);
+        Collections.sort(bamm1, comparator);
+        return bamm1;
     }
 
     /**
