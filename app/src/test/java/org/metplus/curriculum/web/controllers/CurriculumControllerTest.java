@@ -5,6 +5,8 @@ import com.google.common.io.ByteStreams;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import org.metplus.curriculum.database.domain.Setting;
 import org.metplus.curriculum.web.GenericAnswer;
 import org.metplus.curriculum.web.ResultCodes;
@@ -31,6 +33,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
@@ -43,84 +46,97 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Created by Joao Pereira on 03/11/2015.
  */
-public class CurriculumControllerTest extends BaseControllerTest{
+@RunWith(Suite.class)
+@Suite.SuiteClasses({CurriculumControllerTest.UploadEndpoint.class,
+                     CurriculumControllerTest.DownloadEndpoint.class,
+                     CurriculumControllerTest.MatchEndpoint.class})
+public class CurriculumControllerTest {
+    public static class DefaultCurriculumTest extends BaseControllerTest {
+        @Autowired
+        protected WebApplicationContext ctx;
 
-    @Autowired
-    private WebApplicationContext ctx;
+        protected MockMvc mockMvc;
 
-    private MockMvc mockMvc;
-    @Rule
-    public RestDocumentation restDocumentation = new RestDocumentation("build/generated-snippets");
+        @Rule
+        public RestDocumentation restDocumentation = new RestDocumentation("build/generated-snippets");
 
-    @Before
-    public void setUp() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx)
-                .apply(documentationConfiguration(this.restDocumentation))
-                .alwaysDo(document("curriculum/{method-name}/{step}/",
-                        preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint())))
-                .build();
+        @Before
+        public void setUp() {
+            this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx)
+                    .apply(documentationConfiguration(this.restDocumentation))
+                    .alwaysDo(document("curriculum/{method-name}/{step}/",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint())))
+                    .build();
+        }
+
     }
-    @Test
-    public void testUploadCurriculum() throws Exception {
-        final InputStream file = getClass().getClassLoader().getResourceAsStream("line_with_bold.pdf");
-        final MockMultipartFile multipartFile = new MockMultipartFile("file", file);
+    public static class UploadEndpoint extends DefaultCurriculumTest {
 
-        MockHttpServletResponse response = mockMvc
-                .perform(fileUpload("/api/v1/curriculum/upload")
-                        .file(multipartFile)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.MULTIPART_FORM_DATA)
-                        .param("userId", "asdasdasd")
-                        .param("name", "line_with_bold.pdf")
-                        .header("X-Auth-Token", "123123123")
-                        )
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
-                .andDo(document("curriculum/upload",
-                        requestHeaders(headerWithName("X-Auth-Token")
-                                        .description("Authentication token retrieved from the authentication")),
-                        requestParameters(
-                                parameterWithName("userId").description("Identifier of the curriculum"),
-                                parameterWithName("name").description("Name of the curriculum file")
-                                ),
-                        responseFields(
-                                fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
-                                fieldWithPath("message").description("Message associated with the result code")
-                        )
-                ))
-                .andReturn()
-                .getResponse();
+        @Test
+        public void testUploadCurriculum() throws Exception {
+            final InputStream file = getClass().getClassLoader().getResourceAsStream("line_with_bold.pdf");
+            final MockMultipartFile multipartFile = new MockMultipartFile("file", file);
 
-        assertEquals("The status of not the expected", 200, response.getStatus());
+            MockHttpServletResponse response = mockMvc
+                    .perform(fileUpload("/api/v1/curriculum/upload")
+                            .file(multipartFile)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .param("userId", "asdasdasd")
+                            .param("name", "line_with_bold.pdf")
+                            .header("X-Auth-Token", "123123123")
+                    )
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
+                    .andDo(document("curriculum/upload",
+                            requestHeaders(headerWithName("X-Auth-Token")
+                                    .description("Authentication token retrieved from the authentication")),
+                            requestParameters(
+                                    parameterWithName("userId").description("Identifier of the curriculum"),
+                                    parameterWithName("name").description("Name of the curriculum file")
+                            ),
+                            responseFields(
+                                    fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
+                                    fieldWithPath("message").description("Message associated with the result code")
+                            )
+                    ))
+                    .andReturn()
+                    .getResponse();
 
-        GenericAnswer answer = new ObjectMapper().readValue(response.getContentAsString(), GenericAnswer.class);
-        assertEquals("Result code is not correct", ResultCodes.SUCCESS, answer.getResultCode());
+            assertEquals("The status of not the expected", 200, response.getStatus());
+
+            GenericAnswer answer = new ObjectMapper().readValue(response.getContentAsString(), GenericAnswer.class);
+            assertEquals("Result code is not correct", ResultCodes.SUCCESS, answer.getResultCode());
+        }
+
     }
-    @Test
-    public void testDownloadCurriculum() throws Exception {
-        final InputStream file = getClass().getClassLoader().getResourceAsStream("line_with_bold.pdf");
-        final MockMultipartFile multipartFile = new MockMultipartFile("file", file);
+    public static class DownloadEndpoint extends DefaultCurriculumTest {
 
-        MockHttpServletResponse response = mockMvc.perform(
-                        get("/api/v1/curriculum/asdasdasd")
+        @Test
+        public void testDownloadCurriculum() throws Exception {
+            final InputStream file = getClass().getClassLoader().getResourceAsStream("line_with_bold.pdf");
+            final MockMultipartFile multipartFile = new MockMultipartFile("file", file);
+
+            MockHttpServletResponse response = mockMvc.perform(
+                    get("/api/v1/curriculum/asdasdasd")
                             .header("X-Auth-Token", "123123123"))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType("application/octet-stream"))
                     .andDo(document("curriculum/download",
-                        requestHeaders(headerWithName("X-Auth-Token")
-                                        .description("Authentication token retrieved from the authentication"))
-                ))
+                            requestHeaders(headerWithName("X-Auth-Token")
+                                    .description("Authentication token retrieved from the authentication"))
+                    ))
                     .andReturn().getResponse();
-        assertEquals("The status of not the expected", 200, response.getStatus());
+            assertEquals("The status of not the expected", 200, response.getStatus());
 
-    }
+        }
 
-    @Test
-    public void testUnableToFindCurriculumDownloadCurriculum() throws Exception {
+        @Test
+        public void testUnableToFindCurriculumDownloadCurriculum() throws Exception {
 
-        MockHttpServletResponse response = mockMvc.perform(get("/api/v1/curriculum/notpresentuser")
-                            .header("X-Auth-Token", "123123123"))
+            MockHttpServletResponse response = mockMvc.perform(get("/api/v1/curriculum/notpresentuser")
+                    .header("X-Auth-Token", "123123123"))
                     .andExpect(status().isOk())
                     .andDo(document("curriculum/download-error",
                             requestHeaders(headerWithName("X-Auth-Token")
@@ -133,7 +149,56 @@ public class CurriculumControllerTest extends BaseControllerTest{
                     .andReturn().getResponse();
 
 
-        GenericAnswer answer = new ObjectMapper().readValue(response.getContentAsString(), GenericAnswer.class);
-        assertEquals("Result code is not correct", ResultCodes.RESUME_NOT_FOUND, answer.getResultCode());
+            GenericAnswer answer = new ObjectMapper().readValue(response.getContentAsString(), GenericAnswer.class);
+            assertEquals("Result code is not correct", ResultCodes.RESUME_NOT_FOUND, answer.getResultCode());
+        }
+    }
+
+    public static class MatchEndpoint extends DefaultCurriculumTest {
+        @Test
+        public void emptyTitle() throws Exception {
+            MockHttpServletResponse response = mockMvc.perform(post("/api/v1/curriculum/match")
+                    .header("X-Auth-Token", "123123123")
+                    .requestAttr("title", "")
+                    .requestAttr("description", "My description"))
+                    .andExpect(status().is4xxClientError())
+                    .andDo(document("curriculum/match-error",
+                            requestHeaders(headerWithName("X-Auth-Token")
+                                    .description("Authentication token retrieved from the authentication")),
+                            requestFields(fieldWithPath("title")
+                                    .description("Title of the Job"),
+                                          fieldWithPath("description")
+                                    .description("Description of the Job")),
+                            responseFields(
+                                    fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
+                                    fieldWithPath("message").description("Message associated with the result code")
+                            )
+                    ))
+                    .andReturn().getResponse();
+        }
+        @Test
+        public void noMatches() throws Exception {
+            MockHttpServletResponse response = mockMvc.perform(post("/api/v1/curriculum/match")
+                    .header("X-Auth-Token", "123123123")
+                    .requestAttr("title", "My title")
+                    .requestAttr("description", "My description"))
+                    .andExpect(status().isOk())
+                    .andDo(document("curriculum/match-error",
+                            requestHeaders(headerWithName("X-Auth-Token")
+                                    .description("Authentication token retrieved from the authentication")),
+                            requestFields(fieldWithPath("title")
+                                            .description("Title of the Job"),
+                                    fieldWithPath("description")
+                                            .description("Description of the Job")),
+                            responseFields(
+                                    fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
+                                    fieldWithPath("message").description("Message associated with the result code")
+                            )
+                    ))
+                    .andReturn().getResponse();
+            MatchAnswer answer = new ObjectMapper().readValue(response.getContentAsString(), MatchAnswer.class);
+            assertEquals("Result code is not correct", ResultCodes.SUCCESS, answer.getResultCode());
+            assertEquals("Number of resumes should be 0", 0, answer.getResumes().size());
+        }
     }
 }
