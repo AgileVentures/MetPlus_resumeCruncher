@@ -2,6 +2,7 @@ package org.metplus.curriculum.init;
 
 import org.metplus.curriculum.cruncher.Cruncher;
 import org.metplus.curriculum.cruncher.CrunchersList;
+import org.metplus.curriculum.cruncher.ResumeMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -32,4 +33,11 @@ public abstract class CruncherInitializer {
      * @return Cruncher to be used
      */
     public abstract Cruncher getCruncher();
+
+
+    /**
+     * Function used to retrieve the matcher
+     * @return Matcher to be used
+     */
+    public abstract ResumeMatcher getMatcher();
 }

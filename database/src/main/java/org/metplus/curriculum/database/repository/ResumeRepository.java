@@ -6,6 +6,6 @@ import org.springframework.data.repository.CrudRepository;
 /**
  * Interface used on CRUD operations over Resumes
  */
-public interface ResumeRepository extends CrudRepository<Resume, String> {
+public interface ResumeRepository extends CrudRepository<Resume, String>, ResumeCustomRepository {
     Resume findByUserId(String userId);
 }
