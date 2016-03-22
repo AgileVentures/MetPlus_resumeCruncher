@@ -44,14 +44,17 @@ public class ResumeMatcherImpl implements ResumeMatcher<Resume> {
         List<Resume> resultTitle = new ArrayList<>();
         List<Resume> resultDescription = new ArrayList<>();
         for(Resume resume: resumes) {
+            logger.debug("Checking viability of the resume: " + resume);
             // Retrieve the meta data of the resume
             List<Map.Entry<String, MetaDataField>> data = resume.getCruncherData(cruncher.getCruncherName())
                                                                 .getOrderedFields(new ResumeFieldComparator());
             // Does resume and title have the same most common expression
             if(data.get(0).getKey().compareTo(titleOrderedData.get(0).getKey()) == 0) {
+                logger.debug("Resume checks up with the title");
                 resultTitle.add(resume);
                 // Does resume and description have the same most common expression
             } else if(data.get(0).getKey().compareTo(descriptionOrderedData.get(0).getKey()) == 0) {
+                logger.debug("Resume checks up with the description");
                 resultDescription.add(resume);
             }
         }
