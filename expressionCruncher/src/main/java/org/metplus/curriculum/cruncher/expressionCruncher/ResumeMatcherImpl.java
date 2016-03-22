@@ -34,26 +34,25 @@ public class ResumeMatcherImpl implements ResumeMatcher<Resume> {
         // Retrieve all the resumes
         List<Resume> resumes = resumeRepository.resumesOnCriteria(new ResumeComparator());
         // Crunch the title
-        Map<String, MetaDataField> titleData = ((ExpressionCruncherMetaData)cruncher.crunch(title)).getFields();
-        List<Map.Entry<String, MetaDataField>> titleOrderedData = new ArrayList<>(titleData.entrySet());
-        Collections.sort(titleOrderedData, new ResumeFieldComparator());
+        String titleExpression = ((ExpressionCruncherMetaData)cruncher.crunch(title)).getMostReferedExpression();
         // Crunch the description
-        Map<String, MetaDataField> descriptionData = ((ExpressionCruncherMetaData)cruncher.crunch(description)).getFields();
-        List<Map.Entry<String, MetaDataField>> descriptionOrderedData = new ArrayList<>(descriptionData.entrySet());
-        Collections.sort(descriptionOrderedData, new ResumeFieldComparator());
+        String descriptionExpression = ((ExpressionCruncherMetaData)cruncher.crunch(description)).getMostReferedExpression();
         List<Resume> resultTitle = new ArrayList<>();
         List<Resume> resultDescription = new ArrayList<>();
         for(Resume resume: resumes) {
             logger.debug("Checking viability of the resume: " + resume);
             // Retrieve the meta data of the resume
-            List<Map.Entry<String, MetaDataField>> data = resume.getCruncherData(cruncher.getCruncherName())
-                                                                .getOrderedFields(new ResumeFieldComparator());
+            String resumeExpression = ((ExpressionCruncherMetaData)resume.getCruncherData(cruncher.getCruncherName()))
+                                            .getMostReferedExpression();
+            if(resumeExpression == null || resumeExpression.length() == 0)
+                resumeExpression = resume.getCruncherData(cruncher.getCruncherName())
+                                         .getOrderedFields(new ResumeFieldComparator()).get(0).getKey();
             // Does resume and title have the same most common expression
-            if(data.get(0).getKey().compareTo(titleOrderedData.get(0).getKey()) == 0) {
+            if(resumeExpression.compareTo(titleExpression) == 0) {
                 logger.debug("Resume checks up with the title");
                 resultTitle.add(resume);
                 // Does resume and description have the same most common expression
-            } else if(data.get(0).getKey().compareTo(descriptionOrderedData.get(0).getKey()) == 0) {
+            } else if(resumeExpression.compareTo(descriptionExpression) == 0) {
                 logger.debug("Resume checks up with the description");
                 resultDescription.add(resume);
             }
