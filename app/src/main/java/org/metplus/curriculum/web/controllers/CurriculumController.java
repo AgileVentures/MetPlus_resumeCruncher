@@ -1,6 +1,10 @@
 package org.metplus.curriculum.web.controllers;
 
 
+import org.metplus.curriculum.cruncher.Cruncher;
+import org.metplus.curriculum.cruncher.CrunchersList;
+import org.metplus.curriculum.cruncher.MatcherList;
+import org.metplus.curriculum.cruncher.ResumeMatcher;
 import org.metplus.curriculum.database.config.SpringMongoConfig;
 import org.metplus.curriculum.database.domain.Resume;
 import org.metplus.curriculum.database.exceptions.ResumeNotFound;
@@ -23,6 +27,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping(BaseController.baseUrl + "/curriculum")
@@ -38,6 +44,9 @@ public class CurriculumController {
 
     @Autowired
     SpringMongoConfig dbConfig;
+
+    @Autowired
+    private MatcherList matcherList;
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     @ResponseBody
@@ -122,5 +131,28 @@ public class CurriculumController {
         }
 
         return new ResponseEntity<GenericAnswer>(answer, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/match", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<GenericAnswer> match(@RequestParam("title") final String title,
+                                               @RequestParam("description") final String description) {
+        if(title.length() == 0) {
+            GenericAnswer answer = new GenericAnswer();
+            answer.setMessage("Title cannot be empty");
+            answer.setResultCode(ResultCodes.FATAL_ERROR);
+            return new ResponseEntity<>(answer, HttpStatus.BAD_REQUEST);
+        }
+        List<Resume> matchedResumes = new ArrayList<>();
+        MatchAnswer answer = new MatchAnswer();
+        for(ResumeMatcher matcher: matcherList.getMatchers()) {
+            matchedResumes = matcher.match(title, description);
+            for(Resume resume: matchedResumes) {
+                answer.addResumes(matcher.getCruncherName(), resume);
+            }
+        }
+        answer.setMessage("Success");
+        answer.setResultCode(ResultCodes.SUCCESS);
+        return new ResponseEntity<>(answer, HttpStatus.OK);
     }
 }

@@ -65,6 +65,11 @@ public class ResumeMatcherImpl implements ResumeMatcher<Resume> {
         return resultTitle;
     }
 
+    @Override
+    public String getCruncherName() {
+        return cruncher.getCruncherName();
+    }
+
     /**
      * Class that will compare the fields on the resume meta data
      * to order them by most common expression
