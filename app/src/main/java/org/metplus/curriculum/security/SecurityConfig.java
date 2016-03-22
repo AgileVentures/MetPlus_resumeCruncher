@@ -24,8 +24,8 @@ import javax.servlet.http.HttpServletResponse;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Value("${backend.admin.role}")
-    private String backendAdminRole;
+    //@Value("${backend.admin.role:BACKEND_ADMIN}")
+    private String backendAdminRole = "BACKEND_ADMIN";
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

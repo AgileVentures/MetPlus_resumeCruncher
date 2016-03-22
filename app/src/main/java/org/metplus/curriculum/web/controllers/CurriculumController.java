@@ -151,6 +151,8 @@ public class CurriculumController {
         }
         answer.setMessage("Success");
         answer.setResultCode(ResultCodes.SUCCESS);
+
+        logger.debug("Result is: " + answer);
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
 }

@@ -144,6 +144,8 @@ public class Resume extends AbstractDocument {
      * @return Structure with all the meta data
      */
     public Map<String, MetaData> getMetaData() {
+        if(metaData == null)
+            metaData = new HashMap<>();
         return metaData;
     }
 
@@ -162,7 +164,7 @@ public class Resume extends AbstractDocument {
      */
     @JsonIgnore
     public boolean isCruncherDataAvailable(String cruncherName) {
-        return metaData.containsKey(cruncherName);
+        return getMetaData().containsKey(cruncherName);
     }
 
     /**
@@ -171,6 +173,6 @@ public class Resume extends AbstractDocument {
      * @return Cruncher meta data
      */
     public MetaData getCruncherData(String cruncherName) {
-        return metaData.get(cruncherName);
+        return getMetaData().get(cruncherName);
     }
 }

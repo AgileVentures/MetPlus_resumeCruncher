@@ -22,7 +22,7 @@ import java.util.*;
 /**
  * Created by joao on 3/16/16.
  */
-@Component
+@Component("resumeCruncher")
 public class ResumeCruncher {
     private static final Logger logger = LoggerFactory.getLogger(ResumeCruncher.class);
     private Thread cruncher;
