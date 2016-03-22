@@ -1,5 +1,6 @@
 config:
     case-sensitive: false
+    ignoreListWordSearch: true
     merge-list:
       "software development":
         - "software development"
@@ -13,3 +14,18 @@ config:
       - "and"
       - "then"
       - "must"
+      - "least"
+      - "i"
+      - "am"
+      - "of"
+      - "but"
+      - "our"
+      - "mine"
+      - "very"
+      - "worked"
+      - "decided"
+      - "each"
+      - "an"
+      - "as"
+      - "at"
+      - "on"

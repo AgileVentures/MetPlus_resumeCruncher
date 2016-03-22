@@ -28,6 +28,13 @@ public class CruncherImpl implements Cruncher {
      */
     private List<String> ignoreList = new ArrayList<>();
 
+
+    /**
+     * If true when searching for items in the ignore list
+     * assumes they are words
+     */
+    private boolean ignoreListSearchWord = false;
+
     /**
      * Count using case sensitive
      */
@@ -122,6 +129,26 @@ public class CruncherImpl implements Cruncher {
     }
 
     /**
+     * Check if the ignore list should be treated as a list
+     * of words or a list of characters
+     * If is a list of words while crunching adds a space in each side
+     * @return True if list of words, false otherwise
+     */
+    public boolean isIgnoreListSearchWord() {
+        return ignoreListSearchWord;
+    }
+
+    /**
+     * Set if the ignore list should be treated as a list
+     * of words or a list of characters
+     * If is a list of words while crunching adds a space in each side
+     * @param ignoreListSearchWord True if list of words, false otherwise
+     */
+    public void setIgnoreListSearchWord(boolean ignoreListSearchWord) {
+        this.ignoreListSearchWord = ignoreListSearchWord;
+    }
+
+    /**
      * Method will generate a hash table with the expression
      * @param expression Expression to be checked
      * @return Hash table with the accumulated results
@@ -131,13 +158,17 @@ public class CruncherImpl implements Cruncher {
 
         // Remove the expressions that should be ignored
         for (String ignore: ignoreList) {
+            if(isIgnoreListSearchWord())
+                ignore = "\\b" + ignore + "\\b";
             auxExpression = auxExpression.replaceAll(ignore, " ");
         }
+        System.out.println("After ignore list removed:" + auxExpression);
 
         // Convert everything to lower case if the search should be case insensitive
         if (!isCaseSensitive()) {
             auxExpression = auxExpression.toLowerCase();
         }
+        System.out.println("After case sensitive:" + auxExpression);
 
         // Merge all expressions or words
         for (String key: mergeList.keySet()) {
@@ -145,19 +176,23 @@ public class CruncherImpl implements Cruncher {
                 auxExpression = auxExpression.replaceAll(convert, " " + key + " ");
             }
         }
+        System.out.println("After merge:" + auxExpression);
 
         // Do the reduce to words
         for (String phrase: auxExpression.split("\\.")) {
             for (String word: phrase.split("\\s+")) {
                 String auxWord = word.replaceAll(SEP, " ");
-                try {
-                    Integer a = result.get(auxWord);
-                    result.put(auxWord, a+1);
-                } catch(NullPointerException e) {
-                    result.put(auxWord, 1);
+                if (auxWord.length() > 0) {
+                    try {
+                        Integer a = result.get(auxWord);
+                        result.put(auxWord, a + 1);
+                    } catch (NullPointerException e) {
+                        result.put(auxWord, 1);
+                    }
                 }
             }
         }
+        System.out.println("result:" + result);
 
         return result;
     }
@@ -165,10 +200,15 @@ public class CruncherImpl implements Cruncher {
     @Override
     public CruncherMetaData crunch(String data) {
         Map<String, Integer> result = calculate(data);
-        MetaData allMetaData = new MetaData();
+        ExpressionCruncherMetaData allMetaData = new ExpressionCruncherMetaData();
+        int references = 0;
         for(Map.Entry<String, Integer> metaData: result.entrySet()) {
             MetaDataField<Integer> field = new MetaDataField<>(metaData.getValue());
             allMetaData.addField(metaData.getKey(), field);
+            if(references < metaData.getValue().intValue()) {
+                references = metaData.getValue();
+                allMetaData.setMostReferedExpression(metaData.getKey());
+            }
         }
         return allMetaData;
     }

@@ -30,6 +30,8 @@ public class MetaData extends AbstractDocument implements CruncherMetaData {
 
     public List<Map.Entry<String, MetaDataField>> getOrderedFields(Comparator<Map.Entry<String, MetaDataField>> comparator) {
         Set<Map.Entry<String, MetaDataField>> bamm = fields.entrySet();
+        if(bamm == null || bamm.size() == 0)
+            return new ArrayList<>();
         List<Map.Entry<String, MetaDataField>> bamm1 = new ArrayList<>(bamm);
         Collections.sort(bamm1, comparator);
         return bamm1;

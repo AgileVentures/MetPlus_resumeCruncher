@@ -51,7 +51,7 @@ public class ExpressionCruncherImplTest {
         assertEquals(false, cruncherImpl.isCaseSensitive());
         assertEquals(2, cruncherImpl.getMergeList().size());
         assertEquals(2, cruncherImpl.getMergeList().get("cook").size());
-        assertEquals(5, cruncherImpl.getIgnoreList().size());
+        assertEquals(20, cruncherImpl.getIgnoreList().size());
     }
 
     @Test
