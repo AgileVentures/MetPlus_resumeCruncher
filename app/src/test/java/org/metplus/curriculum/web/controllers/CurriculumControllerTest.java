@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.RestDocumentation;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -92,6 +93,7 @@ public class CurriculumControllerTest {
         }
     }
 
+    @RunWith(SpringJUnit4ClassRunner.class)
     public static class UploadEndpoint extends DefaultCurriculumTest {
 
         @Test
@@ -132,6 +134,8 @@ public class CurriculumControllerTest {
         }
 
     }
+
+    @RunWith(SpringJUnit4ClassRunner.class)
     public static class DownloadEndpoint extends DefaultCurriculumTest {
 
         @Test
@@ -175,22 +179,23 @@ public class CurriculumControllerTest {
         }
     }
 
+    @RunWith(SpringJUnit4ClassRunner.class)
     public static class MatchEndpoint extends DefaultCurriculumTest {
         @Test
         public void noMatches() throws Exception {
             MockHttpServletResponse response = mockMvc.perform(post("/api/v1/curriculum/match")
                     .header("X-Auth-Token", token)
                     .accept(MediaType.APPLICATION_JSON)
-                    .param("title", "My title")
-                    .param("description", "My description"))
+                    .param("title", "Stone mason")
+                    .param("description", "Stone mason that is able to build some nice walls"))
                     .andExpect(status().isOk())
-                    .andDo(document("curriculum/match-error",
+                    .andDo(document("curriculum/match-no-resumes",
                             requestHeaders(headerWithName("X-Auth-Token")
                                     .description("Authentication token retrieved from the authentication")),
-                            requestFields(fieldWithPath("title")
-                                            .description("Title of the Job"),
-                                    fieldWithPath("description")
-                                            .description("Description of the Job")),
+                            requestParameters(parameterWithName("title")
+                                                      .description("Title of the Job"),
+                                              parameterWithName("description")
+                                                      .description("Description of the Job")),
                             responseFields(
                                     fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
                                     fieldWithPath("message").description("Message associated with the result code"),

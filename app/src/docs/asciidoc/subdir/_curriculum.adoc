@@ -43,3 +43,18 @@ Response
 include::{snippets}/curriculum/download-error/http-response.adoc[]
 Parameters on response
 include::{snippets}/curriculum/download-error/response-fields.adoc[]
+
+
+*Match resumes with job description*
+
+Request
+include::{snippets}/curriculum/match-no-resumes/http-request.adoc[]
+Headers
+include::{snippets}/curriculum/match-no-resumes/request-headers.adoc[]
+Parameters
+include::{snippets}/curriculum/match-no-resumes/request-parameters.adoc[]
+
+Response
+include::{snippets}/curriculum/match-no-resumes/http-response.adoc[]
+Parameters on response
+include::{snippets}/curriculum/match-no-resumes/response-fields.adoc[]
