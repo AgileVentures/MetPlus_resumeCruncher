@@ -5,31 +5,15 @@ include::{snippets}/authentication/userPassword/http-request.adoc[]
 include::{snippets}/authentication/userPassword/request-headers.adoc[]
 
 Response
-[source,http]
-----
-HTTP/1.1 200 OK
-{
-  "token": "1231-12312-12312"
-}
-----
-
-The token variable should be used in all the subsequent requests.
+include::{snippets}/authentication/userPassword/http-response.adoc[]
+Parameters on response
+include::{snippets}/authentication/userPassword/response-fields.adoc[]
 
 *Authentication error*
 
 Request
-include::{snippets}/authentication/userPassword/http-request.adoc[]
-include::{snippets}/authentication/userPassword/request-headers.adoc[]
+include::{snippets}/authentication/userPassword-error/http-request.adoc[]
+include::{snippets}/authentication/userPassword-error/request-headers.adoc[]
 
 Response
-[source,http]
-----
-HTTP/1.1 401 Unauthorized
-{
-  "timestamp": 1458079772296,
-  "status": 401,
-  "error": "Unauthorized",
-  "message": "Invalid Backend Admin Credentials",
-  "path": "/api/v1/authenticate"
-}
-----
+include::{snippets}/authentication/userPassword-error/http-response.adoc[]
