@@ -16,4 +16,11 @@ public interface ResumeMatcher<T> {
      * @return Ordered list of resumes
      */
     List<T> match(String title, String description);
+
+    /**
+     * Retrieve the name of the cruncher associated with the
+     * matcher
+     * @return Name of the cruncher
+     */
+    String getCruncherName();
 }

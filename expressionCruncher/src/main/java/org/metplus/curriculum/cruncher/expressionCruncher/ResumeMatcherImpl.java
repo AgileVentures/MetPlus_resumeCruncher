@@ -42,8 +42,10 @@ public class ResumeMatcherImpl implements ResumeMatcher<Resume> {
         for(Resume resume: resumes) {
             logger.debug("Checking viability of the resume: " + resume);
             // Retrieve the meta data of the resume
-            String resumeExpression = ((ExpressionCruncherMetaData)resume.getCruncherData(cruncher.getCruncherName()))
-                                            .getMostReferedExpression();
+            ExpressionCruncherMetaData metaDataCruncher = (ExpressionCruncherMetaData)resume.getCruncherData(cruncher.getCruncherName());
+            if(metaDataCruncher == null)
+                continue;
+            String resumeExpression = metaDataCruncher.getMostReferedExpression();
             if(resumeExpression == null || resumeExpression.length() == 0)
                 resumeExpression = resume.getCruncherData(cruncher.getCruncherName())
                                          .getOrderedFields(new ResumeFieldComparator()).get(0).getKey();
@@ -63,6 +65,11 @@ public class ResumeMatcherImpl implements ResumeMatcher<Resume> {
         Collections.sort(resultDescription, new ResumeSorter());
         resultTitle.addAll(resultDescription);
         return resultTitle;
+    }
+
+    @Override
+    public String getCruncherName() {
+        return cruncher.getCruncherName();
     }
 
     /**

@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.metplus.curriculum.config.DatabaseConfig;
 import org.metplus.curriculum.cruncher.CrunchersList;
+import org.metplus.curriculum.cruncher.MatcherList;
 import org.metplus.curriculum.database.config.SpringMongoConfig;
 import org.metplus.curriculum.database.domain.CruncherSettings;
 import org.metplus.curriculum.database.domain.Settings;
@@ -25,7 +26,7 @@ import static org.junit.Assert.*;
 
 @ActiveProfiles("development")
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {ExpressionCruncher.class,SpringMongoConfig.class, DatabaseConfig.class, CrunchersList.class})
+@ContextConfiguration(classes = {ExpressionCruncher.class,SpringMongoConfig.class, DatabaseConfig.class, CrunchersList.class, MatcherList.class})
 public class ExpressionCruncherImplTest {
     @Autowired private ExpressionCruncher cruncher;
     @Autowired

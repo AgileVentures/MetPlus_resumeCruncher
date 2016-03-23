@@ -177,7 +177,7 @@ public class CruncherImpl implements Cruncher {
             }
         }
         System.out.println("After merge:" + auxExpression);
-
+        result = new HashMap<>();
         // Do the reduce to words
         for (String phrase: auxExpression.split("\\.")) {
             for (String word: phrase.split("\\s+")) {
