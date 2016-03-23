@@ -1,6 +1,5 @@
 package org.metplus.curriculum.database.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mongodb.BasicDBObject;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
@@ -16,14 +15,12 @@ import org.springframework.data.mongodb.gridfs.GridFsOperations;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Class that will store the information of the resume
  */
 @Document
-public class Resume extends AbstractDocument {
+public class Resume extends DocumentWithMetaData {
     @Field
     private String filename;
     @Field
@@ -31,8 +28,6 @@ public class Resume extends AbstractDocument {
     @Field
     private String userId;
 
-    @Field
-    private Map<String, MetaData> metaData;
 
     @Autowired
     private GridFsOperations gridOperation;
@@ -139,40 +134,5 @@ public class Resume extends AbstractDocument {
         return userId;
     }
 
-    /**
-     * Retrieve all the meta data of the specific resume
-     * @return Structure with all the meta data
-     */
-    public Map<String, MetaData> getMetaData() {
-        if(metaData == null)
-            metaData = new HashMap<>();
-        return metaData;
-    }
 
-    /**
-     * Over write all the meta data of this resume
-     * @param metaData New meta data
-     */
-    public void setMetaData(Map<String, MetaData> metaData) {
-        this.metaData = metaData;
-    }
-
-    /**
-     * Check if a cruncher already have processed this resume
-     * @param cruncherName Name of the cruncher
-     * @return True if meta data is present, false otherwise
-     */
-    @JsonIgnore
-    public boolean isCruncherDataAvailable(String cruncherName) {
-        return getMetaData().containsKey(cruncherName);
-    }
-
-    /**
-     * Retrieve meta data from a specific cruncher
-     * @param cruncherName Name of the cruncher
-     * @return Cruncher meta data
-     */
-    public MetaData getCruncherData(String cruncherName) {
-        return getMetaData().get(cruncherName);
-    }
 }
