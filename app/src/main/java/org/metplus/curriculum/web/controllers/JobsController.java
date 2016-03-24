@@ -37,8 +37,25 @@ public class JobsController {
         GenericAnswer answer = new GenericAnswer();
         Job job = jobRepository.findByJobId(id);
         if(job != null && job.getJobId().equals(id)) {
+            logger.error("Job with job id '" + id + "' already exist");
             answer.setResultCode(ResultCodes.JOB_ID_EXISTS);
             answer.setMessage("Trying to create job that already exists");
+        } else {
+            logger.debug("Going to create the job");
+            job = new Job();
+            job.setJobId(id);
+            job.setTitle(title);
+            job.setDescription(description);
+            try {
+                jobRepository.save(job);
+                logger.debug("Job added successfully");
+                answer.setResultCode(ResultCodes.SUCCESS);
+                answer.setMessage("Job added successfully");
+            } catch(Exception exp) {
+                logger.error("Unable to save the job '" + job + "' due to: " + exp.getMessage());
+                answer.setResultCode(ResultCodes.FATAL_ERROR);
+                answer.setMessage("Unable to save the job '" + job + "' due to: " + exp.getMessage());
+            }
         }
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
