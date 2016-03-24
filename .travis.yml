@@ -1,19 +1,20 @@
 language: java
-
 jdk:
-  - oraclejdk8
-
+- oraclejdk8
 os:
-  - linux
-
+- linux
 services:
-  - mongodb
-
+- mongodb
 env:
   global:
-    - SPRING_PROFILES_ACTIVE="unit-test"
-
+  - SPRING_PROFILES_ACTIVE="unit-test"
 before_install:
- - chmod +x gradlew
-
-install: ./gradlew :app:assemble
+- chmod +x gradlew
+install: "./gradlew :app:assemble"
+notifications:
+  slack:
+    email: false
+    rooms:
+      - secure: OYYzx+Sc8cOW84DKYF3hhpJTVXpPUUveDFFMNRpH77Zu2BezjOhDJG+R36Os3zOhHdpo7WKv38CedsF+BsC1YOpi3/xyZB5hFWcAOqCQrmSp4+yRDntKvTylxxNGM6GJ+1KsRPXeBGWGDOg1DGAInQZOM9hZnNR63bNP8KkDdB7PwU9Ts9XRiqmsm5JhUl0DjZwWiySqAOyhFYYSYoJkieh6xk+DT6oqZMgDNX3Yj4xCAScttQWfTouo6SMAUeSZReqR7TwTmm16pkslHdZDf0HiqjDHCXF8lbW+F5TxslCRm6lMHqaIC7NwJoe43hafTfO6whWOMUZwsbNCt5v14RAOthEYIcCijPp00UCrt5ZU8RaVqMcn9+hFYr6+L7ZnCjob/Pj2XUjc1duSj2vQC++yaLhDhSRJxI676B60AB8eC+/+KSIfaOo6tw/bRxmERwpDZzMooM3cddJ1f/SaZMkPdvMSxnCw5auzhjFqWrX0bMeIr6Sz/ImPnxFlKncJTIp7MHhh1sQ44M29uerlefWwTO8pl2xdNtQvIVzwkIyJmCVI2Fc+ODD/qkU5McHjO4w2IO5NGTiS9L/sRVrV7tJHixK5v2w04LsYAlBhBornPcoO5Qnyy1DzpWwEXNx5wQcDKf+/ypk+oSQQGkA9IglduIjmy5oR5yzo9e65qjA=
+    on_success: always
+    on_failure: always
