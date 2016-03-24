@@ -4,6 +4,7 @@ import org.metplus.curriculum.cruncher.Cruncher;
 import org.metplus.curriculum.cruncher.Matcher;
 import org.metplus.curriculum.database.domain.*;
 import org.metplus.curriculum.database.exceptions.CruncherSettingsNotFound;
+import org.metplus.curriculum.database.repository.JobRepository;
 import org.metplus.curriculum.database.repository.ResumeRepository;
 import org.metplus.curriculum.database.repository.SettingsRepository;
 import org.metplus.curriculum.init.CruncherInitializer;
@@ -70,6 +71,8 @@ public class ExpressionCruncher extends CruncherInitializer {
     private SettingsRepository repository;
     @Autowired
     private ResumeRepository resumeRepository;
+    @Autowired
+    private JobRepository jobRepository;
 
     @Override
     public void init() {
@@ -107,7 +110,7 @@ public class ExpressionCruncher extends CruncherInitializer {
             cruncherImpl.setIgnoreListSearchWord(ignoreListWordSearch);
             save();
         }
-        resumeMatcher = new MatcherImpl(cruncherImpl, resumeRepository);
+        resumeMatcher = new MatcherImpl(cruncherImpl, resumeRepository, jobRepository);
     }
 
     /**
