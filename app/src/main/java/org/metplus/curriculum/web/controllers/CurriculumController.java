@@ -2,7 +2,7 @@ package org.metplus.curriculum.web.controllers;
 
 
 import org.metplus.curriculum.cruncher.MatcherList;
-import org.metplus.curriculum.cruncher.ResumeMatcher;
+import org.metplus.curriculum.cruncher.Matcher;
 import org.metplus.curriculum.database.config.SpringMongoConfig;
 import org.metplus.curriculum.database.domain.Resume;
 import org.metplus.curriculum.database.exceptions.ResumeNotFound;
@@ -24,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -143,7 +142,7 @@ public class CurriculumController {
         }
         List<Resume> matchedResumes = null;
         MatchAnswer answer = new MatchAnswer();
-        for(ResumeMatcher matcher: matcherList.getMatchers()) {
+        for(Matcher matcher: matcherList.getMatchers()) {
             matchedResumes = matcher.match(title, description);
             for(Resume resume: matchedResumes) {
                 answer.addResumes(matcher.getCruncherName(), resume);

@@ -1,10 +1,9 @@
 package org.metplus.curriculum.init;
 
-import org.apache.poi.ss.formula.functions.Match;
 import org.metplus.curriculum.cruncher.Cruncher;
 import org.metplus.curriculum.cruncher.CrunchersList;
 import org.metplus.curriculum.cruncher.MatcherList;
-import org.metplus.curriculum.cruncher.ResumeMatcher;
+import org.metplus.curriculum.cruncher.Matcher;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -45,5 +44,5 @@ public abstract class CruncherInitializer {
      * Function used to retrieve the matcher
      * @return Matcher to be used
      */
-    public abstract ResumeMatcher getMatcher();
+    public abstract Matcher getMatcher();
 }

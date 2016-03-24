@@ -12,13 +12,13 @@ import java.util.List;
 @Component("matchersList")
 public class MatcherList {
 
-    List<ResumeMatcher> matchers;
+    List<Matcher> matchers;
 
     /**
      * All the matchers
      * @return List of all the matchers
      */
-    public List<ResumeMatcher> getMatchers() {
+    public List<Matcher> getMatchers() {
         if(matchers == null)
             matchers = new ArrayList<>();
         return matchers;
@@ -28,7 +28,7 @@ public class MatcherList {
      * Add a new matcher
      * @param matcher Matcher
      */
-    public void addMatchers(ResumeMatcher matcher) {
+    public void addMatchers(Matcher matcher) {
         getMatchers().add(matcher);
     }
 }
