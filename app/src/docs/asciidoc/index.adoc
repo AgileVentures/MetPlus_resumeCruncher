@@ -22,3 +22,8 @@ include::subdir/_authentication.adoc[]
 ====
 include::subdir/_curriculum.adoc[]
 ====
+
+== job
+====
+include::subdir/_job.adoc[]
+====
