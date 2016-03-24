@@ -232,6 +232,7 @@ public class MatcherImplTest {
         public void noJobDatabase() {
             ExpressionCruncherMetaData metaData = new ExpressionCruncherMetaData();
             metaData.setMostReferedExpression("ipsum");
+            metaData.setFields(new HashMap<>());
             Mockito.when(resumeRepository.resumesOnCriteria(Mockito.any())).thenReturn(resumes);
             Mockito.when(jobRepository.findAll()).thenReturn(new ArrayList<>());
             resumeMatcher = new MatcherImpl(cruncher, resumeRepository, jobRepository);
@@ -243,6 +244,7 @@ public class MatcherImplTest {
             initialize();
             ExpressionCruncherMetaData metaData = new ExpressionCruncherMetaData();
             metaData.setMostReferedExpression("bamm");
+            metaData.setFields(new HashMap<>());
             Mockito.when(resumeRepository.resumesOnCriteria(Mockito.any())).thenReturn(resumes);
             Mockito.when(jobRepository.findAll()).thenReturn(jobs);
             resumeMatcher = new MatcherImpl(cruncher, resumeRepository, jobRepository);
@@ -255,6 +257,7 @@ public class MatcherImplTest {
             initialize();
             ExpressionCruncherMetaData metaData = new ExpressionCruncherMetaData();
             metaData.setMostReferedExpression("ipsum");
+            metaData.setFields(new HashMap<>());
             Mockito.when(resumeRepository.resumesOnCriteria(Mockito.any())).thenReturn(resumes);
             resumeMatcher = new MatcherImpl(cruncher, resumeRepository, jobRepository);
             Mockito.when(jobRepository.findAll()).thenReturn(jobs);

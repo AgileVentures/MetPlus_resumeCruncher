@@ -76,13 +76,21 @@ public class MatcherImpl implements Matcher<Resume, Job> {
 
     @Override
     public List<Job> match(CruncherMetaData metadata) {
+        logger.trace("match(" + metadata + ")");
+        // Retrieve the meta data into a good object type
         ExpressionCruncherMetaData auxMetaData = (ExpressionCruncherMetaData)metadata;
         List<Job> result = new ArrayList<>();
+        // Iterate over all the jobs
         for(Job job: jobRepository.findAll()) {
+            logger.debug("Checking viability of the resume: " + job);
             ExpressionCruncherMetaData jobMetaData = (ExpressionCruncherMetaData)job.getCruncherData(getCruncherName());
-            if(jobMetaData.getMostReferedExpression().equals(auxMetaData.getMostReferedExpression()))
+            // Check if the most common denominator between the job and the meta data is the same
+            if(jobMetaData.getMostReferedExpression().equals(auxMetaData.getMostReferedExpression())) {
+                logger.debug("Job match with metadata");
                 result.add(job);
+            }
         }
+        // Sort the jobs to add to the top the most relevant
         Collections.sort(result, new JobSorter());
         return result;
     }
