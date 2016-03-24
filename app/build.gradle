@@ -52,6 +52,7 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     testCompile 'org.springframework.restdocs:spring-restdocs-mockmvc:1.0.1.RELEASE'
     testCompile 'org.springframework.boot:spring-boot-starter-test'
+    testCompile 'com.jayway.jsonpath:json-path'
 }
 
 

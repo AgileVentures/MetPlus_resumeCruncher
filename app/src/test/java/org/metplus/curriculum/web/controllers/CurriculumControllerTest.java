@@ -12,6 +12,7 @@ import org.metplus.curriculum.web.GenericAnswer;
 import org.metplus.curriculum.web.ResultCodes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
