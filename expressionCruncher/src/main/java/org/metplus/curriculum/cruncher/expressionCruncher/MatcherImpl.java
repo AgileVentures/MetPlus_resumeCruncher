@@ -1,6 +1,6 @@
 package org.metplus.curriculum.cruncher.expressionCruncher;
 
-import org.metplus.curriculum.cruncher.ResumeMatcher;
+import org.metplus.curriculum.cruncher.Matcher;
 import org.metplus.curriculum.database.domain.MetaDataField;
 import org.metplus.curriculum.database.domain.Resume;
 import org.metplus.curriculum.database.repository.ResumeRepository;
@@ -13,8 +13,8 @@ import java.util.*;
  * Created by Joao on 3/21/16.
  * Class that implement the Matcher for Resumes using the Expression Cruncher
  */
-public class ResumeMatcherImpl implements ResumeMatcher<Resume> {
-    private static Logger logger = LoggerFactory.getLogger(ResumeMatcherImpl.class);
+public class MatcherImpl implements Matcher<Resume> {
+    private static Logger logger = LoggerFactory.getLogger(MatcherImpl.class);
     private ResumeRepository resumeRepository;
     private CruncherImpl cruncher;
 
@@ -23,7 +23,7 @@ public class ResumeMatcherImpl implements ResumeMatcher<Resume> {
      * @param cruncher Cruncher implementation
      * @param resumeRepository Resume repository to retrieve the resumes
      */
-    public ResumeMatcherImpl(CruncherImpl cruncher, ResumeRepository resumeRepository) {
+    public MatcherImpl(CruncherImpl cruncher, ResumeRepository resumeRepository) {
         this.cruncher = cruncher;
         this.resumeRepository = resumeRepository;
     }

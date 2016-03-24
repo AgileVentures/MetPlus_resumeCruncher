@@ -4,12 +4,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.metplus.curriculum.cruncher.Cruncher;
 import org.metplus.curriculum.database.domain.MetaData;
 import org.metplus.curriculum.database.domain.MetaDataField;
 import org.metplus.curriculum.database.domain.Resume;
 import org.metplus.curriculum.database.repository.ResumeRepository;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -25,8 +23,8 @@ import static org.junit.Assert.assertEquals;
  * Created by joao on 3/21/16.
  */
 @RunWith(Suite.class)
-@SuiteClasses({ResumeMatcherImplTest.Match.class})
-public class ResumeMatcherImplTest {
+@SuiteClasses({MatcherImplTest.Match.class})
+public class MatcherImplTest {
     @RunWith(MockitoJUnitRunner.class)
     public static class Match{
         @Mock
@@ -34,7 +32,7 @@ public class ResumeMatcherImplTest {
 
         private CruncherImpl cruncher;
 
-        private ResumeMatcherImpl resumeMatcher;
+        private MatcherImpl resumeMatcher;
 
         // Lorem ipsum dolor sit amet, consectetur adipiscing elit.
         // Aenean quis odio ut neque venenatis iaculis nec eu diam.
@@ -91,7 +89,7 @@ public class ResumeMatcherImplTest {
         public void foundNone() {
 
             Mockito.when(resumeRepository.resumesOnCriteria(Mockito.any())).thenReturn(initialize());
-            resumeMatcher = new ResumeMatcherImpl(cruncher, resumeRepository);
+            resumeMatcher = new MatcherImpl(cruncher, resumeRepository);
 
             assertEquals(0, resumeMatcher.match("pico", "pico de gallo").size());
         }
@@ -100,7 +98,7 @@ public class ResumeMatcherImplTest {
         public void foundTwo() {
 
             Mockito.when(resumeRepository.resumesOnCriteria(Mockito.any())).thenReturn(initialize());
-            resumeMatcher = new ResumeMatcherImpl(cruncher, resumeRepository);
+            resumeMatcher = new MatcherImpl(cruncher, resumeRepository);
             List<Resume> result = resumeMatcher.match("ipsum", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean quis odio ut neque venenatis iaculis nec eu diam. Sed a libero odio. Suspendisse iaculis velit nec sodales fermentum. Suspendisse potenti. Donec ultricies nulla vitae facilisis tempor. Cras et pretium augue. Maecenas viverra risus nibh, vitae faucibus massa fermentum vitae. Donec eget urna nec nisl pretium maximus. ");
             assertEquals(2, result.size());
             assertEquals("user2", result.get(0).getUserId());
@@ -111,7 +109,7 @@ public class ResumeMatcherImplTest {
         public void foundThree() {
 
             Mockito.when(resumeRepository.resumesOnCriteria(Mockito.any())).thenReturn(initialize());
-            resumeMatcher = new ResumeMatcherImpl(cruncher, resumeRepository);
+            resumeMatcher = new MatcherImpl(cruncher, resumeRepository);
             List<Resume> result = resumeMatcher.match("ipsum", "fermentum ipsum dolor sit amet, fermentum adipiscing elit. fermentum fermentum quis odio ut neque venenatis iaculis nec eu diam. fermentum Sed a libero odio. Suspendisse iaculis velit nec sodales fermentum. Suspendisse potenti. Donec ultricies nulla vitae facilisis tempor. Cras et pretium augue. Maecenas viverra risus nibh, vitae faucibus massa fermentum vitae. Donec eget urna nec nisl pretium maximus. ");
             assertEquals(3, result.size());
             assertEquals("user2", result.get(0).getUserId());

@@ -7,7 +7,7 @@ import java.util.List;
  * Interface for the matchers of resumes with title and description of jobs
  * @param <T> Resume type
  */
-public interface ResumeMatcher<T> {
+public interface Matcher<T> {
     /**
      * This function will receive a title and a description of a job
      * and is responsible for retrieving a list of resumes that match
