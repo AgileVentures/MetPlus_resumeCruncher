@@ -1,20 +1,17 @@
 package org.metplus.curriculum.cruncher.expressionCruncher;
 
 import org.metplus.curriculum.cruncher.Cruncher;
-import org.metplus.curriculum.cruncher.CruncherMetaData;
-import org.metplus.curriculum.cruncher.ResumeMatcher;
+import org.metplus.curriculum.cruncher.Matcher;
 import org.metplus.curriculum.database.domain.*;
 import org.metplus.curriculum.database.exceptions.CruncherSettingsNotFound;
+import org.metplus.curriculum.database.repository.JobRepository;
 import org.metplus.curriculum.database.repository.ResumeRepository;
 import org.metplus.curriculum.database.repository.SettingsRepository;
 import org.metplus.curriculum.init.CruncherInitializer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 
 /**
@@ -69,11 +66,13 @@ public class ExpressionCruncher extends CruncherInitializer {
 
 
     private CruncherImpl cruncherImpl;
-    private ResumeMatcherImpl resumeMatcher;
+    private MatcherImpl resumeMatcher;
     @Autowired
     private SettingsRepository repository;
     @Autowired
     private ResumeRepository resumeRepository;
+    @Autowired
+    private JobRepository jobRepository;
 
     @Override
     public void init() {
@@ -111,7 +110,7 @@ public class ExpressionCruncher extends CruncherInitializer {
             cruncherImpl.setIgnoreListSearchWord(ignoreListWordSearch);
             save();
         }
-        resumeMatcher = new ResumeMatcherImpl(cruncherImpl, resumeRepository);
+        resumeMatcher = new MatcherImpl(cruncherImpl, resumeRepository, jobRepository);
     }
 
     /**
@@ -144,7 +143,7 @@ public class ExpressionCruncher extends CruncherInitializer {
     }
 
     @Override
-    public ResumeMatcher getMatcher() {
+    public Matcher getMatcher() {
         return resumeMatcher;
     }
 }

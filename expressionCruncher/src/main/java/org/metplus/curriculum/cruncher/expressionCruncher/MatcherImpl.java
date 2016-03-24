@@ -1,8 +1,13 @@
 package org.metplus.curriculum.cruncher.expressionCruncher;
 
-import org.metplus.curriculum.cruncher.ResumeMatcher;
+import org.apache.poi.ss.formula.functions.T;
+import org.metplus.curriculum.cruncher.CruncherMetaData;
+import org.metplus.curriculum.cruncher.Matcher;
+import org.metplus.curriculum.database.domain.DocumentWithMetaData;
+import org.metplus.curriculum.database.domain.Job;
 import org.metplus.curriculum.database.domain.MetaDataField;
 import org.metplus.curriculum.database.domain.Resume;
+import org.metplus.curriculum.database.repository.JobRepository;
 import org.metplus.curriculum.database.repository.ResumeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,19 +18,21 @@ import java.util.*;
  * Created by Joao on 3/21/16.
  * Class that implement the Matcher for Resumes using the Expression Cruncher
  */
-public class ResumeMatcherImpl implements ResumeMatcher<Resume> {
-    private static Logger logger = LoggerFactory.getLogger(ResumeMatcherImpl.class);
+public class MatcherImpl implements Matcher<Resume, Job> {
+    private static Logger logger = LoggerFactory.getLogger(MatcherImpl.class);
     private ResumeRepository resumeRepository;
     private CruncherImpl cruncher;
+    private JobRepository jobRepository;
 
     /**
      * Class constructor
      * @param cruncher Cruncher implementation
      * @param resumeRepository Resume repository to retrieve the resumes
      */
-    public ResumeMatcherImpl(CruncherImpl cruncher, ResumeRepository resumeRepository) {
+    public MatcherImpl(CruncherImpl cruncher, ResumeRepository resumeRepository, JobRepository jobRepository) {
         this.cruncher = cruncher;
         this.resumeRepository = resumeRepository;
+        this.jobRepository = jobRepository;
     }
 
     @Override
@@ -65,6 +72,27 @@ public class ResumeMatcherImpl implements ResumeMatcher<Resume> {
         Collections.sort(resultDescription, new ResumeSorter());
         resultTitle.addAll(resultDescription);
         return resultTitle;
+    }
+
+    @Override
+    public List<Job> match(CruncherMetaData metadata) {
+        logger.trace("match(" + metadata + ")");
+        // Retrieve the meta data into a good object type
+        ExpressionCruncherMetaData auxMetaData = (ExpressionCruncherMetaData)metadata;
+        List<Job> result = new ArrayList<>();
+        // Iterate over all the jobs
+        for(Job job: jobRepository.findAll()) {
+            logger.debug("Checking viability of the resume: " + job);
+            ExpressionCruncherMetaData jobMetaData = (ExpressionCruncherMetaData)job.getCruncherData(getCruncherName());
+            // Check if the most common denominator between the job and the meta data is the same
+            if(jobMetaData.getMostReferedExpression().equals(auxMetaData.getMostReferedExpression())) {
+                logger.debug("Job match with metadata");
+                result.add(job);
+            }
+        }
+        // Sort the jobs to add to the top the most relevant
+        Collections.sort(result, new JobSorter());
+        return result;
     }
 
     @Override
@@ -114,25 +142,36 @@ public class ResumeMatcherImpl implements ResumeMatcher<Resume> {
             return leftFields.get(0).getKey().compareTo(rightFields.get(0).getKey());
         }
     }
-
     /**
      * Class that will compare the fields on the resume meta data
      * to order them by most common expression
      */
-    private class ResumeSorter implements Comparator<Resume> {
+    private class EntitySorter<T extends DocumentWithMetaData> implements Comparator<T> {
         @Override
-        public int compare(Resume o1, Resume o2) {
+        public int compare(T o1, T o2) {
             String field = ((ExpressionCruncherMetaData)o1.getCruncherData(cruncher.getCruncherName()))
-                                                          .getMostReferedExpression();
+                    .getMostReferedExpression();
             int left = (Integer) o1.getCruncherData(cruncher.getCruncherName())
-                                   .getFields().get(field).getData();
+                    .getFields().get(field).getData();
             int right = (Integer) o2.getCruncherData(cruncher.getCruncherName())
-                                    .getFields().get(field).getData();
+                    .getFields().get(field).getData();
             if(left < right)
                 return 1;
             else if(left > right)
                 return -1;
             return 0;
         }
+    }
+    /**
+     * Class that will compare the fields on the resume meta data
+     * to order them by most common expression
+     */
+    private class ResumeSorter extends EntitySorter<Resume> {
+    }
+    /**
+     * Class that will compare the fields on the resume meta data
+     * to order them by most common expression
+     */
+    private class JobSorter extends EntitySorter<Job> {
     }
 }
