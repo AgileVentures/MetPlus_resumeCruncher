@@ -52,9 +52,9 @@ public class JobsController {
                 answer.setResultCode(ResultCodes.SUCCESS);
                 answer.setMessage("Job added successfully");
             } catch(Exception exp) {
-                logger.error("Unable to save the job '" + job + "' due to: " + exp.getMessage());
+                logger.error("Unable to create the job '" + job + "' due to: " + exp.getMessage());
                 answer.setResultCode(ResultCodes.FATAL_ERROR);
-                answer.setMessage("Unable to save the job '" + job + "' due to: " + exp.getMessage());
+                answer.setMessage("Unable to create the job '" + job + "' due to: " + exp.getMessage());
             }
         }
         return new ResponseEntity<>(answer, HttpStatus.OK);
@@ -67,6 +67,28 @@ public class JobsController {
                                                 @RequestParam(value = "description", required = false) String description){
         logger.trace("update(" + jobId + ", " + title + ", " + description + ")");
         GenericAnswer answer = new GenericAnswer();
+        Job job = jobRepository.findByJobId(jobId);
+        if(job == null) {
+            logger.error("Job with job id '" + jobId + "' do not exist");
+            answer.setResultCode(ResultCodes.JOB_NOT_FOUND);
+            answer.setMessage("Job not found");
+        } else {
+            logger.debug("Going to update the job");
+            if(title != null)
+                job.setTitle(title);
+            if(description != null)
+                job.setDescription(description);
+            try {
+                jobRepository.save(job);
+                logger.debug("Job updated successfully");
+                answer.setResultCode(ResultCodes.SUCCESS);
+                answer.setMessage("Job updated successfully");
+            } catch(Exception exp) {
+                logger.error("Unable to save the job '" + job + "' due to: " + exp.getMessage());
+                answer.setResultCode(ResultCodes.FATAL_ERROR);
+                answer.setMessage("Unable to save the job '" + job + "' due to: " + exp.getMessage());
+            }
+        }
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
     @RequestMapping(value = "/match/{resumeId}", method = RequestMethod.GET)

@@ -9,5 +9,6 @@ public enum ResultCodes {
     ACCESS_DENIED,
     FATAL_ERROR,
     RESUME_NOT_FOUND,
-    JOB_ID_EXISTS;
+    JOB_ID_EXISTS,
+    JOB_NOT_FOUND;
 }
