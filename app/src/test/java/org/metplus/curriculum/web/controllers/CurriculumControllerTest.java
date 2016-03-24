@@ -66,13 +66,6 @@ public class CurriculumControllerTest {
 
         @Before
         public void setUp() throws Exception {
-
-            /**AuthenticationManager authenticationManager = this.ctx
-                    .getBean(AuthenticationManager.class);
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(backendAdminUsername, backendAdminPassword));
-            SecurityContextHolder.getContext().setAuthentication(authentication);**/
-
             this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx)
                     .addFilter(springSecurityFilterChain)
                     .apply(documentationConfiguration(this.restDocumentation))
