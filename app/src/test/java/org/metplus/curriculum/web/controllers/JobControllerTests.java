@@ -376,7 +376,7 @@ public class JobControllerTests {
                     .andExpect(jsonPath("$.jobs.matcher2", hasSize(2)))
                     .andExpect(jsonPath("$.jobs.matcher2[0]", is("job3")))
                     .andExpect(jsonPath("$.jobs.matcher2[1]", is("job2")))
-                    .andDo(document("resume/update-success",
+                    .andDo(document("job/match-success",
                             requestHeaders(headerWithName("X-Auth-Token")
                                     .description("Authentication token retrieved from the authentication")),
                             pathParameters(parameterWithName("resumeId").description("User identifier of the resume")),
@@ -423,7 +423,7 @@ public class JobControllerTests {
                     .andExpect(jsonPath("$.resultCode", is(ResultCodes.SUCCESS.toString())))
                     .andExpect(jsonPath("$.jobs.matcher1", isEmptyOrNullString()))
                     .andExpect(jsonPath("$.jobs.matcher2", isEmptyOrNullString()))
-                    .andDo(document("resume/update-success",
+                    .andDo(document("job/match-not-found",
                             requestHeaders(headerWithName("X-Auth-Token")
                                     .description("Authentication token retrieved from the authentication")),
                             pathParameters(parameterWithName("resumeId").description("User identifier of the resume")),

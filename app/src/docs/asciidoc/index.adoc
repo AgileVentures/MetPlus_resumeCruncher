@@ -1,7 +1,6 @@
 = PETS Resume cruncher API Documentation
-Joao Pereira <joaopapereira@gmail.com>
-2016-02-27
-:revnumber: {project-version}
+Joao Pereira <joaopapereira@gmail.com> 2016-03-25
+:revnumber: 0.1.0
 :example-caption!:
 ifndef::imagesdir[:imagesdir: images]
 ifndef::sourcedir[:sourcedir: ../java]
@@ -10,20 +9,18 @@ This is a user manual for an MetPlus Resume cruncher project.
 
 == Introduction
 
-This project does something.
-We just haven't decided what that is yet.
+This API can is used to upload/download Resumes from the Mongo Database
 
 == Authentication
-====
-include::subdir/_authentication.adoc[]
-====
 
-== Curriculum
-====
-include::subdir/_curriculum.adoc[]
-====
+include::subdir/_authentication.adoc[leveloffset=+2]
 
-== job
-====
-include::subdir/_job.adoc[]
-====
+
+== Curriculum Operations
+
+include::subdir/_curriculum.adoc[leveloffset=+2]
+
+== Jobs Operations
+
+include::subdir/_job.adoc[leveloffset=+2]
+

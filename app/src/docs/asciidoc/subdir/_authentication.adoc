@@ -1,4 +1,4 @@
-*Authentication Success*
+= Authentication Success
 
 Request
 include::{snippets}/authentication/userPassword/http-request.adoc[]
@@ -9,7 +9,7 @@ include::{snippets}/authentication/userPassword/http-response.adoc[]
 Parameters on response
 include::{snippets}/authentication/userPassword/response-fields.adoc[]
 
-*Authentication error*
+= Authentication error
 
 Request
 include::{snippets}/authentication/userPassword-error/http-request.adoc[]
