@@ -1,4 +1,4 @@
-package org.metplus.curriculum.web;
+package org.metplus.curriculum.web.answers;
 
 import java.io.Serializable;
 

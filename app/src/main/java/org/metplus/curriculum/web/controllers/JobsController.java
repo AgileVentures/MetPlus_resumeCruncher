@@ -1,11 +1,13 @@
 package org.metplus.curriculum.web.controllers;
 
+import org.metplus.curriculum.cruncher.Matcher;
+import org.metplus.curriculum.cruncher.MatcherList;
 import org.metplus.curriculum.database.domain.Job;
 import org.metplus.curriculum.database.domain.Resume;
 import org.metplus.curriculum.database.repository.JobRepository;
 import org.metplus.curriculum.database.repository.ResumeRepository;
-import org.metplus.curriculum.web.GenericAnswer;
-import org.metplus.curriculum.web.ResultCodes;
+import org.metplus.curriculum.web.answers.GenericAnswer;
+import org.metplus.curriculum.web.answers.ResultCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * REST Controller that will handle
@@ -33,6 +37,9 @@ public class JobsController {
 
     @Autowired
     private ResumeRepository resumeRepository;
+
+    @Autowired
+    private MatcherList matcherList;
 
 
     private static Logger logger = LoggerFactory.getLogger(JobsController.class);
@@ -109,6 +116,14 @@ public class JobsController {
         if(resume == null) {
             answer.setResultCode(ResultCodes.RESUME_NOT_FOUND);
             answer.setMessage("Cannot find the resume");
+        }
+
+        List<Job> matchedJobs = null;
+        for(Matcher matcher: matcherList.getMatchers()) {
+            matchedJobs = matcher.match(resume.getCruncherData(matcher.getCruncherName()));
+            for(Job job: matchedJobs) {
+                //answer.addResume(matcher.getCruncherName(), job);
+            }
         }
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }

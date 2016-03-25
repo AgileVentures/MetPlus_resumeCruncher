@@ -8,11 +8,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import org.metplus.curriculum.web.GenericAnswer;
-import org.metplus.curriculum.web.ResultCodes;
+import org.metplus.curriculum.web.answers.GenericAnswer;
+import org.metplus.curriculum.web.answers.ResultCodes;
+import org.metplus.curriculum.web.answers.ResumeMatchAnswer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
@@ -197,7 +197,7 @@ public class CurriculumControllerTest {
                             )
                     ))
                     .andReturn().getResponse();
-            MatchAnswer answer = new ObjectMapper().readValue(response.getContentAsString(), MatchAnswer.class);
+            ResumeMatchAnswer answer = new ObjectMapper().readValue(response.getContentAsString(), ResumeMatchAnswer.class);
             assertEquals("Result code is not correct", ResultCodes.SUCCESS, answer.getResultCode());
             assertEquals("Number of resumes should be 0", 0, answer.getResumes().size());
         }

@@ -1,4 +1,4 @@
-package org.metplus.curriculum.web;
+package org.metplus.curriculum.web.answers;
 
 /**
  * Enumeration with all the result codes

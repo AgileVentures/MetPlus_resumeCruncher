@@ -8,7 +8,7 @@ import org.junit.runners.Suite;
 import org.metplus.curriculum.database.domain.Job;
 import org.metplus.curriculum.database.repository.JobRepository;
 import org.metplus.curriculum.database.repository.ResumeRepository;
-import org.metplus.curriculum.web.ResultCodes;
+import org.metplus.curriculum.web.answers.ResultCodes;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -37,7 +37,6 @@ import static org.springframework.restdocs.request.RequestDocumentation.pathPara
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
