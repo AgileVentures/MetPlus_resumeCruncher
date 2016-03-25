@@ -83,7 +83,7 @@ public class MatcherImpl implements Matcher<Resume, Job> {
         // Iterate over all the jobs
         for(Job job: jobRepository.findAll()) {
             logger.debug("Checking viability of the resume: " + job);
-            ExpressionCruncherMetaData jobMetaData = (ExpressionCruncherMetaData)job.getCruncherData(getCruncherName());
+            ExpressionCruncherMetaData jobMetaData = (ExpressionCruncherMetaData)job.getTitleCruncherData(getCruncherName());
             // Check if the most common denominator between the job and the meta data is the same
             if(jobMetaData.getMostReferedExpression().equals(auxMetaData.getMostReferedExpression())) {
                 logger.debug("Job match with metadata");

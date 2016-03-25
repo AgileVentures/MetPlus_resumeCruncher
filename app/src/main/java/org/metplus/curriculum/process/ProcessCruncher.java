@@ -7,8 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Semaphore;
 
 /**
  * Created by joao on 3/25/16.
@@ -22,7 +21,7 @@ public abstract class ProcessCruncher<Work> {
     @Autowired
     protected CrunchersList allCrunchers;
 
-    CountDownLatch jobSignal;
+    Semaphore semaphore;
 
     /**
      * Post constructor function
@@ -31,7 +30,7 @@ public abstract class ProcessCruncher<Work> {
      */
     @PostConstruct
     public void postConstructor() {
-        jobSignal = new CountDownLatch(1);
+        semaphore = new Semaphore(1);
         workDeque = new ArrayDeque<>();
         start();
     }
@@ -48,7 +47,7 @@ public abstract class ProcessCruncher<Work> {
                 process(work);
             }
             try {
-                jobSignal.await(1, TimeUnit.HOURS);
+                semaphore.acquire();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -66,7 +65,7 @@ public abstract class ProcessCruncher<Work> {
      */
     public synchronized void stop(){
         setKeepRunning(false);
-        jobSignal.countDown();
+        semaphore.release();
     }
 
     /**
@@ -95,7 +94,7 @@ public abstract class ProcessCruncher<Work> {
      */
     public synchronized void addWork(Work work) {
         workDeque.add(work);
-        jobSignal.countDown();
+        semaphore.release();
     }
 
     /**

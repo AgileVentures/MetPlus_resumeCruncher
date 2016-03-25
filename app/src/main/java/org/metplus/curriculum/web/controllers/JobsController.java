@@ -6,6 +6,7 @@ import org.metplus.curriculum.database.domain.Job;
 import org.metplus.curriculum.database.domain.Resume;
 import org.metplus.curriculum.database.repository.JobRepository;
 import org.metplus.curriculum.database.repository.ResumeRepository;
+import org.metplus.curriculum.process.JobCruncher;
 import org.metplus.curriculum.web.answers.GenericAnswer;
 import org.metplus.curriculum.web.answers.JobMatchAnswer;
 import org.metplus.curriculum.web.answers.ResultCodes;
@@ -43,6 +44,9 @@ public class JobsController {
     @Autowired
     private MatcherList matcherList;
 
+    @Autowired
+    private JobCruncher jobCruncher;
+
 
     private static Logger logger = LoggerFactory.getLogger(JobsController.class);
     @RequestMapping(value = "/create", method = RequestMethod.POST)
@@ -66,6 +70,7 @@ public class JobsController {
             job.setDescription(description);
             try {
                 jobRepository.save(job);
+                jobCruncher.addWork(job);
                 logger.debug("Job added successfully");
                 answer.setResultCode(ResultCodes.SUCCESS);
                 answer.setMessage("Job added successfully");
