@@ -3,6 +3,8 @@ package org.metplus.curriculum.database.domain;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.Map;
+
 /**
  * Job Model
  */
@@ -14,6 +16,35 @@ public class Job extends DocumentWithMetaData {
     private String jobId;
     @Field
     private String description;
+
+    @Field
+    private DocumentWithMetaData titleMetaData;
+
+    @Field
+    private DocumentWithMetaData descriptionMetaData;
+
+    public MetaData getTitleCruncherData(String cruncherName) {
+        return titleMetaData.getMetaData().get(cruncherName);
+    }
+    public Map<String, MetaData> getTitleCruncherData() {
+        return titleMetaData.getMetaData();
+    }
+
+
+    public void setTitleMetaData(DocumentWithMetaData titleMetaData) {
+        this.titleMetaData = titleMetaData;
+    }
+
+    public DocumentWithMetaData getDescriptionMetaData() {
+        return descriptionMetaData;
+    }
+
+    public void setDescriptionMetaData(DocumentWithMetaData descriptionMetaData) {
+        this.descriptionMetaData = descriptionMetaData;
+    }
+    public DocumentWithMetaData getTitleMetaData() {return titleMetaData;};
+
+
 
     /**
      * Retrieve the title of the Job
