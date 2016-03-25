@@ -9,8 +9,9 @@ import org.metplus.curriculum.database.exceptions.ResumeNotFound;
 import org.metplus.curriculum.database.exceptions.ResumeReadException;
 import org.metplus.curriculum.database.repository.ResumeRepository;
 import org.metplus.curriculum.process.ResumeCruncher;
-import org.metplus.curriculum.web.GenericAnswer;
-import org.metplus.curriculum.web.ResultCodes;
+import org.metplus.curriculum.web.answers.GenericAnswer;
+import org.metplus.curriculum.web.answers.ResultCodes;
+import org.metplus.curriculum.web.answers.ResumeMatchAnswer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,11 +142,11 @@ public class CurriculumController {
             return new ResponseEntity<>(answer, HttpStatus.BAD_REQUEST);
         }
         List<Resume> matchedResumes = null;
-        MatchAnswer answer = new MatchAnswer();
+        ResumeMatchAnswer answer = new ResumeMatchAnswer();
         for(Matcher matcher: matcherList.getMatchers()) {
             matchedResumes = matcher.match(title, description);
             for(Resume resume: matchedResumes) {
-                answer.addResumes(matcher.getCruncherName(), resume);
+                answer.addResume(matcher.getCruncherName(), resume);
             }
         }
         answer.setMessage("Success");

@@ -1,0 +1,94 @@
+= Create a new job
+
+== HTTP Request
+
+Request
+include::{snippets}/job/create-success/http-request.adoc[]
+Headers
+include::{snippets}/job/create-success/request-headers.adoc[]
+Parameters
+include::{snippets}/job/create-success/request-parameters.adoc[]
+
+== HTTP Answers
+
+=== Success
+
+Response
+include::{snippets}/job/create-success/http-response.adoc[]
+Parameters on response
+include::{snippets}/job/create-success/response-fields.adoc[]
+
+'''
+
+=== Create job with ID that already exists
+
+Response
+include::{snippets}/job/create-already-exists/http-response.adoc[]
+Parameters on response
+include::{snippets}/job/create-already-exists/response-fields.adoc[]
+
+= Update a job
+
+== HTTP Request
+
+Request
+include::{snippets}/job/update-success/http-request.adoc[]
+Headers
+include::{snippets}/job/update-success/request-headers.adoc[]
+Parameters
+include::{snippets}/job/update-success/request-parameters.adoc[]
+
+== HTTP Answers
+
+=== Success
+
+Response
+include::{snippets}/job/update-success/http-response.adoc[]
+Parameters on response
+include::{snippets}/job/update-success/response-fields.adoc[]
+
+'''
+
+==== Create job with ID that already exists
+
+Response
+include::{snippets}/job/update-not-exists/http-response.adoc[]
+Parameters on response
+include::{snippets}/job/update-not-exists/response-fields.adoc[]
+
+= Match jobs with resume
+
+== HTTP Request
+
+Request
+include::{snippets}/job/match-success/http-request.adoc[]
+Headers
+include::{snippets}/job/match-success/request-headers.adoc[]
+Path Parameters
+include::{snippets}/job/match-success/path-parameters.adoc[]
+
+== HTTP Answers
+
+=== Success
+
+Response
+include::{snippets}/job/match-success/http-response.adoc[]
+Parameters on response
+include::{snippets}/job/match-success/response-fields.adoc[]
+
+'''
+
+==== Cannot find the Resume to match jobs against
+
+Response
+include::{snippets}/job/match-not-exists/http-response.adoc[]
+Parameters on response
+include::{snippets}/job/match-not-exists/response-fields.adoc[]
+
+
+==== Unable to find Job that match the Resume
+
+Response
+include::{snippets}/job/match-not-found/http-response.adoc[]
+Parameters on response
+include::{snippets}/job/match-not-found/response-fields.adoc[]
