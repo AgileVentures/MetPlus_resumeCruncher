@@ -1,7 +1,9 @@
 package org.metplus.curriculum.web.controllers;
 
 import org.metplus.curriculum.database.domain.Job;
+import org.metplus.curriculum.database.domain.Resume;
 import org.metplus.curriculum.database.repository.JobRepository;
+import org.metplus.curriculum.database.repository.ResumeRepository;
 import org.metplus.curriculum.web.GenericAnswer;
 import org.metplus.curriculum.web.ResultCodes;
 import org.slf4j.Logger;
@@ -21,11 +23,17 @@ import org.springframework.web.bind.annotation.*;
 @PreAuthorize("hasAuthority('ROLE_DOMAIN_USER')")
 public class JobsController {
     public JobsController(){}
-    public JobsController(JobRepository jobRepository) {
+    public JobsController(JobRepository jobRepository, ResumeRepository resumeRepository) {
         this.jobRepository = jobRepository;
+        this.resumeRepository = resumeRepository;
     }
+
     @Autowired
     private JobRepository jobRepository;
+
+    @Autowired
+    private ResumeRepository resumeRepository;
+
 
     private static Logger logger = LoggerFactory.getLogger(JobsController.class);
     @RequestMapping(value = "/create", method = RequestMethod.POST)
@@ -94,9 +102,14 @@ public class JobsController {
     }
     @RequestMapping(value = "/match/{resumeId}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<GenericAnswer> match(final String resumeId){
+    public ResponseEntity<GenericAnswer> match(@PathVariable("resumeId") final String resumeId){
         logger.trace("match(" + resumeId + ")");
         GenericAnswer answer = new GenericAnswer();
+        Resume resume = resumeRepository.findByUserId(resumeId);
+        if(resume == null) {
+            answer.setResultCode(ResultCodes.RESUME_NOT_FOUND);
+            answer.setMessage("Cannot find the resume");
+        }
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
 }
