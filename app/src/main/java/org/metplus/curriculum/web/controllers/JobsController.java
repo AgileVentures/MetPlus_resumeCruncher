@@ -7,6 +7,7 @@ import org.metplus.curriculum.database.domain.Resume;
 import org.metplus.curriculum.database.repository.JobRepository;
 import org.metplus.curriculum.database.repository.ResumeRepository;
 import org.metplus.curriculum.web.answers.GenericAnswer;
+import org.metplus.curriculum.web.answers.JobMatchAnswer;
 import org.metplus.curriculum.web.answers.ResultCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +28,10 @@ import java.util.List;
 @PreAuthorize("hasAuthority('ROLE_DOMAIN_USER')")
 public class JobsController {
     public JobsController(){}
-    public JobsController(JobRepository jobRepository, ResumeRepository resumeRepository) {
+    public JobsController(JobRepository jobRepository, ResumeRepository resumeRepository, MatcherList matcherList) {
         this.jobRepository = jobRepository;
         this.resumeRepository = resumeRepository;
+        this.matcherList = matcherList;
     }
 
     @Autowired
@@ -111,20 +113,26 @@ public class JobsController {
     @ResponseBody
     public ResponseEntity<GenericAnswer> match(@PathVariable("resumeId") final String resumeId){
         logger.trace("match(" + resumeId + ")");
-        GenericAnswer answer = new GenericAnswer();
         Resume resume = resumeRepository.findByUserId(resumeId);
         if(resume == null) {
+            logger.error("Unable to find resume with id '{}'", resumeId);
+            GenericAnswer answer = new GenericAnswer();
             answer.setResultCode(ResultCodes.RESUME_NOT_FOUND);
             answer.setMessage("Cannot find the resume");
+            return new ResponseEntity<>(answer, HttpStatus.OK);
         }
-
+        logger.debug("Start processing the Jobs");
         List<Job> matchedJobs = null;
+        JobMatchAnswer answer = new JobMatchAnswer();
         for(Matcher matcher: matcherList.getMatchers()) {
             matchedJobs = matcher.match(resume.getCruncherData(matcher.getCruncherName()));
             for(Job job: matchedJobs) {
-                //answer.addResume(matcher.getCruncherName(), job);
+                answer.addJob(matcher.getCruncherName(), job);
             }
         }
+        answer.setMessage("Success");
+        answer.setResultCode(ResultCodes.SUCCESS);
+        logger.debug("Done processing: " + answer);
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
 }
