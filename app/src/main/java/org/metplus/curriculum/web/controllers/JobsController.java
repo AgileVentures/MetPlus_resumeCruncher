@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(BaseController.baseUrl + "job")
 @PreAuthorize("hasAuthority('ROLE_DOMAIN_USER')")
 public class JobsController {
+    public JobsController(){}
     public JobsController(JobRepository jobRepository) {
         this.jobRepository = jobRepository;
     }
