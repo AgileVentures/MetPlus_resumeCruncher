@@ -115,4 +115,14 @@ public abstract class ProcessCruncher<Work> {
             return null;
         }
     }
+
+    /**
+     * Method waits for the thread to stop
+     * Warning: This method do not perform a Stop on the thread.
+     *          Call method stop() before calling this method
+     * @throws InterruptedException When the thread is interrupted
+     */
+    public void join() throws InterruptedException {
+        cruncher.join();
+    }
 }

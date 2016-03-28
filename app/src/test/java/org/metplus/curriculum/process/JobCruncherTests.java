@@ -33,9 +33,10 @@ public class JobCruncherTests {
         @Mock
         private Cruncher cruncherImpl;
         @Test
-        public void noJobs() {
+        public void noJobs() throws InterruptedException {
             jobCruncher.postConstructor();
             jobCruncher.stop();
+            jobCruncher.join();
             Mockito.verify(allCrunchers, Mockito.times(0)).getCrunchers();
             Mockito.verify(jobRepository, Mockito.times(0)).save(Mockito.<Job>any());
         }
@@ -47,8 +48,8 @@ public class JobCruncherTests {
             Mockito.when(allCrunchers.getCrunchers()).thenReturn(listCrunchers);
             jobCruncher.postConstructor();
             jobCruncher.addWork(job);
-            Thread.sleep(100);
             jobCruncher.stop();
+            jobCruncher.join();
             Mockito.verify(allCrunchers, Mockito.times(1)).getCrunchers();
             Mockito.verify(jobRepository, Mockito.times(1)).save(job);
         }
@@ -67,8 +68,8 @@ public class JobCruncherTests {
             jobCruncher.addWork(job1);
             jobCruncher.addWork(job2);
 
-            Thread.sleep(100);
             jobCruncher.stop();
+            jobCruncher.join();
             Mockito.verify(allCrunchers, Mockito.times(2)).getCrunchers();
             Mockito.verify(cruncherImpl).crunch("title 1");
             Mockito.verify(cruncherImpl).crunch("description 1");
