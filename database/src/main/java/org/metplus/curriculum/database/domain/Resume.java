@@ -1,6 +1,5 @@
 package org.metplus.curriculum.database.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mongodb.BasicDBObject;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
@@ -11,22 +10,24 @@ import org.metplus.curriculum.database.exceptions.ResumeReadException;
 import org.metplus.curriculum.exceptions.CurriculumException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.gridfs.GridFsOperations;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.HashMap;
 
 /**
  * Class that will store the information of the resume
  */
 @Document
-public class Resume extends AbstractDocument {
+public class Resume extends DocumentWithMetaData {
+    @Field
     private String filename;
+    @Field
     private String fileType;
+    @Field
     private String userId;
 
-    private HashMap<String, HashMap<String, MetaDataField>> metaData;
 
     @Autowired
     private GridFsOperations gridOperation;
@@ -133,38 +134,5 @@ public class Resume extends AbstractDocument {
         return userId;
     }
 
-    /**
-     * Retrieve all the meta data of the specific resume
-     * @return Structure with all the meta data
-     */
-    public HashMap<String, HashMap<String, MetaDataField>> getMetaData() {
-        return metaData;
-    }
 
-    /**
-     * Over write all the meta data of this resume
-     * @param metaData New meta data
-     */
-    public void setMetaData(HashMap<String, HashMap<String, MetaDataField>> metaData) {
-        this.metaData = metaData;
-    }
-
-    /**
-     * Check if a cruncher already have processed this resume
-     * @param cruncherName Name of the cruncher
-     * @return True if meta data is present, false otherwise
-     */
-    @JsonIgnore
-    public boolean isCruncherDataAvailable(String cruncherName) {
-        return metaData.containsKey(cruncherName);
-    }
-
-    /**
-     * Retrieve meta data from a specific cruncher
-     * @param cruncherName Name of the cruncher
-     * @return Cruncher meta data
-     */
-    public HashMap<String, MetaDataField> getCruncherData(String cruncherName) {
-        return metaData.get(cruncherName);
-    }
 }

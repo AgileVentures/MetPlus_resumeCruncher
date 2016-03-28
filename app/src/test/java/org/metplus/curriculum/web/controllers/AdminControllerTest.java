@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.metplus.curriculum.database.domain.CruncherSettings;
 import org.metplus.curriculum.database.domain.Setting;
 import org.metplus.curriculum.database.domain.Settings;
@@ -15,9 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.restdocs.RestDocumentation;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.util.NoSuchElementException;
+
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 
@@ -30,6 +35,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+@RunWith(SpringJUnit4ClassRunner.class)
 public class AdminControllerTest  extends BaseControllerTest {
 
     public static final Logger logger = LoggerFactory.getLogger(AdminControllerTest.class);
@@ -50,7 +56,11 @@ public class AdminControllerTest  extends BaseControllerTest {
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint())))
                 .build();
-        before = repository.findAll().iterator().next();
+        try {
+            before = repository.findAll().iterator().next();
+        } catch(NoSuchElementException exp) {
+            before = new Settings();
+        }
         before.addApplicationSetting(new Setting<>("simple test", "Value"));
         repository.save(before);
     }

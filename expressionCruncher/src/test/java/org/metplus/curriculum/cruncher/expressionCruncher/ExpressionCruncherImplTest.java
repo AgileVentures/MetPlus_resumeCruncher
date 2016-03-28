@@ -5,15 +5,20 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.metplus.curriculum.config.DatabaseConfig;
+import org.metplus.curriculum.cruncher.CrunchersList;
+import org.metplus.curriculum.cruncher.MatcherList;
 import org.metplus.curriculum.database.config.SpringMongoConfig;
 import org.metplus.curriculum.database.domain.CruncherSettings;
 import org.metplus.curriculum.database.domain.Settings;
 import org.metplus.curriculum.database.exceptions.CruncherSettingsNotFound;
 import org.metplus.curriculum.database.repository.SettingsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.List;
 
@@ -21,7 +26,7 @@ import static org.junit.Assert.*;
 
 @ActiveProfiles("development")
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {ExpressionCruncher.class,SpringMongoConfig.class, DatabaseConfig.class})
+@ContextConfiguration(classes = {ExpressionCruncher.class,SpringMongoConfig.class, DatabaseConfig.class, CrunchersList.class, MatcherList.class})
 public class ExpressionCruncherImplTest {
     @Autowired private ExpressionCruncher cruncher;
     @Autowired
@@ -47,7 +52,7 @@ public class ExpressionCruncherImplTest {
         assertEquals(false, cruncherImpl.isCaseSensitive());
         assertEquals(2, cruncherImpl.getMergeList().size());
         assertEquals(2, cruncherImpl.getMergeList().get("cook").size());
-        assertEquals(5, cruncherImpl.getIgnoreList().size());
+        assertEquals(20, cruncherImpl.getIgnoreList().size());
     }
 
     @Test

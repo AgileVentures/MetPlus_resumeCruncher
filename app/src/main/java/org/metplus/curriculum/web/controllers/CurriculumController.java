@@ -1,18 +1,21 @@
 package org.metplus.curriculum.web.controllers;
 
 
+import org.metplus.curriculum.cruncher.MatcherList;
+import org.metplus.curriculum.cruncher.Matcher;
 import org.metplus.curriculum.database.config.SpringMongoConfig;
 import org.metplus.curriculum.database.domain.Resume;
 import org.metplus.curriculum.database.exceptions.ResumeNotFound;
 import org.metplus.curriculum.database.exceptions.ResumeReadException;
 import org.metplus.curriculum.database.repository.ResumeRepository;
-import org.metplus.curriculum.web.GenericAnswer;
-import org.metplus.curriculum.web.ResultCodes;
-import  org.apache.log4j.Logger;
+import org.metplus.curriculum.process.ResumeCruncher;
+import org.metplus.curriculum.web.answers.GenericAnswer;
+import org.metplus.curriculum.web.answers.ResultCodes;
+import org.metplus.curriculum.web.answers.ResumeMatchAnswer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.FileCopyUtils;
@@ -22,18 +25,25 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping(BaseController.baseUrl + "/curriculum")
 @PreAuthorize("hasAuthority('ROLE_DOMAIN_USER')")
 public class CurriculumController {
-    private static final Logger LOG = Logger.getLogger(CurriculumController.class);
+    private static Logger logger = LoggerFactory.getLogger(CurriculumController.class);
 
     @Autowired
-    ResumeRepository resumeRepository;
+    private ResumeCruncher resumeCruncher;
 
     @Autowired
-    SpringMongoConfig dbConfig;
+    private ResumeRepository resumeRepository;
+
+    @Autowired
+    private SpringMongoConfig dbConfig;
+
+    @Autowired
+    private MatcherList matcherList;
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     @ResponseBody
@@ -42,12 +52,12 @@ public class CurriculumController {
                 @RequestParam("name") String name,
                 @RequestParam("file") MultipartFile file) {
         System.out.println("Inside function");
-        LOG.debug("File '" + name + "' is being uploaded to user: '" + id + "'");
+        logger.debug("File '" + name + "' is being uploaded to user: '" + id + "'");
         GenericAnswer answer = new GenericAnswer();
 
         Resume resume = resumeRepository.findByUserId(id);
         if(resume == null) {
-            LOG.debug("No previous resume on the system");
+            logger.debug("No previous resume on the system");
             resume = new Resume(id);
         }
         if (!file.isEmpty()) {
@@ -59,20 +69,20 @@ public class CurriculumController {
                 resumeRepository.save(resume);
                 answer.setMessage("File uploaded successfully");
                 answer.setResultCode(ResultCodes.SUCCESS);
+                resumeCruncher.addResume(resume);
             } catch (Exception e) {
-                System.out.println(e.getStackTrace());
                 e.printStackTrace();
                 answer.setMessage("Error uploading the file: " + e.getMessage());
                 answer.setResultCode(ResultCodes.FATAL_ERROR);
-                LOG.warn("Error uploading file: '" + name + "' of user: '" + id + "': " + e.getMessage());
+                logger.warn("Error uploading file: '" + name + "' of user: '" + id + "': " + e.getMessage());
             }
         } else {
-            LOG.info("File: '" + name + "' of user: '" + id + "' is empty!");
+            logger.info("File: '" + name + "' of user: '" + id + "' is empty!");
             answer.setResultCode(ResultCodes.FATAL_ERROR);
             answer.setMessage("File is empty");
         }
 
-        LOG.debug("Result:" + answer);
+        logger.debug("Result:" + answer);
 
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
@@ -82,40 +92,67 @@ public class CurriculumController {
     public ResponseEntity<?> getCurriculum(
             @PathVariable("userId") String id,
             HttpServletResponse response) {
-        LOG.debug("Retrieving curriculum of user: '" + id + "'");
+        logger.debug("Retrieving curriculum of user: '" + id + "'");
         GenericAnswer answer = new GenericAnswer();
 
         Resume resume = resumeRepository.findByUserId(id);
         if(resume == null) {
-            LOG.warn("Unable to find user: '" + id + "'");
+            logger.warn("Unable to find user: '" + id + "'");
             answer.setMessage("Unable to find the user: '" + id + "'");
             answer.setResultCode(ResultCodes.RESUME_NOT_FOUND);
-            return new ResponseEntity<GenericAnswer>(answer, HttpStatus.OK);
+            return new ResponseEntity<>(answer, HttpStatus.OK);
         }
         try {
             ByteArrayOutputStream file = resume.getResume(dbConfig);
             response.setContentType("application/octet-stream");
-            response.setHeader("Content-Disposition", String.format("inline; filename=\"" + resume.getFilename() +"\""));
+            response.setHeader("Content-Disposition", "inline; filename=\"" + resume.getFilename() +"\"");
             FileCopyUtils.copy(file.toByteArray(), response.getOutputStream());
             response.setContentLength(file.size());
             response.flushBuffer();
             return null;
         } catch (ResumeNotFound resumeNotFound) {
-            LOG.warn("Unable to find curriculum for user: '" + id + "'");
+            logger.warn("Unable to find curriculum for user: '" + id + "'");
             answer.setMessage("Unable to find the resume for the user");
             answer.setResultCode(ResultCodes.RESUME_NOT_FOUND);
         } catch (ResumeReadException e) {
-            LOG.error("Error retrieving the resume for user: '" + id + "'");
-            LOG.error(e.getStackTrace());
+            logger.error("Error retrieving the resume for user: '" + id + "'");
+            logger.error(String.valueOf(e.getStackTrace()));
             answer.setMessage("Unable to retrieve resume");
             answer.setResultCode(ResultCodes.FATAL_ERROR);
         } catch (IOException e) {
-            LOG.error("Error reading resume for user: '" + id + "'");
-            LOG.error(e.getStackTrace());
+            logger.error("Error reading resume for user: '" + id + "'");
+            logger.error(String.valueOf(e.getStackTrace()));
             answer.setMessage("Unable to read resume");
             answer.setResultCode(ResultCodes.FATAL_ERROR);
         }
 
-        return new ResponseEntity<GenericAnswer>(answer, HttpStatus.OK);
+        return new ResponseEntity<>(answer, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/match", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<GenericAnswer> match(@RequestParam("title") final String title,
+                                               @RequestParam("description") final String description) {
+        logger.debug("Match resumes with title: '" + title + "', description: '" + description + "'");
+        if(title == null || title.length() == 0) {
+            logger.error("Matching resumes with empty Title is not allowed");
+            GenericAnswer answer = new GenericAnswer();
+            answer.setMessage("Title cannot be empty");
+            answer.setResultCode(ResultCodes.FATAL_ERROR);
+            return new ResponseEntity<>(answer, HttpStatus.BAD_REQUEST);
+        }
+        List<Resume> matchedResumes = null;
+        ResumeMatchAnswer answer = new ResumeMatchAnswer();
+        for(Matcher matcher: matcherList.getMatchers()) {
+            matchedResumes = matcher.match(title, description);
+            for(Resume resume: matchedResumes) {
+                answer.addResume(matcher.getCruncherName(), resume);
+            }
+        }
+        answer.setMessage("Success");
+        answer.setResultCode(ResultCodes.SUCCESS);
+
+        logger.debug("Result is: " + answer);
+        return new ResponseEntity<>(answer, HttpStatus.OK);
     }
 }
