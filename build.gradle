@@ -6,7 +6,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.5.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.8.RELEASE")
     }
 }
 
@@ -80,7 +80,7 @@ applicationDistribution.from(copyLicense) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.3'
+    gradleVersion = '2.12'
 }
 
 task stage {
