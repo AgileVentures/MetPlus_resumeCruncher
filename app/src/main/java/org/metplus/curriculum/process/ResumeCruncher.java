@@ -1,8 +1,6 @@
 package org.metplus.curriculum.process;
 
 import org.metplus.curriculum.cruncher.Cruncher;
-import org.metplus.curriculum.cruncher.CruncherMetaData;
-import org.metplus.curriculum.cruncher.CrunchersList;
 import org.metplus.curriculum.database.config.SpringMongoConfig;
 import org.metplus.curriculum.database.domain.MetaData;
 import org.metplus.curriculum.database.domain.Resume;
@@ -16,8 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Process that will be running in the background
