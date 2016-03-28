@@ -29,10 +29,11 @@ import java.util.List;
 @PreAuthorize("hasAuthority('ROLE_DOMAIN_USER')")
 public class JobsController {
     public JobsController(){}
-    public JobsController(JobRepository jobRepository, ResumeRepository resumeRepository, MatcherList matcherList) {
+    public JobsController(JobRepository jobRepository, ResumeRepository resumeRepository, MatcherList matcherList, JobCruncher jobCruncher) {
         this.jobRepository = jobRepository;
         this.resumeRepository = resumeRepository;
         this.matcherList = matcherList;
+        this.jobCruncher = jobCruncher;
     }
 
     @Autowired
@@ -103,6 +104,7 @@ public class JobsController {
                 job.setDescription(description);
             try {
                 jobRepository.save(job);
+                jobCruncher.addWork(job);
                 logger.debug("Job updated successfully");
                 answer.setResultCode(ResultCodes.SUCCESS);
                 answer.setMessage("Job updated successfully");
