@@ -24,7 +24,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by joao on 3/16/16.
+ * Process that will be running in the background
+ * to crunch the job information
  */
 @Component("jobCruncher")
 public class JobCruncher extends ProcessCruncher<Job>{
@@ -35,6 +36,7 @@ public class JobCruncher extends ProcessCruncher<Job>{
 
     @Override
     protected void process(Job job) {
+        logger.trace("process({})", job);
         Map<String, MetaData> allDescriptionMetaData = new HashMap<>();
         Map<String, MetaData> allTitleMetaData = new HashMap<>();
         for(Cruncher cruncher: allCrunchers.getCrunchers()) {
@@ -50,5 +52,6 @@ public class JobCruncher extends ProcessCruncher<Job>{
         descriptionData.setMetaData(allDescriptionMetaData);
         job.setDescriptionMetaData(descriptionData);
         jobRepository.save(job);
+        logger.debug("Job [{}] processed successfully", job);
     }
 }

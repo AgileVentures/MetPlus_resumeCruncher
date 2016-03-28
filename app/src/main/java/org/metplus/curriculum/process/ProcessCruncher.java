@@ -6,7 +6,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.NoSuchElementException;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -39,6 +41,7 @@ public abstract class ProcessCruncher<Work> {
      * Main function that will be always running and crunching the workDeque
      */
     public void run() {
+        logger.info("Processor started");
         do {
             logger.debug("Going to check workDeque");
             Work work = null;
@@ -46,12 +49,15 @@ public abstract class ProcessCruncher<Work> {
                 logger.debug("Going to process work");
                 process(work);
             }
+            logger.debug("No more work to process, sleep waiting");
             try {
                 semaphore.acquire();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         } while(keepRunning);
+
+        logger.info("Processor stopped");
     }
 
     /**
@@ -64,6 +70,7 @@ public abstract class ProcessCruncher<Work> {
      * Stop the thread
      */
     public synchronized void stop(){
+        logger.info("Requested stop of processor");
         setKeepRunning(false);
         semaphore.release();
     }
