@@ -146,32 +146,53 @@ public class MatcherImpl implements Matcher<Resume, Job> {
      * Class that will compare the fields on the resume meta data
      * to order them by most common expression
      */
-    private class EntitySorter<T extends DocumentWithMetaData> implements Comparator<T> {
+    private abstract class EntitySorter<T extends DocumentWithMetaData> implements Comparator<T> {
         @Override
         public int compare(T o1, T o2) {
-            String field = ((ExpressionCruncherMetaData)o1.getCruncherData(cruncher.getCruncherName()))
-                    .getMostReferedExpression();
-            int left = (Integer) o1.getCruncherData(cruncher.getCruncherName())
-                    .getFields().get(field).getData();
-            int right = (Integer) o2.getCruncherData(cruncher.getCruncherName())
-                    .getFields().get(field).getData();
+            String field = getFieldName(o1);
+            int left = getFieldValue(o1, field);
+            int right = getFieldValue(o2, field);
             if(left < right)
                 return 1;
             else if(left > right)
                 return -1;
             return 0;
         }
+        protected abstract String getFieldName(T obj);
+        protected abstract int getFieldValue(T obj, String fieldName);
     }
     /**
      * Class that will compare the fields on the resume meta data
      * to order them by most common expression
      */
     private class ResumeSorter extends EntitySorter<Resume> {
+
+        @Override
+        protected String getFieldName(Resume obj) {
+            return ((ExpressionCruncherMetaData)obj.getCruncherData(cruncher.getCruncherName()))
+                    .getMostReferedExpression();
+        }
+        @Override
+        protected int getFieldValue(Resume obj, String fieldName) {
+            return (Integer) obj.getCruncherData(cruncher.getCruncherName())
+                    .getFields().get(fieldName).getData();
+        }
     }
     /**
      * Class that will compare the fields on the resume meta data
      * to order them by most common expression
      */
     private class JobSorter extends EntitySorter<Job> {
+
+        @Override
+        protected String getFieldName(Job obj) {
+            return ((ExpressionCruncherMetaData)obj.getTitleCruncherData(cruncher.getCruncherName()))
+                    .getMostReferedExpression();
+        }
+        @Override
+        protected int getFieldValue(Job obj, String fieldName) {
+            return (Integer) obj.getTitleCruncherData(cruncher.getCruncherName())
+                    .getFields().get(fieldName).getData();
+        }
     }
 }
