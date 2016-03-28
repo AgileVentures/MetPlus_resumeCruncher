@@ -1,6 +1,5 @@
 package org.metplus.curriculum.process;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -14,9 +13,7 @@ import org.metplus.curriculum.database.repository.ResumeRepository;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -42,30 +39,30 @@ public class ResumeCruncherTest {
         @Mock
         private Cruncher cruncherImpl;
         @Test
-        public void noResumes() {
+        public void noResumes() throws InterruptedException {
             cruncher.postConstructor();
             cruncher.stop();
-            cruncher.run();
+            cruncher.join();
             Mockito.verify(allCrunchers, Mockito.times(0)).getCrunchers();
-            Mockito.verify(resumeRepository, Mockito.times(0)).save(Mockito.<Resume>any());
+            Mockito.verify(resumeRepository, Mockito.times(0)).save(Mockito.any(Resume.class));
         }
         @Test
-        public void oneResume() throws ResumeNotFound, ResumeReadException {
+        public void oneResume() throws ResumeNotFound, ResumeReadException, InterruptedException {
             Resume resume = Mockito.mock(Resume.class);
             Mockito.when(resume.getResume(springMongoConfig)).thenReturn(new ByteArrayOutputStream());
             List<Cruncher> listCrunchers = new ArrayList<>();
             listCrunchers.add(cruncherImpl);
             Mockito.when(allCrunchers.getCrunchers()).thenReturn(listCrunchers);
             cruncher.postConstructor();
+            cruncher.addWork(resume);
             cruncher.stop();
-            cruncher.addResume(resume);
-            cruncher.run();
+            cruncher.join();
             Mockito.verify(allCrunchers, Mockito.times(1)).getCrunchers();
             Mockito.verify(resumeRepository, Mockito.times(1)).save(resume);
             Mockito.verify(resume).getResume(springMongoConfig);
         }
         @Test
-        public void twoResume() throws ResumeNotFound, ResumeReadException {
+        public void twoResume() throws ResumeNotFound, ResumeReadException, InterruptedException {
             Resume resume = Mockito.mock(Resume.class);
             Mockito.when(resume.getResume(springMongoConfig)).thenReturn(new ByteArrayOutputStream());
             Resume resume1 = Mockito.mock(Resume.class);
@@ -74,10 +71,10 @@ public class ResumeCruncherTest {
             listCrunchers.add(cruncherImpl);
             Mockito.when(allCrunchers.getCrunchers()).thenReturn(listCrunchers);
             cruncher.postConstructor();
+            cruncher.addWork(resume);
+            cruncher.addWork(resume1);
             cruncher.stop();
-            cruncher.addResume(resume);
-            cruncher.addResume(resume1);
-            cruncher.run();
+            cruncher.join();
             Mockito.verify(allCrunchers, Mockito.times(2)).getCrunchers();
             Mockito.verify(resumeRepository).save(resume);
             Mockito.verify(resumeRepository).save(resume1);
@@ -85,31 +82,31 @@ public class ResumeCruncherTest {
             Mockito.verify(resume1).getResume(springMongoConfig);
         }
         @Test
-        public void unableToFindResumeFile() throws ResumeNotFound, ResumeReadException {
+        public void unableToFindResumeFile() throws ResumeNotFound, ResumeReadException, InterruptedException {
             Resume resume = Mockito.mock(Resume.class);
             Mockito.when(resume.getResume(springMongoConfig)).thenThrow(new ResumeNotFound(""));
             List<Cruncher> listCrunchers = new ArrayList<>();
             listCrunchers.add(cruncherImpl);
             Mockito.when(allCrunchers.getCrunchers()).thenReturn(listCrunchers);
             cruncher.postConstructor();
+            cruncher.addWork(resume);
             cruncher.stop();
-            cruncher.addResume(resume);
-            cruncher.run();
+            cruncher.join();
             Mockito.verify(allCrunchers, Mockito.times(0)).getCrunchers();
             Mockito.verify(resumeRepository, Mockito.times(0)).save(resume);
             Mockito.verify(resume).getResume(springMongoConfig);
         }
         @Test
-        public void unableToReadResumeFile() throws ResumeNotFound, ResumeReadException {
+        public void unableToReadResumeFile() throws ResumeNotFound, ResumeReadException, InterruptedException {
             Resume resume = Mockito.mock(Resume.class);
             Mockito.when(resume.getResume(springMongoConfig)).thenThrow(new ResumeReadException(""));
             List<Cruncher> listCrunchers = new ArrayList<>();
             listCrunchers.add(cruncherImpl);
             Mockito.when(allCrunchers.getCrunchers()).thenReturn(listCrunchers);
             cruncher.postConstructor();
+            cruncher.addWork(resume);
             cruncher.stop();
-            cruncher.addResume(resume);
-            cruncher.run();
+            cruncher.join();
             Mockito.verify(allCrunchers, Mockito.times(0)).getCrunchers();
             Mockito.verify(resumeRepository, Mockito.times(0)).save(resume);
             Mockito.verify(resume).getResume(springMongoConfig);

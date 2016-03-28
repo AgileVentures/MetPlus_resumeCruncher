@@ -4,15 +4,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.metplus.curriculum.database.domain.Job;
-import org.metplus.curriculum.database.domain.MetaData;
-import org.metplus.curriculum.database.domain.MetaDataField;
-import org.metplus.curriculum.database.domain.Resume;
+import org.metplus.curriculum.database.domain.*;
 import org.metplus.curriculum.database.repository.JobRepository;
 import org.metplus.curriculum.database.repository.ResumeRepository;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -196,7 +194,9 @@ public class MatcherImplTest {
             dataJob1.setMostReferedExpression("ipsum");
             Map<String, MetaData> metaDataJob1 = new HashMap<>();
             metaDataJob1.put(cruncher.getCruncherName(), dataJob1);
-            job1.setMetaData(metaDataJob1);
+            DocumentWithMetaData metaData1 = new DocumentWithMetaData();
+            metaData1.setMetaData(metaDataJob1);
+            job1.setTitleMetaData(metaData1);
             job1.setJobId("job1");
 
             Job job2 = new Job();
@@ -209,7 +209,9 @@ public class MatcherImplTest {
             dataJob2.setMostReferedExpression("iaculis");
             Map<String, MetaData> metaDataJob2 = new HashMap<>();
             metaDataJob2.put(cruncher.getCruncherName(), dataJob2);
-            job2.setMetaData(metaDataJob2);
+            DocumentWithMetaData metaData2 = new DocumentWithMetaData();
+            metaData2.setMetaData(metaDataJob2);
+            job2.setTitleMetaData(metaData2);
             job2.setJobId("job2");
 
             Job job3 = new Job();
@@ -222,7 +224,9 @@ public class MatcherImplTest {
             dataJob3.setMostReferedExpression("ipsum");
             Map<String, MetaData> metaDataJob3 = new HashMap<>();
             metaDataJob3.put(cruncher.getCruncherName(), dataJob3);
-            job3.setMetaData(metaDataJob3);
+            DocumentWithMetaData metaData3 = new DocumentWithMetaData();
+            metaData3.setMetaData(metaDataJob3);
+            job3.setTitleMetaData(metaData3);
             job3.setJobId("job3");
             jobs.add(job1);
             jobs.add(job2);
