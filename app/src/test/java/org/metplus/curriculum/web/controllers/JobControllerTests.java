@@ -40,6 +40,7 @@ import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
@@ -438,8 +439,7 @@ public class JobControllerTests {
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                     .andExpect(jsonPath("$.resultCode", is(ResultCodes.SUCCESS.toString())))
-                    .andExpect(jsonPath("$.jobs.matcher1", isEmptyOrNullString()))
-                    .andExpect(jsonPath("$.jobs.matcher2", isEmptyOrNullString()))
+                    .andExpect(jsonPath("$.jobs").value(is(new java.util.LinkedHashMap())))
                     .andDo(document("job/match-not-found",
                             requestHeaders(headerWithName("X-Auth-Token")
                                     .description("Authentication token retrieved from the authentication")),
