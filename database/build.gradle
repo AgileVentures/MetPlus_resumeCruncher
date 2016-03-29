@@ -7,7 +7,7 @@ repositories {
 
 apply plugin: 'spring-boot'
 dependencies {
-    compile('org.springframework.data:spring-data-mongodb:1.7.2.RELEASE')
+    compile('org.springframework.data:spring-data-mongodb')
     compile project(':core')
     testCompile("junit:junit:4.12")
 }
