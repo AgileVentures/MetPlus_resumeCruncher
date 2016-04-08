@@ -14,6 +14,7 @@ import org.metplus.curriculum.database.domain.MetaData;
 import org.metplus.curriculum.database.domain.Resume;
 import org.metplus.curriculum.database.repository.JobRepository;
 import org.metplus.curriculum.database.repository.ResumeRepository;
+import org.metplus.curriculum.process.JobCruncher;
 import org.metplus.curriculum.web.answers.ResultCodes;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
@@ -37,9 +38,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
@@ -77,6 +78,8 @@ public class JobControllerTests {
         protected ResumeRepository resumeRepository;
         @Mock
         protected MatcherList matcherList;
+        @Mock
+        protected JobCruncher jobCruncher;
 
         @Autowired
         private Filter springSecurityFilterChain;
@@ -86,7 +89,7 @@ public class JobControllerTests {
 
         @Before
         public void setUp() throws Exception {
-            mockMvc = MockMvcBuilders.standaloneSetup(new JobsController(jobRepository, resumeRepository, matcherList))
+            mockMvc = MockMvcBuilders.standaloneSetup(new JobsController(jobRepository, resumeRepository, matcherList, jobCruncher))
                     .setValidator(validator())
                     .apply(documentationConfiguration(this.restDocumentation))
                     .build();
@@ -132,7 +135,8 @@ public class JobControllerTests {
                             )
                     ));
             Mockito.verify(jobRepository).findByJobId("1");
-            Mockito.verify(jobRepository, Mockito.times(0)).save((Job) Mockito.any());
+            Mockito.verify(jobRepository, Mockito.times(0)).save(Mockito.any(Job.class));
+            Mockito.verify(jobCruncher, Mockito.times(0)).addWork(Mockito.any(Job.class));
         }
 
         @Test
@@ -171,6 +175,9 @@ public class JobControllerTests {
             assertEquals("Job title", jobArgumentCaptor.getValue().getTitle());
             assertEquals("1", jobArgumentCaptor.getValue().getJobId());
             assertEquals("My awsome job description", jobArgumentCaptor.getValue().getDescription());
+            ArgumentCaptor<Job> allJobs = ArgumentCaptor.forClass(Job.class);
+            Mockito.verify(jobRepository).save(allJobs.capture());
+            Mockito.verify(jobCruncher).addWork(allJobs.getValue());
         }
     }
 
@@ -206,6 +213,8 @@ public class JobControllerTests {
                     ));
             Mockito.verify(jobRepository).findByJobId("1");
             Mockito.verify(jobRepository, Mockito.times(0)).save((Job) Mockito.any());
+            Mockito.verify(jobRepository, Mockito.times(0)).save(Mockito.any(Job.class));
+            Mockito.verify(jobCruncher, Mockito.times(0)).addWork(Mockito.any(Job.class));
         }
 
         @Test
@@ -246,6 +255,9 @@ public class JobControllerTests {
             assertEquals("Job title", jobArgumentCaptor.getValue().getTitle());
             assertEquals("1", jobArgumentCaptor.getValue().getJobId());
             assertEquals("My awsome job description", jobArgumentCaptor.getValue().getDescription());
+            ArgumentCaptor<Job> allJobs = ArgumentCaptor.forClass(Job.class);
+            Mockito.verify(jobRepository).save(allJobs.capture());
+            Mockito.verify(jobCruncher).addWork(allJobs.getValue());
         }
         @Test
         public void successOnlyTitle() throws Exception {
@@ -271,6 +283,9 @@ public class JobControllerTests {
             assertEquals("Job title", jobArgumentCaptor.getValue().getTitle());
             assertEquals("1", jobArgumentCaptor.getValue().getJobId());
             assertEquals("My current description", jobArgumentCaptor.getValue().getDescription());
+            ArgumentCaptor<Job> allJobs = ArgumentCaptor.forClass(Job.class);
+            Mockito.verify(jobRepository).save(allJobs.capture());
+            Mockito.verify(jobCruncher).addWork(allJobs.getValue());
         }
 
         @Test
@@ -297,6 +312,9 @@ public class JobControllerTests {
             assertEquals("My current title", jobArgumentCaptor.getValue().getTitle());
             assertEquals("1", jobArgumentCaptor.getValue().getJobId());
             assertEquals("My awsome job description", jobArgumentCaptor.getValue().getDescription());
+            ArgumentCaptor<Job> allJobs = ArgumentCaptor.forClass(Job.class);
+            Mockito.verify(jobRepository).save(allJobs.capture());
+            Mockito.verify(jobCruncher).addWork(allJobs.getValue());
         }
     }
 
@@ -421,8 +439,7 @@ public class JobControllerTests {
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                     .andExpect(jsonPath("$.resultCode", is(ResultCodes.SUCCESS.toString())))
-                    .andExpect(jsonPath("$.jobs.matcher1", isEmptyOrNullString()))
-                    .andExpect(jsonPath("$.jobs.matcher2", isEmptyOrNullString()))
+                    .andExpect(jsonPath("$.jobs").value(is(new java.util.LinkedHashMap())))
                     .andDo(document("job/match-not-found",
                             requestHeaders(headerWithName("X-Auth-Token")
                                     .description("Authentication token retrieved from the authentication")),

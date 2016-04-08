@@ -69,7 +69,7 @@ public class CurriculumController {
                 resumeRepository.save(resume);
                 answer.setMessage("File uploaded successfully");
                 answer.setResultCode(ResultCodes.SUCCESS);
-                resumeCruncher.addResume(resume);
+                resumeCruncher.addWork(resume);
             } catch (Exception e) {
                 e.printStackTrace();
                 answer.setMessage("Error uploading the file: " + e.getMessage());

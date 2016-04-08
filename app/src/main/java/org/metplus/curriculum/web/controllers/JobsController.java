@@ -6,6 +6,7 @@ import org.metplus.curriculum.database.domain.Job;
 import org.metplus.curriculum.database.domain.Resume;
 import org.metplus.curriculum.database.repository.JobRepository;
 import org.metplus.curriculum.database.repository.ResumeRepository;
+import org.metplus.curriculum.process.JobCruncher;
 import org.metplus.curriculum.web.answers.GenericAnswer;
 import org.metplus.curriculum.web.answers.JobMatchAnswer;
 import org.metplus.curriculum.web.answers.ResultCodes;
@@ -28,10 +29,11 @@ import java.util.List;
 @PreAuthorize("hasAuthority('ROLE_DOMAIN_USER')")
 public class JobsController {
     public JobsController(){}
-    public JobsController(JobRepository jobRepository, ResumeRepository resumeRepository, MatcherList matcherList) {
+    public JobsController(JobRepository jobRepository, ResumeRepository resumeRepository, MatcherList matcherList, JobCruncher jobCruncher) {
         this.jobRepository = jobRepository;
         this.resumeRepository = resumeRepository;
         this.matcherList = matcherList;
+        this.jobCruncher = jobCruncher;
     }
 
     @Autowired
@@ -42,6 +44,9 @@ public class JobsController {
 
     @Autowired
     private MatcherList matcherList;
+
+    @Autowired
+    private JobCruncher jobCruncher;
 
 
     private static Logger logger = LoggerFactory.getLogger(JobsController.class);
@@ -66,6 +71,7 @@ public class JobsController {
             job.setDescription(description);
             try {
                 jobRepository.save(job);
+                jobCruncher.addWork(job);
                 logger.debug("Job added successfully");
                 answer.setResultCode(ResultCodes.SUCCESS);
                 answer.setMessage("Job added successfully");
@@ -98,6 +104,7 @@ public class JobsController {
                 job.setDescription(description);
             try {
                 jobRepository.save(job);
+                jobCruncher.addWork(job);
                 logger.debug("Job updated successfully");
                 answer.setResultCode(ResultCodes.SUCCESS);
                 answer.setMessage("Job updated successfully");
