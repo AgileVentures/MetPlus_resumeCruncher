@@ -2,4 +2,4 @@
 # The logic to start up your application should be put in this
 # script. The application will work only if it binds to
 # $OPENSHIFT_DIY_IP:8080
-nohup $OPENSHIFT_REPO_DIR/diy/testrubyserver.rb $OPENSHIFT_DIY_IP $OPENSHIFT_REPO_DIR/diy |& /usr/bin/logshifter -tag diy &
+nohup java $JAVA_OPTS -Dserver.port=${OPENSHIFT_DIY_PORT} -Dserver.address=${OPENSHIFT_DIY_IP} -Dpets-db.uri=${MONGOLAB_URI} -Dbackend.admin.username=${APP_USERNAME} -Dbackend.admin.password=${APP_PASSWORD} -jar $OPENSHIFT_REPO_DIR/app/build/libs/app.jar > ${OPENSHIFT_DIY_LOG_DIR}/cruncher.log 2>&1 &
