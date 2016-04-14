@@ -59,12 +59,6 @@ subprojects {
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
-
-    gradle.taskGraph.whenReady {taskGraph ->
-        if (taskGraph.hasTask(stage)) {
-           test.enabled = false
-        }
-    }
 }
 
 
