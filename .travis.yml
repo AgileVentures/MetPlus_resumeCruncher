@@ -31,3 +31,4 @@ deploy:
     feature/openshift: cruncher
   domain: metpluspets
   skip_cleanup: true
+  on: feature/openshift
