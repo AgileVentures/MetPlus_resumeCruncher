@@ -32,3 +32,4 @@ deploy:
   domain: metpluspets
   skip_cleanup: true
   on: feature/openshift
+  deployment_branch: feature/openshift
