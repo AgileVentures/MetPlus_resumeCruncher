@@ -28,8 +28,8 @@ deploy:
   password:
     secure: rBZ9tY3HSvj7P3Ys0CskFqJ1A13UG3gVbXMDkKcwCvga3Jv3q3xc/DWap0k3G/NLkAdqZR6I8W9LjPkzr75psMm21lhF5kfa7hSqbPdZfCR2GZOYpZL8G5OD3nZb41XDXcGPcijW3+2zDPjsZLeTA162otBtkJa7i61Kkgg6bhycE29VIscbZf4yIXISNkbmZiRmRmWrBm/68724lJkdTcO8gXiQh12FPlFSeLSWOa/UByIwpbs133zlM85WnzZLNKXJ+pH8AP8bF4Wx7AlppA9pTa8th9izci4U52KfTQKDIzH0n9v5FNcLDe9u7dl5p/N9jtJ1mAhy5fmx/OBdxlxixz7yQX7ebB/fgEujJqIoEc5dfF/lTUBE852jmVx9Q/Dls20wWXrfvDrZp1A3+SVBclTfw9F8mwbP0THYgWtsi/od/9Q2E8SA+zIWxeilI9XSWI07O/M/6dIYlgB4Gl7/Q2oWoxh3eeI4HMwuDoZ2TkriAoxoVr1/5SLknTzp0YDK70XKXpox+jLS+II60xowUkURq8e7/T5UWCM6Rz86f8hsyJd//uhf6H9WmPFqip9XQFJGqWdel/AlL6nS/t53HTJmQifcosiR6EoXvU2spJUDaD2PT4wFDBH46HWu6E+3cFeCPkUwa9HxpYj5Dis1GZIvcpsJ87BLCmzLZi4=
   app: 
-    feature/openshift: cruncher
+    development: cruncher
   domain: metpluspets
   skip_cleanup: true
-  on: feature/openshift
-  deployment_branch: feature/openshift
+  on: development
+  deployment_branch: development
