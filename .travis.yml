@@ -31,9 +31,9 @@ deploy:
     feature/openshift: cruncher
   domain: metpluspets
   skip_cleanup: true
-  after_deploy:
-    - .openshift/action_hooks/pre_build
-    - .openshift/action_hooks/build
-    - .openshift/action_hooks/build
-    - .openshift/action_hooks/stop
-    - .openshift/action_hooks/start
+after_deploy:
+  - .openshift/action_hooks/pre_build
+  - .openshift/action_hooks/build
+  - .openshift/action_hooks/build
+  - .openshift/action_hooks/stop
+  - .openshift/action_hooks/start
