@@ -2,4 +2,9 @@
 # The logic to start up your application should be put in this
 # script. The application will work only if it binds to
 # $OPENSHIFT_DIY_IP:8080
-$OPENSHIFT_REPO_DIR/gradlew wrapper stage
+set -x
+cd $OPENSHIFT_REPO_DIR
+export GRADLE_USER_HOME=$OPENSHIFT_DATA_DIR/gradle
+export GRADLE_HOME=$OPENSHIFT_DATA_DIR/gradle-1.12
+export PATH=$GRADLE_HOME/bin:$PATH
+./gradlew wrapper stage
