@@ -24,6 +24,9 @@ public class DatabaseConfig {
     private String host;
 
     private String uri = null;
+    /**
+     * Class constructor
+     */
     public DatabaseConfig(){}
 
     public void setName(String name) {
