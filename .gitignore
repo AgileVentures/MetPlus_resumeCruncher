@@ -5,3 +5,4 @@ build/
 *.p12
 *.ipr
 *.iws
+app/src/main/resources/logback.xml
