@@ -7,4 +7,5 @@ cd $OPENSHIFT_DATA_DIR
 if [ ! -d jdk1.8.0_65 ]; then
   wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u65-b16/jdk-8u65-linux-i586.tar.gz
   tar -zxf jdk-8u65-linux-i586.tar.gz
+  rm jdk-8u65-linux-i586.tar.gz
 fi
