@@ -11,6 +11,25 @@ env:
 before_install:
 - chmod +x gradlew
 install: "./gradlew :app:assemble"
+
+before_cache:
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+
 notifications:
   slack:
     secure: mh9wbK5q5Sb2tB6WqHJrLadlweqZn2pspCIipn2ecVfmlXiL9xCxRH8nXNvEEIfaRquQv3ak/l6RH2qYm0auyS6mhDKK/IKUDgRTIBCSfTyr9dSRaHVjD+YT3ZLFfdr5RJc3wbEyC8hjuSU8Fih+OP8a3rjfj/8BxhRHS2Prgk7QcyW2E2W8IfmbkFYUmMDvDN6WQ3tf6wVf+lmOJenjZTSXw+YPys2LMlIFPAZubqhdO6rlUIxNJdtUxWJrkGINMvl7YQOHGf90hDZ7KAmA9h0WpdZnF1iGncYIjoTMgl7Xj1zjnggI1wx/+B0cqjIfNUfEaTa3YdFKhmN2wqhGqvKShjODUSd25O9KPPEHDGyAXPsqsrqVx4rj1217Fo2MbdglmwtxWqr/8IzMb44q/nBMVWlb89O+s3Xe1GpPyuMRwrUxP/dQXSGIONznyzbjYW5pPFcSDEg675CiYUZShqHka2zq/MGiY5PDxBpHsL7wqCpHoWG8NFbIO7MShiLq6h7fy1+T+p3h0lu3/8N8aqGgvEiPAwlySkEaYgw27l5QQx4mJZstB9Dt0Pd1BgTB19VenHl5gp5iNayb7RLs4y/Ufgso/P+YuM3kRi9vn5YmeAKV2RRNKSR7e8iyjekUBHvggulF2SCBpcJnlPoRQlDvoIT1HlC/73jTB567/4s=
+deploy:
+  provider: openshift
+  user: pets_admin@metplus.org
+  password:
+    secure: rBZ9tY3HSvj7P3Ys0CskFqJ1A13UG3gVbXMDkKcwCvga3Jv3q3xc/DWap0k3G/NLkAdqZR6I8W9LjPkzr75psMm21lhF5kfa7hSqbPdZfCR2GZOYpZL8G5OD3nZb41XDXcGPcijW3+2zDPjsZLeTA162otBtkJa7i61Kkgg6bhycE29VIscbZf4yIXISNkbmZiRmRmWrBm/68724lJkdTcO8gXiQh12FPlFSeLSWOa/UByIwpbs133zlM85WnzZLNKXJ+pH8AP8bF4Wx7AlppA9pTa8th9izci4U52KfTQKDIzH0n9v5FNcLDe9u7dl5p/N9jtJ1mAhy5fmx/OBdxlxixz7yQX7ebB/fgEujJqIoEc5dfF/lTUBE852jmVx9Q/Dls20wWXrfvDrZp1A3+SVBclTfw9F8mwbP0THYgWtsi/od/9Q2E8SA+zIWxeilI9XSWI07O/M/6dIYlgB4Gl7/Q2oWoxh3eeI4HMwuDoZ2TkriAoxoVr1/5SLknTzp0YDK70XKXpox+jLS+II60xowUkURq8e7/T5UWCM6Rz86f8hsyJd//uhf6H9WmPFqip9XQFJGqWdel/AlL6nS/t53HTJmQifcosiR6EoXvU2spJUDaD2PT4wFDBH46HWu6E+3cFeCPkUwa9HxpYj5Dis1GZIvcpsJ87BLCmzLZi4=
+  app: 
+    development: cruncher
+  domain: metpluspets
+  skip_cleanup: true
+  on: development
+  deployment_branch: development
