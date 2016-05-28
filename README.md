@@ -51,3 +51,9 @@ Before running the tests make sure to have mongodb launched in your machine or i
 After that just run the following command
 
 ```> SPRING_ACTIVE_PROFILE="unit-test" ./gradlew check ```
+
+# Credits
+Naive Bayes Classifier is based on the source developed by Philipp Nolte.
+
+The Initial source can be found in: 
+https://github.com/ptnplanet/Java-Naive-Bayes-Classifier
