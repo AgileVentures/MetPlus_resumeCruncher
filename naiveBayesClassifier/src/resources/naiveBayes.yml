@@ -1,0 +1,25 @@
+config:
+    learn-database:
+      key:
+        - "option 1"
+    clean-expressions:
+      - "a"
+      - "or"
+      - "and"
+      - "then"
+      - "must"
+      - "least"
+      - "i"
+      - "am"
+      - "of"
+      - "but"
+      - "our"
+      - "mine"
+      - "very"
+      - "worked"
+      - "decided"
+      - "each"
+      - "an"
+      - "as"
+      - "at"
+      - "on"
