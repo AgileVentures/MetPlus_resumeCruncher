@@ -1,9 +1,13 @@
 package org.metplus.curriculum.cruncher.naivebayes;
 
+import de.daslaboratorium.machinelearning.classifier.Classification;
 import de.daslaboratorium.machinelearning.classifier.bayes.BayesClassifier;
 import org.metplus.curriculum.cruncher.Cruncher;
 import org.metplus.curriculum.cruncher.CruncherMetaData;
+import org.metplus.curriculum.database.domain.MetaDataField;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +24,22 @@ public class CruncherImpl implements Cruncher {
     }
 
     public CruncherMetaData crunch(String data) {
-        return null;
+        Collection<Classification<String, String>> results = classifier.classifyDetailed(Arrays.asList(data));
+        NaiveBayesMetaData metaData = generateMetaData(results);
+        return metaData;
+    }
+    private NaiveBayesMetaData generateMetaData(Collection<Classification<String, String>> result) {
+        NaiveBayesMetaData allMetaData = new NaiveBayesMetaData();
+        allMetaData.setBestMatchCategory(null);
+        for(Classification<String, String> metaData: result) {
+            if(allMetaData.getBestMatchCategory() == null)
+                allMetaData.setBestMatchCategory(metaData.getCategory());
+            if(metaData.getProbability() <= 0)
+                break;
+            MetaDataField<Float> field = new MetaDataField<>(metaData.getProbability());
+            allMetaData.addField(metaData.getCategory(), field);
+        }
+        return allMetaData;
     }
 
     public String getCruncherName() {
