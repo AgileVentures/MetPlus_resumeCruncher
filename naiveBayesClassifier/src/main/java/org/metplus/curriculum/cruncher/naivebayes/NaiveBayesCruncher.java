@@ -84,8 +84,10 @@ public class NaiveBayesCruncher extends CruncherInitializer {
             try {
                 settings = repository.findAll().iterator().next().getCruncherSettings(CruncherImpl.CRUNCHER_NAME);
             } catch(NoSuchElementException e) {
-                repository.save(new Settings());
-                settings = repository.findAll().iterator().next().getCruncherSettings(CruncherImpl.CRUNCHER_NAME);
+                settings = new CruncherSettings(CruncherImpl.CRUNCHER_NAME);
+                Settings globalSettings = repository.findAll().iterator().next();
+                globalSettings.addCruncherSettings(CruncherImpl.CRUNCHER_NAME, settings);
+                repository.save(globalSettings);
             }
 
             learnDatabase = (Map)settings.getSetting(LEARN_DATABASE).getData();
