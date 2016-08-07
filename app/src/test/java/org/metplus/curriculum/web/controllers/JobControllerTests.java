@@ -401,7 +401,7 @@ public class JobControllerTests {
                             responseFields(
                                     fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
                                     fieldWithPath("message").description("Message associated with the result code"),
-                                    fieldWithPath("jobs").description("Hash with a list of job names matched by each cruncher")
+                                    fieldWithPath("jobs").description("Hash with a list of job IDs matched by each cruncher")
                             )
                     ));
             Mockito.verify(resumeRepository).findByUserId("1");

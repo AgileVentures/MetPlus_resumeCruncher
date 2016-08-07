@@ -55,6 +55,9 @@ public class ResumeCruncher extends ProcessCruncher<Resume>{
         } catch (DocumentParseException e) {
             e.printStackTrace();
             logger.error("Problem Parsing the resume: " + resume + ". " + e);
+        } catch(Exception e) {
+            e.printStackTrace();
+            logger.error("Problem processing the resume: " + resume + ". " + e);
         }
         logger.info("Ended process of: " + resume.getUserId());
     }
