@@ -1,5 +1,5 @@
 = PETS Resume cruncher API Documentation
-Joao Pereira <joaopapereira@gmail.com> 2016-03-25
+Joao Pereira <joaopapereira@gmail.com> {localdate}
 :revnumber: 0.1.0
 :example-caption!:
 ifndef::imagesdir[:imagesdir: images]

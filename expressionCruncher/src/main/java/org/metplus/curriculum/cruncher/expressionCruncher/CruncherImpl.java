@@ -182,7 +182,7 @@ public class CruncherImpl implements Cruncher {
         for (String phrase: auxExpression.split("\\.")) {
             for (String word: phrase.split("\\s+")) {
                 String auxWord = word.replaceAll(SEP, " ");
-                if (auxWord.length() > 0) {
+                if (auxWord.length() > 0 && auxWord.charAt(0) != '$') {
                     try {
                         Integer a = result.get(auxWord);
                         result.put(auxWord, a + 1);
