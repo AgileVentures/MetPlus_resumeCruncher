@@ -26,7 +26,6 @@ public class BackendAdminUsernamePasswordAuthenticationProvider implements Authe
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         Optional<String> username = (Optional) authentication.getPrincipal();
         Optional<String> password = (Optional) authentication.getCredentials();
-
         if (credentialsMissing(username, password) || credentialsInvalid(username, password)) {
             throw new BadCredentialsException(INVALID_BACKEND_ADMIN_CREDENTIALS);
         }

@@ -5,6 +5,8 @@ spring:
     log4j.logger.org.hibernate: ERROR
     log4j.logger.com.mongodb: SEVERE
     log4j.logger.org.apache: ERROR
+    log4j.logger.org.metplus: DEBUG
+logging.level.org.metplus: DEBUG
 
 
 backend.admin.role: BACKEND_ADMIN

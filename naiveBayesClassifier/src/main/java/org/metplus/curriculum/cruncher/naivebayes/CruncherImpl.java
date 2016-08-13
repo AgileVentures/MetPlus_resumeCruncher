@@ -51,7 +51,7 @@ public class CruncherImpl implements Cruncher {
     }
 
     public void train(Map<String, List<String>> database) {
-        if(database.size() > 0 ) {
+        if(database != null && database.size() > 0 ) {
             for (Map.Entry<String, List<String>> entry : database.entrySet()) {
                 train(entry.getKey(), entry.getValue());
             }
