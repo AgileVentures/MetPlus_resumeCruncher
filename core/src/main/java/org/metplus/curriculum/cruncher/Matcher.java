@@ -19,6 +19,14 @@ public interface Matcher<T, E> {
     List<T> match(String title, String description);
 
     /**
+     * This function will receive a job
+     * and is responsible for retrieving a list of resumes that match
+     * @param job Job object
+     * @return Ordered list of resumes
+     */
+    List<T> match(E job);
+
+    /**
      * This function will receive a meta data of a resume
      * and is responsible for retrieving a list of Jobs that match
      * @param metadata Meta data to match with

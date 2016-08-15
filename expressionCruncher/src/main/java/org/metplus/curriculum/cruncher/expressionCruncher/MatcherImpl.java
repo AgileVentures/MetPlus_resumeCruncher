@@ -75,6 +75,45 @@ public class MatcherImpl implements Matcher<Resume, Job> {
     }
 
     @Override
+    public List<Resume> match(Job job) {
+        logger.trace("match(" + job + ")");
+        // Retrieve all the resumes
+        List<Resume> resumes = resumeRepository.resumesOnCriteria(new ResumeComparator());
+        // Crunch the title
+        String titleExpression = job.getTitleMetaData();
+        // Crunch the description
+        String descriptionExpression = ((ExpressionCruncherMetaData)cruncher.crunch(description)).getMostReferedExpression();
+        List<Resume> resultTitle = new ArrayList<>();
+        List<Resume> resultDescription = new ArrayList<>();
+        for(Resume resume: resumes) {
+            logger.debug("Checking viability of the resume: " + resume);
+            // Retrieve the meta data of the resume
+            ExpressionCruncherMetaData metaDataCruncher = (ExpressionCruncherMetaData)resume.getCruncherData(cruncher.getCruncherName());
+            if(metaDataCruncher == null)
+                continue;
+            String resumeExpression = metaDataCruncher.getMostReferedExpression();
+            if(resumeExpression == null || resumeExpression.length() == 0)
+                resumeExpression = resume.getCruncherData(cruncher.getCruncherName())
+                        .getOrderedFields(new ResumeFieldComparator()).get(0).getKey();
+            // Does resume and title have the same most common expression
+            if(resumeExpression.compareTo(titleExpression) == 0) {
+                logger.debug("Resume checks up with the title");
+                resultTitle.add(resume);
+                // Does resume and description have the same most common expression
+            } else if(resumeExpression.compareTo(descriptionExpression) == 0) {
+                logger.debug("Resume checks up with the description");
+                resultDescription.add(resume);
+            }
+        }
+        // Sort the resumes that match title to have on top the one with more expressions
+        Collections.sort(resultTitle, new ResumeSorter());
+        // Sort the resumes that match description to have on top the one with more expressions
+        Collections.sort(resultDescription, new ResumeSorter());
+        resultTitle.addAll(resultDescription);
+        return resultTitle;
+    }
+
+    @Override
     public List<Job> match(CruncherMetaData metadata) {
         logger.trace("match(" + metadata + ")");
         // Retrieve the meta data into a good object type

@@ -4,9 +4,11 @@ package org.metplus.curriculum.web.controllers;
 import org.metplus.curriculum.cruncher.MatcherList;
 import org.metplus.curriculum.cruncher.Matcher;
 import org.metplus.curriculum.database.config.SpringMongoConfig;
+import org.metplus.curriculum.database.domain.Job;
 import org.metplus.curriculum.database.domain.Resume;
 import org.metplus.curriculum.database.exceptions.ResumeNotFound;
 import org.metplus.curriculum.database.exceptions.ResumeReadException;
+import org.metplus.curriculum.database.repository.JobRepository;
 import org.metplus.curriculum.database.repository.ResumeRepository;
 import org.metplus.curriculum.process.ResumeCruncher;
 import org.metplus.curriculum.web.answers.GenericAnswer;
@@ -38,6 +40,9 @@ public class CurriculumController {
 
     @Autowired
     private ResumeRepository resumeRepository;
+
+    @Autowired
+    private JobRepository jobRepository;
 
     @Autowired
     private SpringMongoConfig dbConfig;
@@ -145,6 +150,32 @@ public class CurriculumController {
         ResumeMatchAnswer answer = new ResumeMatchAnswer();
         for(Matcher matcher: matcherList.getMatchers()) {
             matchedResumes = matcher.match(title, description);
+            for(Resume resume: matchedResumes) {
+                answer.addResume(matcher.getCruncherName(), resume);
+            }
+        }
+        answer.setMessage("Success");
+        answer.setResultCode(ResultCodes.SUCCESS);
+
+        logger.debug("Result is: " + answer);
+        return new ResponseEntity<>(answer, HttpStatus.OK);
+    }
+    @RequestMapping(value = "/match", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<GenericAnswer> match(@RequestParam("jobId") final String jobId) {
+        logger.debug("Match resumes with job id: '" + jobId + "'");
+        if(jobId == null || jobId.length() == 0) {
+            logger.error("Matching resumes with empty job identifier");
+            GenericAnswer answer = new GenericAnswer();
+            answer.setMessage("Empty job identifier");
+            answer.setResultCode(ResultCodes.FATAL_ERROR);
+            return new ResponseEntity<>(answer, HttpStatus.BAD_REQUEST);
+        }
+        List<Resume> matchedResumes = null;
+        ResumeMatchAnswer answer = new ResumeMatchAnswer();
+        Job job = jobRepository.findByJobId(jobId);
+        for(Matcher matcher: matcherList.getMatchers()) {
+            matchedResumes = matcher.match(job);
             for(Resume resume: matchedResumes) {
                 answer.addResume(matcher.getCruncherName(), resume);
             }
