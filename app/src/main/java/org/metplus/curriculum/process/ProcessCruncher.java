@@ -57,7 +57,7 @@ public abstract class ProcessCruncher<Work> {
             }
         } while(keepRunning);
 
-        logger.info("Processor stopped");
+        logger.warn("Processor stopped");
     }
 
     /**
@@ -70,7 +70,7 @@ public abstract class ProcessCruncher<Work> {
      * Stop the thread
      */
     public synchronized void stop(){
-        logger.info("Requested stop of processor");
+        logger.warn("Requested stop of processor");
         setKeepRunning(false);
         semaphore.release();
     }

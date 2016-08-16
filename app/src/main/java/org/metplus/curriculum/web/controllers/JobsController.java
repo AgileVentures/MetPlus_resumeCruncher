@@ -133,6 +133,13 @@ public class JobsController {
         JobMatchAnswer answer = new JobMatchAnswer();
         for(Matcher matcher: matcherList.getMatchers()) {
             matchedJobs = matcher.match(resume.getCruncherData(matcher.getCruncherName()));
+            if(matchedJobs == null) {
+                logger.error("Unable to find to jobs because the resume with id '{}' is in a invalid state", resumeId);
+                GenericAnswer errorAnswer = new GenericAnswer();
+                errorAnswer.setResultCode(ResultCodes.FATAL_ERROR);
+                errorAnswer.setMessage("Unable to find to jobs because the resume is in a invalid state");
+                return new ResponseEntity<>(answer, HttpStatus.OK);
+            }
             for(Job job: matchedJobs) {
                 answer.addJob(matcher.getCruncherName(), job);
             }
