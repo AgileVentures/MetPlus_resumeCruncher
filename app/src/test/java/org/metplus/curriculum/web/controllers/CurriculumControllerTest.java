@@ -30,9 +30,11 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -45,7 +47,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(Suite.class)
 @Suite.SuiteClasses({CurriculumControllerTest.UploadEndpoint.class,
                      CurriculumControllerTest.DownloadEndpoint.class,
-                     CurriculumControllerTest.MatchEndpoint.class})
+                     CurriculumControllerTest.MatchEndpoint.class,
+                     CurriculumControllerTest.MatchEndpointWithJobId.class})
 public class CurriculumControllerTest {
     public static class DefaultCurriculumTest extends BaseControllerTest {
         @Autowired
@@ -190,6 +193,33 @@ public class CurriculumControllerTest {
                                                       .description("Title of the Job"),
                                               parameterWithName("description")
                                                       .description("Description of the Job")),
+                            responseFields(
+                                    fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
+                                    fieldWithPath("message").description("Message associated with the result code"),
+                                    fieldWithPath("resumes").description("Hash with the resumes found for each cruncher")
+                            )
+                    ))
+                    .andReturn().getResponse();
+            ResumeMatchAnswer answer = new ObjectMapper().readValue(response.getContentAsString(), ResumeMatchAnswer.class);
+            assertEquals("Result code is not correct", ResultCodes.SUCCESS, answer.getResultCode());
+            assertEquals("Number of resumes should be 0", 0, answer.getResumes().size());
+        }
+    }
+    @RunWith(SpringJUnit4ClassRunner.class)
+    public static class MatchEndpointWithJobId extends DefaultCurriculumTest {
+        @Test
+        public void noMatches() throws Exception {
+
+            MockHttpServletResponse response = mockMvc.perform(get("/api/v1/curriculum/match/{jobId}", 1)
+                    .header("X-Auth-Token", token)
+                    .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andDo(document("curriculum/match-no-resumes-job-id",
+                            requestHeaders(headerWithName("X-Auth-Token")
+                                    .description("Authentication token retrieved from the authentication")),
+                            pathParameters(
+                                    parameterWithName("jobId").description("Job Identifier to retrieve the Resumes that match the job")
+                            ),
                             responseFields(
                                     fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
                                     fieldWithPath("message").description("Message associated with the result code"),
