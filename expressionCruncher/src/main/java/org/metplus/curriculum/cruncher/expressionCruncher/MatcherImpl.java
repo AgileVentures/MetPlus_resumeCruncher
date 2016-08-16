@@ -1,6 +1,5 @@
 package org.metplus.curriculum.cruncher.expressionCruncher;
 
-import org.apache.poi.ss.formula.functions.T;
 import org.metplus.curriculum.cruncher.CruncherMetaData;
 import org.metplus.curriculum.cruncher.Matcher;
 import org.metplus.curriculum.database.domain.DocumentWithMetaData;
@@ -11,6 +10,7 @@ import org.metplus.curriculum.database.repository.JobRepository;
 import org.metplus.curriculum.database.repository.ResumeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
@@ -38,12 +38,42 @@ public class MatcherImpl implements Matcher<Resume, Job> {
     @Override
     public List<Resume> match(String title, String description) {
         logger.trace("match(" + title + ", " + description + ")");
+        String titleExpression;
+        String descriptionExpression;
+
+        try {
+            // Crunch the title
+            titleExpression = ((ExpressionCruncherMetaData)cruncher.crunch(title)).getMostReferedExpression();
+            // Crunch the description
+            descriptionExpression = ((ExpressionCruncherMetaData)cruncher.crunch(description)).getMostReferedExpression();
+        } catch(Exception exp) {
+            logger.error("Unable to retrieve the most common expression");
+            logger.error(exp.getLocalizedMessage());
+            return null;
+        }
+        return matchResumes(titleExpression, descriptionExpression);
+    }
+
+    @Override
+    public List<Resume> match(Job job) {
+        logger.trace("match(" + job + ")");
+        String titleExpression;
+        String descriptionExpression;
+        try {
+            titleExpression = ((ExpressionCruncherMetaData) job.getTitleCruncherData(getCruncherName())).getMostReferedExpression();
+            descriptionExpression = ((ExpressionCruncherMetaData) job.getDescriptionCruncherData(getCruncherName())).getMostReferedExpression();
+        } catch(Exception exp) {
+            logger.error("Unable to retrieve the most common expression");
+            logger.error(exp.getLocalizedMessage());
+            return null;
+        }
+
+        return matchResumes(titleExpression, descriptionExpression);
+    }
+
+    private List<Resume> matchResumes(String titleExpression, String descriptionExpression) {
         // Retrieve all the resumes
         List<Resume> resumes = resumeRepository.resumesOnCriteria(new ResumeComparator());
-        // Crunch the title
-        String titleExpression = ((ExpressionCruncherMetaData)cruncher.crunch(title)).getMostReferedExpression();
-        // Crunch the description
-        String descriptionExpression = ((ExpressionCruncherMetaData)cruncher.crunch(description)).getMostReferedExpression();
         List<Resume> resultTitle = new ArrayList<>();
         List<Resume> resultDescription = new ArrayList<>();
         for(Resume resume: resumes) {
@@ -55,7 +85,7 @@ public class MatcherImpl implements Matcher<Resume, Job> {
             String resumeExpression = metaDataCruncher.getMostReferedExpression();
             if(resumeExpression == null || resumeExpression.length() == 0)
                 resumeExpression = resume.getCruncherData(cruncher.getCruncherName())
-                                         .getOrderedFields(new ResumeFieldComparator()).get(0).getKey();
+                        .getOrderedFields(new ResumeFieldComparator()).get(0).getKey();
             // Does resume and title have the same most common expression
             if(resumeExpression.compareTo(titleExpression) == 0) {
                 logger.debug("Resume checks up with the title");
