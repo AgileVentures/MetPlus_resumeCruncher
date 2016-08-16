@@ -160,9 +160,9 @@ public class CurriculumController {
         logger.debug("Result is: " + answer);
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
-    @RequestMapping(value = "/match", method = RequestMethod.POST)
+    @RequestMapping(value = "/match/{jobId}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<GenericAnswer> match(@RequestParam("jobId") final String jobId) {
+    public ResponseEntity<GenericAnswer> match(@PathVariable("jobId") final String jobId) {
         logger.debug("Match resumes with job id: '" + jobId + "'");
         if(jobId == null || jobId.length() == 0) {
             logger.error("Matching resumes with empty job identifier");
@@ -176,6 +176,13 @@ public class CurriculumController {
         Job job = jobRepository.findByJobId(jobId);
         for(Matcher matcher: matcherList.getMatchers()) {
             matchedResumes = matcher.match(job);
+            if(matchedResumes == null) {
+                logger.error("Matching resumes with empty job identifier");
+                GenericAnswer errorAnswer = new GenericAnswer();
+                errorAnswer.setMessage("Not all information is crunched");
+                errorAnswer.setResultCode(ResultCodes.FATAL_ERROR);
+                return new ResponseEntity<>(errorAnswer, HttpStatus.BAD_REQUEST);
+            }
             for(Resume resume: matchedResumes) {
                 answer.addResume(matcher.getCruncherName(), resume);
             }
