@@ -201,6 +201,7 @@ public class CruncherImpl implements Cruncher {
     public CruncherMetaData crunch(String data) {
         Map<String, Integer> result = calculate(data);
         ExpressionCruncherMetaData allMetaData = new ExpressionCruncherMetaData();
+        allMetaData.setMostReferedExpression("");
         int references = 0;
         for(Map.Entry<String, Integer> metaData: result.entrySet()) {
             MetaDataField<Integer> field = new MetaDataField<>(metaData.getValue());

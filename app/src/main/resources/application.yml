@@ -1,13 +1,10 @@
 spring:
     profiles.active: development
 
-    log4j.logger: DEBUG
-    log4j.logger.org.hibernate: ERROR
-    log4j.logger.com.mongodb: SEVERE
-    log4j.logger.org.apache: ERROR
-    log4j.logger.org.metplus: DEBUG
-logging.level.org.metplus: DEBUG
-
+logging.level: INFO
+logging.level.org.hibernate: ERROR
+logging.level.com.mongodb: SEVERE
+logging.level.org.springframework: WARN
 
 backend.admin.role: BACKEND_ADMIN
 
@@ -15,6 +12,8 @@ backend.admin.role: BACKEND_ADMIN
 
 spring:
   profiles: development
+
+logging.level.org.metplus: DEBUG
 
 server:
   port: 8443
@@ -34,6 +33,9 @@ backend:
   admin:
     username: ${username}
     password: ${password}
+
+
+logging.level.org.metplus: INFO
 
 ---
 spring:
