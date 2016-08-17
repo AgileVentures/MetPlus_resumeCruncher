@@ -6,6 +6,8 @@ import org.metplus.curriculum.database.domain.CruncherSettings;
 import org.metplus.curriculum.database.domain.Setting;
 import org.metplus.curriculum.database.domain.Settings;
 import org.metplus.curriculum.database.exceptions.CruncherSettingsNotFound;
+import org.metplus.curriculum.database.repository.JobRepository;
+import org.metplus.curriculum.database.repository.ResumeRepository;
 import org.metplus.curriculum.database.repository.SettingsRepository;
 import org.metplus.curriculum.init.CruncherInitializer;
 import org.slf4j.Logger;
@@ -53,8 +55,13 @@ public class NaiveBayesCruncher extends CruncherInitializer {
     }
 
 
+    private MatcherImpl resumeMatcher;
     @Autowired
     private SettingsRepository repository;
+    @Autowired
+    private ResumeRepository resumeRepository;
+    @Autowired
+    private JobRepository jobRepository;
 
     public NaiveBayesCruncher() {
 
@@ -106,6 +113,8 @@ public class NaiveBayesCruncher extends CruncherInitializer {
         } finally {
             learnDatabase = null;
         }
+
+        resumeMatcher = new MatcherImpl(cruncherImpl, resumeRepository, jobRepository);
     }
 
     public void save() {
@@ -128,6 +137,6 @@ public class NaiveBayesCruncher extends CruncherInitializer {
 
     @Override
     public Matcher getMatcher() {
-        return null;
+        return resumeMatcher;
     }
 }

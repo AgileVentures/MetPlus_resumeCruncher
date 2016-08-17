@@ -150,6 +150,13 @@ public class CurriculumController {
         ResumeMatchAnswer answer = new ResumeMatchAnswer();
         for(Matcher matcher: matcherList.getMatchers()) {
             matchedResumes = matcher.match(title, description);
+            if(matchedResumes == null) {
+                logger.error("Matching resumes with job title and description");
+                GenericAnswer errorAnswer = new GenericAnswer();
+                errorAnswer.setMessage("Not all information is crunched");
+                errorAnswer.setResultCode(ResultCodes.FATAL_ERROR);
+                return new ResponseEntity<>(errorAnswer, HttpStatus.BAD_REQUEST);
+            }
             for(Resume resume: matchedResumes) {
                 answer.addResume(matcher.getCruncherName(), resume);
             }
