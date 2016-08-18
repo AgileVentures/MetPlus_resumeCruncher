@@ -8,9 +8,23 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.metplus.curriculum.cruncher.CruncherMetaData;
+import org.metplus.curriculum.cruncher.Matcher;
+import org.metplus.curriculum.cruncher.MatcherList;
+import org.metplus.curriculum.database.domain.DocumentWithMetaData;
+import org.metplus.curriculum.database.domain.Job;
+import org.metplus.curriculum.database.domain.MetaData;
+import org.metplus.curriculum.database.domain.Resume;
+import org.metplus.curriculum.database.repository.JobRepository;
+import org.metplus.curriculum.database.repository.ResumeRepository;
+import org.metplus.curriculum.process.JobCruncher;
+import org.metplus.curriculum.process.ResumeCruncher;
 import org.metplus.curriculum.web.answers.GenericAnswer;
 import org.metplus.curriculum.web.answers.ResultCodes;
 import org.metplus.curriculum.web.answers.ResumeMatchAnswer;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -20,11 +34,18 @@ import org.springframework.restdocs.RestDocumentation;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.Filter;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -38,6 +59,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.pathPara
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -196,7 +218,7 @@ public class CurriculumControllerTest {
                             responseFields(
                                     fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
                                     fieldWithPath("message").description("Message associated with the result code"),
-                                    fieldWithPath("resumes").description("Hash with the resumes found for each cruncher")
+                                    fieldWithPath("resumes").description("Hash with the identifiers of the resumes matched for each cruncher")
                             )
                     ))
                     .andReturn().getResponse();
@@ -205,8 +227,27 @@ public class CurriculumControllerTest {
             assertEquals("Number of resumes should be 0", 0, answer.getResumes().size());
         }
     }
-    @RunWith(SpringJUnit4ClassRunner.class)
+    @RunWith(MockitoJUnitRunner.class)
     public static class MatchEndpointWithJobId extends DefaultCurriculumTest {
+        @Mock
+        protected JobRepository jobRepository;
+        @Mock
+        protected ResumeRepository resumeRepository;
+        @Mock
+        protected MatcherList matcherList;
+        @Mock
+        protected ResumeCruncher resumeCruncher;
+        @Before
+        public void setUp() throws Exception {
+            mockMvc = MockMvcBuilders.standaloneSetup(new CurriculumController(jobRepository, resumeRepository, matcherList, resumeCruncher))
+                    .setValidator(validator())
+                    .apply(documentationConfiguration(this.restDocumentation))
+                    .build();
+            token = "123-1234-1234";
+        }
+        private LocalValidatorFactoryBean validator() {
+            return new LocalValidatorFactoryBean();
+        }
         @Test
         public void noMatches() throws Exception {
 
@@ -223,13 +264,77 @@ public class CurriculumControllerTest {
                             responseFields(
                                     fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
                                     fieldWithPath("message").description("Message associated with the result code"),
-                                    fieldWithPath("resumes").description("Hash with the resumes found for each cruncher")
+                                    fieldWithPath("resumes").description("Hash with the identifiers of the resumes matched for each cruncher")
                             )
                     ))
                     .andReturn().getResponse();
             ResumeMatchAnswer answer = new ObjectMapper().readValue(response.getContentAsString(), ResumeMatchAnswer.class);
             assertEquals("Result code is not correct", ResultCodes.SUCCESS, answer.getResultCode());
             assertEquals("Number of resumes should be 0", 0, answer.getResumes().size());
+        }
+        @Test
+        public void multipleMatches() throws Exception {
+            DocumentWithMetaData titleMetaData = new DocumentWithMetaData();
+            DocumentWithMetaData descriptionMetaData = new DocumentWithMetaData();
+            Map<String, MetaData> metaData1 = new HashMap<>();
+            metaData1.put("matcher1", new MetaData());
+            metaData1.put("matcher2", new MetaData());
+            titleMetaData.setMetaData(metaData1);
+            descriptionMetaData.setMetaData(metaData1);
+            Job job = new Job();
+            job.setTitleMetaData(titleMetaData);
+            job.setDescriptionMetaData(descriptionMetaData);
+            Mockito.when(jobRepository.findByJobId("1")).thenReturn(job);
+
+            Resume resume1 = new Resume("1");
+            Resume resume2 = new Resume("2");
+            Resume resume3 = new Resume("3");
+            List<Resume> matcher1Resumes = new ArrayList<>();
+            matcher1Resumes.add(resume1);
+            matcher1Resumes.add(resume2);
+            List<Resume> matcher2Resumes = new ArrayList<>();
+            matcher2Resumes.add(resume3);
+            matcher2Resumes.add(resume2);
+
+            Matcher matcher1 = Mockito.mock(Matcher.class);
+            Mockito.when(matcher1.getCruncherName()).thenReturn("matcher1");
+            Mockito.when(matcher1.match(Mockito.any(Job.class))).thenReturn(matcher1Resumes);
+            Matcher matcher2 = Mockito.mock(Matcher.class);
+            Mockito.when(matcher2.getCruncherName()).thenReturn("matcher2");
+            Mockito.when(matcher2.match(Mockito.any(Job.class))).thenReturn(matcher2Resumes);
+
+            List<Matcher> allMatchers = new ArrayList<>();
+            allMatchers.add(matcher1);
+            allMatchers.add(matcher2);
+            Mockito.when(matcherList.getMatchers()).thenReturn(allMatchers);
+
+            MockHttpServletResponse response = mockMvc.perform(get("/api/v1/curriculum/match/{jobId}", 1)
+                    .header("X-Auth-Token", token)
+                    .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andDo(document("curriculum/multiple-match-resumes-job-id",
+                            requestHeaders(headerWithName("X-Auth-Token")
+                                    .description("Authentication token retrieved from the authentication")),
+                            pathParameters(
+                                    parameterWithName("jobId").description("Job Identifier to retrieve the Resumes that match the job")
+                            ),
+                            responseFields(
+                                    fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
+                                    fieldWithPath("message").description("Message associated with the result code"),
+                                    fieldWithPath("resumes").description("Hash with the identifiers of the resumes matched for each cruncher")
+                            )
+                    ))
+                    .andExpect(jsonPath("$.resultCode", is(ResultCodes.SUCCESS.toString())))
+                    .andExpect(jsonPath("$.resumes.matcher1", hasSize(2)))
+                    .andExpect(jsonPath("$.resumes.matcher1[0]", is("1")))
+                    .andExpect(jsonPath("$.resumes.matcher1[1]", is("2")))
+                    .andExpect(jsonPath("$.resumes.matcher2", hasSize(2)))
+                    .andExpect(jsonPath("$.resumes.matcher2[0]", is("3")))
+                    .andExpect(jsonPath("$.resumes.matcher2[1]", is("2")))
+                    .andReturn().getResponse();
+            Mockito.verify(jobRepository).findByJobId("1");
+            Mockito.verify(matcher1).match(Mockito.any(Job.class));
+            Mockito.verify(matcher2).match(Mockito.any(Job.class));
         }
     }
 }

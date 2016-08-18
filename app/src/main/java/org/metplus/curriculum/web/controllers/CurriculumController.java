@@ -50,6 +50,14 @@ public class CurriculumController {
     @Autowired
     private MatcherList matcherList;
 
+    public CurriculumController(){}
+    public CurriculumController(JobRepository jobRepository, ResumeRepository resumeRepository, MatcherList matcherList, ResumeCruncher resumeCruncher) {
+        this.jobRepository = jobRepository;
+        this.resumeRepository = resumeRepository;
+        this.matcherList = matcherList;
+        this.resumeCruncher = resumeCruncher;
+    }
+
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<GenericAnswer> uploadCurriculum(
@@ -182,6 +190,7 @@ public class CurriculumController {
         ResumeMatchAnswer answer = new ResumeMatchAnswer();
         Job job = jobRepository.findByJobId(jobId);
         for(Matcher matcher: matcherList.getMatchers()) {
+            logger.debug("Checking for matcher: " + matcher.getCruncherName());
             matchedResumes = matcher.match(job);
             if(matchedResumes == null) {
                 logger.error("Matching resumes with empty job identifier");

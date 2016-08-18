@@ -29,9 +29,9 @@ public class Job extends DocumentWithMetaData {
      * @return Meta data
      */
     public MetaData getTitleCruncherData(String cruncherName) {
-        if(titleMetaData != null && titleMetaData.getMetaData() != null)
-            return titleMetaData.getMetaData().get(cruncherName);
-        return null;
+        if(titleMetaData == null || titleMetaData.getMetaData() == null)
+            return null;
+        return titleMetaData.getMetaData().get(cruncherName);
     }
 
     /**
@@ -39,9 +39,9 @@ public class Job extends DocumentWithMetaData {
      * @return Map with all crunchers meta data
      */
     public Map<String, MetaData> getTitleCruncherData() {
-        if(titleMetaData != null)
-            return titleMetaData.getMetaData();
-        return null;
+        if(titleMetaData == null)
+            return null;
+        return titleMetaData.getMetaData();
     }
 
     /**
@@ -50,6 +50,8 @@ public class Job extends DocumentWithMetaData {
      * @return Meta data
      */
     public MetaData getDescriptionCruncherData(String cruncherName) {
+        if(descriptionMetaData == null || descriptionMetaData.getMetaData() == null)
+            return null;
         return descriptionMetaData.getMetaData().get(cruncherName);
     }
 
@@ -58,9 +60,9 @@ public class Job extends DocumentWithMetaData {
      * @return Map with all crunchers meta data
      */
     public Map<String, MetaData> getDescriptionCruncherData() {
-        if(descriptionMetaData != null)
-            return descriptionMetaData.getMetaData();
-        return null;
+        if(descriptionMetaData == null)
+            return null;
+        return descriptionMetaData.getMetaData();
     }
 
     /**
