@@ -3,9 +3,12 @@ package org.metplus.curriculum.web.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.metplus.curriculum.cruncher.CruncherMetaData;
@@ -19,6 +22,8 @@ import org.metplus.curriculum.database.repository.JobRepository;
 import org.metplus.curriculum.database.repository.ResumeRepository;
 import org.metplus.curriculum.process.JobCruncher;
 import org.metplus.curriculum.process.ResumeCruncher;
+import org.metplus.curriculum.test.BeforeAfterInterface;
+import org.metplus.curriculum.test.BeforeAfterRule;
 import org.metplus.curriculum.web.answers.GenericAnswer;
 import org.metplus.curriculum.web.answers.ResultCodes;
 import org.metplus.curriculum.web.answers.ResumeMatchAnswer;
@@ -39,6 +44,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.Filter;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,7 +78,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                      CurriculumControllerTest.MatchEndpoint.class,
                      CurriculumControllerTest.MatchEndpointWithJobId.class})
 public class CurriculumControllerTest {
-    public static class DefaultCurriculumTest extends BaseControllerTest {
+    public static class DefaultCurriculumTest extends BaseControllerTest implements BeforeAfterInterface{
         @Autowired
         protected WebApplicationContext ctx;
 
@@ -87,11 +93,22 @@ public class CurriculumControllerTest {
         private Filter springSecurityFilterChain;
         protected String token;
 
-        @Rule
-        public RestDocumentation restDocumentation = new RestDocumentation("build/generated-snippets");
 
-        @Before
-        public void setUp() throws Exception {
+        public RestDocumentation restDocumentation;
+
+        public BeforeAfterRule beforeAfter;
+        @Rule
+        public TestRule chain =
+                RuleChain.outerRule(restDocumentation = new RestDocumentation("build/generated-snippets"))
+                        .around(beforeAfter = new BeforeAfterRule(this));
+
+        @Override
+        public void after() {
+
+        }
+
+        @Override
+        public void before() {
             this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx)
                     .addFilter(springSecurityFilterChain)
                     .apply(documentationConfiguration(this.restDocumentation))
@@ -99,16 +116,31 @@ public class CurriculumControllerTest {
                             preprocessRequest(prettyPrint()),
                             preprocessResponse(prettyPrint())))
                     .build();
-            MockHttpServletResponse response = mockMvc
-                    .perform(post("/api/v1/authenticate")
-                                    .header("X-Auth-Username", backendAdminUsername)
-                                    .header("X-Auth-Password", backendAdminPassword)
-                                    .accept(MediaType.APPLICATION_JSON)
-                                    .contentType(MediaType.MULTIPART_FORM_DATA)
-                    ).andExpect(status().isOk()).andReturn().getResponse();
+            MockHttpServletResponse response = null;
+            try {
+                response = mockMvc
+                        .perform(post("/api/v1/authenticate")
+                                .header("X-Auth-Username", backendAdminUsername)
+                                .header("X-Auth-Password", backendAdminPassword)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.MULTIPART_FORM_DATA)
+                        ).andExpect(status().isOk()).andReturn().getResponse();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             JSONParser parser = new JSONParser();
-            JSONObject obj = (JSONObject) parser.parse(response.getContentAsString());
+            JSONObject obj = null;
+            try {
+                obj = (JSONObject) parser.parse(response.getContentAsString());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
             token = (String) obj.get("token");
+        }
+        protected LocalValidatorFactoryBean validator() {
+            return new LocalValidatorFactoryBean();
         }
     }
 
@@ -198,10 +230,41 @@ public class CurriculumControllerTest {
         }
     }
 
-    @RunWith(SpringJUnit4ClassRunner.class)
+    @RunWith(MockitoJUnitRunner.class)
     public static class MatchEndpoint extends DefaultCurriculumTest {
+        @Mock
+        protected JobRepository jobRepository;
+        @Mock
+        protected ResumeRepository resumeRepository;
+        @Mock
+        protected MatcherList matcherList;
+        @Mock
+        protected ResumeCruncher resumeCruncher;
+
+        @Override
+        public void before(){
+
+            mockMvc = MockMvcBuilders.standaloneSetup(new CurriculumController(jobRepository, resumeRepository, matcherList, resumeCruncher))
+                    .setValidator(validator())
+                    .apply(documentationConfiguration(this.restDocumentation))
+                    .build();
+            token = "123-1234-1234";
+        }
         @Test
         public void noMatches() throws Exception {
+
+            Matcher matcher1 = Mockito.mock(Matcher.class);
+            Mockito.when(matcher1.getCruncherName()).thenReturn("matcher1");
+            Mockito.when(matcher1.match(Mockito.any(Job.class))).thenReturn(new ArrayList<>());
+            Matcher matcher2 = Mockito.mock(Matcher.class);
+            Mockito.when(matcher2.getCruncherName()).thenReturn("matcher2");
+            Mockito.when(matcher2.match(Mockito.any(Job.class))).thenReturn(new ArrayList<>());
+
+            List<Matcher> allMatchers = new ArrayList<>();
+            allMatchers.add(matcher1);
+            allMatchers.add(matcher2);
+            Mockito.when(matcherList.getMatchers()).thenReturn(allMatchers);
+
             MockHttpServletResponse response = mockMvc.perform(post("/api/v1/curriculum/match")
                     .header("X-Auth-Token", token)
                     .accept(MediaType.APPLICATION_JSON)
@@ -237,20 +300,32 @@ public class CurriculumControllerTest {
         protected MatcherList matcherList;
         @Mock
         protected ResumeCruncher resumeCruncher;
-        @Before
-        public void setUp() throws Exception {
+
+        @Override
+        public void before(){
+
             mockMvc = MockMvcBuilders.standaloneSetup(new CurriculumController(jobRepository, resumeRepository, matcherList, resumeCruncher))
                     .setValidator(validator())
                     .apply(documentationConfiguration(this.restDocumentation))
                     .build();
             token = "123-1234-1234";
         }
-        private LocalValidatorFactoryBean validator() {
-            return new LocalValidatorFactoryBean();
-        }
         @Test
         public void noMatches() throws Exception {
 
+
+            Matcher matcher1 = Mockito.mock(Matcher.class);
+            Mockito.when(matcher1.getCruncherName()).thenReturn("matcher1");
+            Mockito.when(matcher1.match(Mockito.any(Job.class))).thenReturn(new ArrayList<>());
+            Matcher matcher2 = Mockito.mock(Matcher.class);
+            Mockito.when(matcher2.getCruncherName()).thenReturn("matcher2");
+            Mockito.when(matcher2.match(Mockito.any(Job.class))).thenReturn(new ArrayList<>());
+
+            List<Matcher> allMatchers = new ArrayList<>();
+            allMatchers.add(matcher1);
+            allMatchers.add(matcher2);
+            Mockito.when(matcherList.getMatchers()).thenReturn(allMatchers);
+            
             MockHttpServletResponse response = mockMvc.perform(get("/api/v1/curriculum/match/{jobId}", 1)
                     .header("X-Auth-Token", token)
                     .accept(MediaType.APPLICATION_JSON))
