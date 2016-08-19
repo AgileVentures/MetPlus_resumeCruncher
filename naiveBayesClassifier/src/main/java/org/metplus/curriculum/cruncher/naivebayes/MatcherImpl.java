@@ -9,6 +9,7 @@ import org.metplus.curriculum.database.repository.ResumeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,13 +36,39 @@ public class MatcherImpl implements Matcher<Resume, Job> {
     @Override
     public List<Resume> match(String title, String description) {
         logger.trace("match(" + title + "," + description + ")");
-        return null;
+        NaiveBayesMetaData titleMetaData =(NaiveBayesMetaData)cruncher.crunch(title);
+        NaiveBayesMetaData descriptionMetaData = (NaiveBayesMetaData)cruncher.crunch(description);
+        if(titleMetaData == null || descriptionMetaData == null)
+            return null;
+        return matchResumes(titleMetaData, descriptionMetaData);
     }
 
     @Override
     public List<Resume> match(Job job) {
         logger.trace("match(" + job + ")");
-        return null;
+        if(job == null)
+            return null;
+        if(job.getTitleCruncherData(getCruncherName()) == null)
+            return null;
+        if(job.getDescriptionCruncherData(getCruncherName()) == null)
+            return null;
+
+        return matchResumes((NaiveBayesMetaData)job.getTitleCruncherData(getCruncherName()),
+                     (NaiveBayesMetaData)job.getDescriptionCruncherData(getCruncherName()));
+    }
+    private List<Resume> matchResumes(NaiveBayesMetaData titleMetaData, NaiveBayesMetaData descriptionMetaData) {
+        logger.trace("matchResumes(" + titleMetaData + ", " + descriptionMetaData + ")");
+        List<Resume> result = new ArrayList<>();
+        for(Resume resume: resumeRepository.findAll()) {
+            logger.debug("trying to match with resume: " + resume.getUserId());
+            NaiveBayesMetaData data = (NaiveBayesMetaData)resume.getCruncherData(getCruncherName());
+            if(data == null) {
+                logger.warn("Resume with id: " + resume.getUserId() + " do not have meta data for cruncher");
+                continue;
+            }
+            data.
+        }
+        return result;
     }
 
     @Override

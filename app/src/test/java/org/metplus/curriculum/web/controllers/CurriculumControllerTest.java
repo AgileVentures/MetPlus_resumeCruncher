@@ -325,7 +325,7 @@ public class CurriculumControllerTest {
             allMatchers.add(matcher1);
             allMatchers.add(matcher2);
             Mockito.when(matcherList.getMatchers()).thenReturn(allMatchers);
-            
+
             MockHttpServletResponse response = mockMvc.perform(get("/api/v1/curriculum/match/{jobId}", 1)
                     .header("X-Auth-Token", token)
                     .accept(MediaType.APPLICATION_JSON))
