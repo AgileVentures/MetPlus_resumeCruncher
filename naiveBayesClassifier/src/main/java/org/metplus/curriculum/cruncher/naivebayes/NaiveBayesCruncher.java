@@ -72,6 +72,8 @@ public class NaiveBayesCruncher extends CruncherInitializer {
     public void init() {
         try {
             cruncherImpl = new CruncherImpl(cleanExpressions);
+            learnDatabase = config.getDatabase();
+            cleanExpressions = config.getCleanExpressions();
             load();
         } catch (CruncherSettingsNotFound cruncherSettingsNotFound) {
             save();

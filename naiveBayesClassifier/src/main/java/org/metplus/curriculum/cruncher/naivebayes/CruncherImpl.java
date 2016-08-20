@@ -48,7 +48,7 @@ public class CruncherImpl implements Cruncher {
                 break;
             MetaDataField<Float> field = new MetaDataField<>(metaData.getProbability());
             allMetaData.addField(metaData.getCategory(), field);
-            output += ("" + metaData.getCategory() + ": " + metaData.getCategory() + ", ");
+            output += ("" + metaData.getCategory() + ": " + metaData.getProbability() + ", ");
         }
         logger.debug(output + "]");
         return allMetaData;

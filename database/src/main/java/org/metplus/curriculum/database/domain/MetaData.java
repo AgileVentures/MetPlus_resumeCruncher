@@ -29,12 +29,14 @@ public class MetaData extends AbstractDocument implements CruncherMetaData {
     }
 
     public List<Map.Entry<String, MetaDataField>> getOrderedFields(Comparator<Map.Entry<String, MetaDataField>> comparator) {
-        Set<Map.Entry<String, MetaDataField>> bamm = fields.entrySet();
-        if(bamm == null || bamm.size() == 0)
+        if(fields == null)
             return new ArrayList<>();
-        List<Map.Entry<String, MetaDataField>> bamm1 = new ArrayList<>(bamm);
-        Collections.sort(bamm1, comparator);
-        return bamm1;
+        Set<Map.Entry<String, MetaDataField>> fieldsData = fields.entrySet();
+        if(fieldsData == null || fieldsData.size() == 0)
+            return new ArrayList<>();
+        List<Map.Entry<String, MetaDataField>> result = new ArrayList<>(fieldsData);
+        Collections.sort(result, comparator);
+        return result;
     }
 
     /**
@@ -72,9 +74,11 @@ public class MetaData extends AbstractDocument implements CruncherMetaData {
     @Override
     public String toString() {
         String result = "MetaData: ";
-        for(Map.Entry entry: fields.entrySet()) {
-            result += "'" + entry.getKey() + "': '" + entry.getValue()+ "',";
-        }
+        if(fields != null)
+            for(Map.Entry entry: fields.entrySet())
+                result += "'" + entry.getKey() + "': '" + entry.getValue()+ "',";
+        else
+            result += "empty";
         return result;
     }
 }

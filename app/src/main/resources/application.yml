@@ -4,7 +4,7 @@ spring:
 logging.level: INFO
 logging.level.org.hibernate: ERROR
 logging.level.com.mongodb: ERROR
-logging.level.org.springframework: INFO
+logging.level.org.springframework: WARN
 
 backend.admin.role: BACKEND_ADMIN
 

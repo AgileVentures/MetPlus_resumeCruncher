@@ -114,7 +114,7 @@ public class MatcherImpl implements Matcher<Resume, Job> {
         List<String> topResumeFields = new ArrayList<> ();
         boolean foundGoodCategory = false;
         for(Map.Entry<String, MetaDataField> category: compareTo.getOrderedFields(new DoubleFieldComparator())) {
-            if(base.contains(category)) {
+            if(base.contains(category.getKey())) {
                 topResumeFields.add(category.getKey());
                 foundGoodCategory = true;
             } else
@@ -123,13 +123,15 @@ public class MatcherImpl implements Matcher<Resume, Job> {
                 break;
         }
         // Check if there is anything in common if no continue to next resume
-        if(!foundGoodCategory)
+        if(!foundGoodCategory) {
+            logger.trace("No categories in common");
             return -1;
+        }
         int currentIndex = 0;
         for(String categoryName: base) {
             int index = topResumeFields.indexOf(categoryName);
             if(index != -1) {
-                total += weightMatrix[currentIndex] + ((currentIndex<index?-1:1) * weightMatrix[currentIndex]);
+                total += weightMatrix[currentIndex] + ((currentIndex<index?-1:1) * weightMatrix[index]);
             }
             currentIndex++;
         }

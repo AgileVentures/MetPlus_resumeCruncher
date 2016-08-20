@@ -15,13 +15,39 @@ import java.util.Map;
  */
 public class ResumeMatchAnswer extends GenericAnswer {
 
-    Map<String, List<String>> resumes;
+    static class ResumeWithProbability {
+        private String resumeId;
+        private double probability;
+
+        public ResumeWithProbability(String resumeId, double probability) {
+            this.resumeId = resumeId;
+            this.probability = probability;
+        }
+
+        public String getResumeId() {
+            return resumeId;
+        }
+
+        public void setResumeId(String resumeId) {
+            this.resumeId = resumeId;
+        }
+
+        public double getProbability() {
+            return probability;
+        }
+
+        public void setProbability(double probability) {
+            this.probability = probability;
+        }
+    }
+
+    Map<String, List<ResumeWithProbability>> resumes;
 
     /**
      * Retrieve all Resume information
      * @return Map with Resumes that match per matcher
      */
-    public Map<String, List<String>> getResumes() {
+    public Map<String, List<ResumeWithProbability>> getResumes() {
         if(resumes == null)
             resumes = new HashMap<>();
         return resumes;
@@ -31,7 +57,7 @@ public class ResumeMatchAnswer extends GenericAnswer {
      * Set the Resumes that match
      * @param resumes Map with Resumes that match per matcher
      */
-    public void setResumes(Map<String, List<String>> resumes) {
+    public void setResumes(Map<String, List<ResumeWithProbability>> resumes) {
         this.resumes = resumes;
     }
 
@@ -43,7 +69,7 @@ public class ResumeMatchAnswer extends GenericAnswer {
     public void addResume(String cruncherName, Resume resume) {
         if(!getResumes().containsKey(cruncherName))
             getResumes().put(cruncherName, new ArrayList<>());
-        getResumes().get(cruncherName).add(resume.getUserId());
+        getResumes().get(cruncherName).add(new ResumeWithProbability(resume.getUserId(), resume.getStarRating()));
     }
 
     @Override
