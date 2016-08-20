@@ -39,7 +39,7 @@ logging.level.org.metplus: INFO
 
 ---
 spring:
-  profiles: unit-test
+  profiles: unit-database
 
 server:
   port: 8443

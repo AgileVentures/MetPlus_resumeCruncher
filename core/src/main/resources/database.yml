@@ -24,7 +24,7 @@ pets-db:
   password:
 ---
 spring:
-  profiles: unit-test
+  profiles: unit-database
 
 pets-db:
   name: expression_counter_db
