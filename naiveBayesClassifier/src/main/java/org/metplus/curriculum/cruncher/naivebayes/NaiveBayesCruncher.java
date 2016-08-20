@@ -13,20 +13,18 @@ import org.metplus.curriculum.init.CruncherInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /**
  * Class used for initialization of the cruncher based on a
  * Naive Bayes Classifier
  */
 @Component
-@ConfigurationProperties(locations = "classpath:naiveBayes.yml", prefix = "config")
+@ConfigurationProperties(locations = "classpath:naiveBayes.yml", prefix = "naiveConfig")
 public class NaiveBayesCruncher extends CruncherInitializer {
     private static final Logger LOG = LoggerFactory.getLogger(NaiveBayesCruncher.class);
 
@@ -34,7 +32,9 @@ public class NaiveBayesCruncher extends CruncherInitializer {
     private static final String CLEAN_EXPRESSIONS = "CleanExpressions";
 
     private CruncherImpl cruncherImpl;
+    @Value("learnDatabase")
     private Map<String, List<String>> learnDatabase;
+    @Value("cleanExpressions")
     private List<String> cleanExpressions;
 
     public Map<String, List<String>> getLearnDatabase() {
@@ -74,7 +74,7 @@ public class NaiveBayesCruncher extends CruncherInitializer {
     @Override
     public void init() {
         try {
-            cruncherImpl = new CruncherImpl();
+            cruncherImpl = new CruncherImpl(cleanExpressions);
             load();
         } catch (CruncherSettingsNotFound cruncherSettingsNotFound) {
             save();
@@ -100,14 +100,32 @@ public class NaiveBayesCruncher extends CruncherInitializer {
                 LOG.warn("Could not find cruncher");
                 settings = new CruncherSettings(CruncherImpl.CRUNCHER_NAME);
                 Settings globalSettings = repository.findAll().iterator().next();
-                settings.addSetting(new Setting<>(LEARN_DATABASE, new HashMap<String, List<String>>()));
+                settings.addSetting(new Setting<>(LEARN_DATABASE, learnDatabase));
+                settings.addSetting(new Setting<>(CLEAN_EXPRESSIONS, cleanExpressions));
                 globalSettings.addCruncherSettings(CruncherImpl.CRUNCHER_NAME, settings);
                 repository.save(globalSettings);
             }
-            LOG.info("Settings: " + settings);
-            LOG.info("SettingsName: " + LEARN_DATABASE);
-            learnDatabase = (HashMap<String, List<String>>)settings.getSetting(LEARN_DATABASE).getData();
+            LOG.info("Database settings: " + settings);
+            LOG.info("Local settings learn database: " + learnDatabase);
+            LOG.info("Local settings clean expressions: " + cleanExpressions);
 
+            LOG.info("SettingsName: " + LEARN_DATABASE);
+            if(settings.getSetting(LEARN_DATABASE).getData() != null &&
+                    ((HashMap<String, List<String>>)settings.getSetting(LEARN_DATABASE).getData()).size() > 0) {
+                learnDatabase = (HashMap<String, List<String>>) settings.getSetting(LEARN_DATABASE).getData();
+            } else {
+                LOG.warn("The learn database was empty using default values");
+            }
+            LOG.info("SettingsName: " + CLEAN_EXPRESSIONS);
+            if(settings.getSetting(CLEAN_EXPRESSIONS) != null &&
+                    settings.getSetting(CLEAN_EXPRESSIONS).getData() != null &&
+                    ((ArrayList<String>)settings.getSetting(CLEAN_EXPRESSIONS).getData()).size() > 0) {
+                cleanExpressions = ((ArrayList<String>)settings.getSetting(CLEAN_EXPRESSIONS).getData());
+            } else {
+                LOG.warn("The expression cleaner was empty using default values");
+            }
+
+            cruncherImpl.setCleanExpressions(cleanExpressions);
             LOG.info("learnDatabase: " + learnDatabase);
             cruncherImpl.train(learnDatabase);
         } finally {

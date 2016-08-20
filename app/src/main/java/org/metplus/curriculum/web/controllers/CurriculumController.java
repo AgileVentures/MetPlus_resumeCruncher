@@ -209,4 +209,21 @@ public class CurriculumController {
         logger.debug("Result is: " + answer);
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/reindex", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<GenericAnswer> reindex() {
+        logger.debug("reindex()");
+        GenericAnswer answer = new GenericAnswer();
+        int total = 0;
+        for(Resume resume: resumeRepository.findAll()) {
+            resumeCruncher.addWork(resume);
+            total++;
+        }
+        answer.setMessage("Going to reindex " + total + " resumes");
+        answer.setResultCode(ResultCodes.SUCCESS);
+
+        logger.debug("Result is: " + answer);
+        return new ResponseEntity<>(answer, HttpStatus.OK);
+    }
 }

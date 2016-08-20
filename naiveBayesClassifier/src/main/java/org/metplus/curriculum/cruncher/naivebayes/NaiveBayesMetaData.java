@@ -15,4 +15,16 @@ public class NaiveBayesMetaData extends MetaData {
     }
 
     private String bestMatchCategory;
+
+    private double totalProbability = 0.f;
+
+    public void addToTotalProbability(double probability) {
+        totalProbability += probability;
+    }
+    public void setTotalProbability(double probability) {
+        totalProbability = probability;
+    }
+    public double getTotalProbability() {
+        return totalProbability;
+    }
 }

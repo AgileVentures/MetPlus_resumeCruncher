@@ -38,6 +38,19 @@ public class MetaData extends AbstractDocument implements CruncherMetaData {
     }
 
     /**
+     * Retrieve a specific field
+     * @param fieldName Name of the field to retrieve
+     * @return Null if there are no fields or the field do not exists or the value if exists
+     */
+    public MetaDataField getField(String fieldName) {
+        if(fields == null)
+            return null;
+        if(fields.containsKey(fieldName))
+            return fields.get(fieldName);
+        return null;
+    }
+
+    /**
      * Add new meta data fields
      * @param name Name of the field
      * @param data Data of the field
