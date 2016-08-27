@@ -55,3 +55,33 @@ Response
 include::{snippets}/curriculum/match-no-resumes/http-response.adoc[]
 Parameters on response
 include::{snippets}/curriculum/match-no-resumes/response-fields.adoc[]
+
+= Match Resumes with job identifier
+
+== No Resumes found
+
+Request
+include::{snippets}/curriculum/match-no-resumes-job-id/http-request.adoc[]
+Headers
+include::{snippets}/curriculum/match-no-resumes-job-id/request-headers.adoc[]
+Parameters
+include::{snippets}/curriculum/match-no-resumes-job-id/path-parameters.adoc[]
+
+Response
+include::{snippets}/curriculum/match-no-resumes-job-id/http-response.adoc[]
+Parameters on response
+include::{snippets}/curriculum/match-no-resumes-job-id/response-fields.adoc[]
+
+== 3 Resumes found
+
+Request
+include::{snippets}/curriculum/multiple-match-resumes-job-id/http-request.adoc[]
+Headers
+include::{snippets}/curriculum/multiple-match-resumes-job-id/request-headers.adoc[]
+Parameters
+include::{snippets}/curriculum/multiple-match-resumes-job-id/path-parameters.adoc[]
+
+Response
+include::{snippets}/curriculum/multiple-match-resumes-job-id/http-response.adoc[]
+Parameters on response
+include::{snippets}/curriculum/multiple-match-resumes-job-id/response-fields.adoc[]

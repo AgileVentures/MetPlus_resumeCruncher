@@ -354,11 +354,11 @@ public class JobControllerTests {
             Mockito.when(resumeRepository.findByUserId("1")).thenReturn(resume);
 
             Job job1 = new Job();
-            job1.setJobId("job1");
+            job1.setJobId("1");
             Job job2 = new Job();
-            job2.setJobId("job2");
+            job2.setJobId("2");
             Job job3 = new Job();
-            job3.setJobId("job3");
+            job3.setJobId("3");
             List<Job> matcher1Resumes = new ArrayList<>();
             matcher1Resumes.add(job1);
             matcher1Resumes.add(job2);
@@ -389,11 +389,11 @@ public class JobControllerTests {
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                     .andExpect(jsonPath("$.resultCode", is(ResultCodes.SUCCESS.toString())))
                     .andExpect(jsonPath("$.jobs.matcher1", hasSize(2)))
-                    .andExpect(jsonPath("$.jobs.matcher1[0]", is("job1")))
-                    .andExpect(jsonPath("$.jobs.matcher1[1]", is("job2")))
+                    .andExpect(jsonPath("$.jobs.matcher1[0]", is("1")))
+                    .andExpect(jsonPath("$.jobs.matcher1[1]", is("2")))
                     .andExpect(jsonPath("$.jobs.matcher2", hasSize(2)))
-                    .andExpect(jsonPath("$.jobs.matcher2[0]", is("job3")))
-                    .andExpect(jsonPath("$.jobs.matcher2[1]", is("job2")))
+                    .andExpect(jsonPath("$.jobs.matcher2[0]", is("3")))
+                    .andExpect(jsonPath("$.jobs.matcher2[1]", is("2")))
                     .andDo(document("job/match-success",
                             requestHeaders(headerWithName("X-Auth-Token")
                                     .description("Authentication token retrieved from the authentication")),

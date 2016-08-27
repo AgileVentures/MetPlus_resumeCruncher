@@ -4,9 +4,11 @@ package org.metplus.curriculum.web.controllers;
 import org.metplus.curriculum.cruncher.MatcherList;
 import org.metplus.curriculum.cruncher.Matcher;
 import org.metplus.curriculum.database.config.SpringMongoConfig;
+import org.metplus.curriculum.database.domain.Job;
 import org.metplus.curriculum.database.domain.Resume;
 import org.metplus.curriculum.database.exceptions.ResumeNotFound;
 import org.metplus.curriculum.database.exceptions.ResumeReadException;
+import org.metplus.curriculum.database.repository.JobRepository;
 import org.metplus.curriculum.database.repository.ResumeRepository;
 import org.metplus.curriculum.process.ResumeCruncher;
 import org.metplus.curriculum.web.answers.GenericAnswer;
@@ -40,10 +42,21 @@ public class CurriculumController {
     private ResumeRepository resumeRepository;
 
     @Autowired
+    private JobRepository jobRepository;
+
+    @Autowired
     private SpringMongoConfig dbConfig;
 
     @Autowired
     private MatcherList matcherList;
+
+    public CurriculumController(){}
+    public CurriculumController(JobRepository jobRepository, ResumeRepository resumeRepository, MatcherList matcherList, ResumeCruncher resumeCruncher) {
+        this.jobRepository = jobRepository;
+        this.resumeRepository = resumeRepository;
+        this.matcherList = matcherList;
+        this.resumeCruncher = resumeCruncher;
+    }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     @ResponseBody
@@ -145,6 +158,40 @@ public class CurriculumController {
         ResumeMatchAnswer answer = new ResumeMatchAnswer();
         for(Matcher matcher: matcherList.getMatchers()) {
             matchedResumes = matcher.match(title, description);
+            for(Resume resume: matchedResumes) {
+                answer.addResume(matcher.getCruncherName(), resume);
+            }
+        }
+        answer.setMessage("Success");
+        answer.setResultCode(ResultCodes.SUCCESS);
+
+        logger.debug("Result is: " + answer);
+        return new ResponseEntity<>(answer, HttpStatus.OK);
+    }
+    @RequestMapping(value = "/match/{jobId}", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<GenericAnswer> match(@PathVariable("jobId") final String jobId) {
+        logger.debug("Match resumes with job id: '" + jobId + "'");
+        if(jobId == null || jobId.length() == 0) {
+            logger.error("Matching resumes with empty job identifier");
+            GenericAnswer answer = new GenericAnswer();
+            answer.setMessage("Empty job identifier");
+            answer.setResultCode(ResultCodes.FATAL_ERROR);
+            return new ResponseEntity<>(answer, HttpStatus.BAD_REQUEST);
+        }
+        List<Resume> matchedResumes = null;
+        ResumeMatchAnswer answer = new ResumeMatchAnswer();
+        Job job = jobRepository.findByJobId(jobId);
+        for(Matcher matcher: matcherList.getMatchers()) {
+            logger.debug("Checking for matcher: " + matcher.getCruncherName());
+            matchedResumes = matcher.match(job);
+            if(matchedResumes == null) {
+                logger.error("Matching resumes with empty job identifier");
+                GenericAnswer errorAnswer = new GenericAnswer();
+                errorAnswer.setMessage("Not all information is crunched");
+                errorAnswer.setResultCode(ResultCodes.FATAL_ERROR);
+                return new ResponseEntity<>(errorAnswer, HttpStatus.BAD_REQUEST);
+            }
             for(Resume resume: matchedResumes) {
                 answer.addResume(matcher.getCruncherName(), resume);
             }
