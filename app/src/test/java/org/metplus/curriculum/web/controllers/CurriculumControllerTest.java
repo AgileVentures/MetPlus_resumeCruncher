@@ -398,11 +398,15 @@ public class CurriculumControllerTest {
                     ))
                     .andExpect(jsonPath("$.resultCode", is(ResultCodes.SUCCESS.toString())))
                     .andExpect(jsonPath("$.resumes.matcher1", hasSize(2)))
-                    .andExpect(jsonPath("$.resumes.matcher1[0]", is("1")))
-                    .andExpect(jsonPath("$.resumes.matcher1[1]", is("2")))
+                    .andExpect(jsonPath("$.resumes.matcher1[0].resumeId", is("1")))
+                    .andExpect(jsonPath("$.resumes.matcher1[0].probability", is(0.)))
+                    .andExpect(jsonPath("$.resumes.matcher1[1].resumeId", is("2")))
+                    .andExpect(jsonPath("$.resumes.matcher1[1].probability", is(0.)))
                     .andExpect(jsonPath("$.resumes.matcher2", hasSize(2)))
-                    .andExpect(jsonPath("$.resumes.matcher2[0]", is("3")))
-                    .andExpect(jsonPath("$.resumes.matcher2[1]", is("2")))
+                    .andExpect(jsonPath("$.resumes.matcher2[0].resumeId", is("3")))
+                    .andExpect(jsonPath("$.resumes.matcher2[0].probability", is(0.)))
+                    .andExpect(jsonPath("$.resumes.matcher2[1].resumeId", is("2")))
+                    .andExpect(jsonPath("$.resumes.matcher2[1].probability", is(0.)))
                     .andReturn().getResponse();
             Mockito.verify(jobRepository).findByJobId("1");
             Mockito.verify(matcher1).match(Mockito.any(Job.class));
