@@ -13,6 +13,7 @@ import org.metplus.curriculum.init.CruncherInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -22,6 +23,7 @@ import java.util.*;
  * Naive Bayes Classifier
  */
 @Component
+@ConfigurationProperties(locations = "classpath:naiveBayes.yml", prefix = "config")
 public class NaiveBayesCruncher extends CruncherInitializer {
     private static final Logger LOG = LoggerFactory.getLogger(NaiveBayesCruncher.class);
 
@@ -29,8 +31,7 @@ public class NaiveBayesCruncher extends CruncherInitializer {
     private static final String CLEAN_EXPRESSIONS = "CleanExpressions";
 
     private CruncherImpl cruncherImpl;
-    @Autowired
-    private NaiveBayesConfig config;
+
     private Map<String, List<String>> learnDatabase;
     private List<String> cleanExpressions;
 
@@ -72,8 +73,8 @@ public class NaiveBayesCruncher extends CruncherInitializer {
     public void init() {
         try {
             cruncherImpl = new CruncherImpl(cleanExpressions);
-            learnDatabase = config.getDatabase();
-            cleanExpressions = config.getCleanExpressions();
+            //learnDatabase = config.getLearnDatabase();
+            //cleanExpressions = config.getCleanExpressions();
             load();
         } catch (CruncherSettingsNotFound cruncherSettingsNotFound) {
             save();
@@ -82,8 +83,8 @@ public class NaiveBayesCruncher extends CruncherInitializer {
 
     public void reload() {
         try {
-            learnDatabase = config.getDatabase();
-            cleanExpressions = config.getCleanExpressions();
+            //learnDatabase = config.getLearnDatabase();
+            //cleanExpressions = config.getCleanExpressions();
             load();
         } catch (CruncherSettingsNotFound cruncherSettingsNotFound) {
         }

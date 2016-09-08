@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping(BaseController.baseUrl + "/curriculum")
+@RequestMapping({BaseController.baseUrl + "/curriculum", BaseController.baseUrl + "/resume"})
 @PreAuthorize("hasAuthority('ROLE_DOMAIN_USER')")
 public class CurriculumController {
     private static Logger logger = LoggerFactory.getLogger(CurriculumController.class);
