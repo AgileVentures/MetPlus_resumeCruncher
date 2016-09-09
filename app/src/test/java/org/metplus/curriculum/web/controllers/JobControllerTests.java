@@ -355,16 +355,22 @@ public class JobControllerTests {
 
             Job job1 = new Job();
             job1.setJobId("1");
+            job1.setStarRating(4.2);
             Job job2 = new Job();
+            job2.setStarRating(1.0);
             job2.setJobId("2");
             Job job3 = new Job();
             job3.setJobId("3");
+            job3.setStarRating(3.);
+            Job job4 = new Job();
+            job4.setJobId("2");
+            job4.setStarRating(0.5);
             List<Job> matcher1Resumes = new ArrayList<>();
             matcher1Resumes.add(job1);
             matcher1Resumes.add(job2);
             List<Job> matcher2Resumes = new ArrayList<>();
             matcher2Resumes.add(job3);
-            matcher2Resumes.add(job2);
+            matcher2Resumes.add(job4);
 
             Matcher matcher1 = Mockito.mock(Matcher.class);
             Mockito.when(matcher1.getCruncherName()).thenReturn("matcher1");
@@ -389,11 +395,15 @@ public class JobControllerTests {
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                     .andExpect(jsonPath("$.resultCode", is(ResultCodes.SUCCESS.toString())))
                     .andExpect(jsonPath("$.jobs.matcher1", hasSize(2)))
-                    .andExpect(jsonPath("$.jobs.matcher1[0]", is("1")))
-                    .andExpect(jsonPath("$.jobs.matcher1[1]", is("2")))
+                    .andExpect(jsonPath("$.jobs.matcher1[0].jobId", is("1")))
+                    .andExpect(jsonPath("$.jobs.matcher1[0].stars", is(4.2)))
+                    .andExpect(jsonPath("$.jobs.matcher1[1].jobId", is("2")))
+                    .andExpect(jsonPath("$.jobs.matcher1[1].stars", is(1.0)))
                     .andExpect(jsonPath("$.jobs.matcher2", hasSize(2)))
-                    .andExpect(jsonPath("$.jobs.matcher2[0]", is("3")))
-                    .andExpect(jsonPath("$.jobs.matcher2[1]", is("2")))
+                    .andExpect(jsonPath("$.jobs.matcher2[0].jobId", is("3")))
+                    .andExpect(jsonPath("$.jobs.matcher2[0].stars", is(3.)))
+                    .andExpect(jsonPath("$.jobs.matcher2[1].jobId", is("2")))
+                    .andExpect(jsonPath("$.jobs.matcher2[1].stars", is(.5)))
                     .andDo(document("job/match-success",
                             requestHeaders(headerWithName("X-Auth-Token")
                                     .description("Authentication token retrieved from the authentication")),
@@ -401,7 +411,7 @@ public class JobControllerTests {
                             responseFields(
                                     fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
                                     fieldWithPath("message").description("Message associated with the result code"),
-                                    fieldWithPath("jobs").description("Hash with a list of job IDs matched by each cruncher")
+                                    fieldWithPath("jobs").description("Hash with a list of job IDs and the star rating matched by each cruncher")
                             )
                     ));
             Mockito.verify(resumeRepository).findByUserId("1");

@@ -17,11 +17,11 @@ public class ResumeMatchAnswer extends GenericAnswer {
 
     static class ResumeWithProbability {
         private String resumeId;
-        private double probability;
+        private double stars;
 
-        public ResumeWithProbability(String resumeId, double probability) {
+        public ResumeWithProbability(String resumeId, double stars) {
             this.resumeId = resumeId;
-            this.probability = probability;
+            this.stars = stars;
         }
 
         public String getResumeId() {
@@ -32,12 +32,12 @@ public class ResumeMatchAnswer extends GenericAnswer {
             this.resumeId = resumeId;
         }
 
-        public double getProbability() {
-            return probability;
+        public double getStars() {
+            return stars;
         }
 
-        public void setProbability(double probability) {
-            this.probability = probability;
+        public void setStars(double stars) {
+            this.stars = stars;
         }
     }
 

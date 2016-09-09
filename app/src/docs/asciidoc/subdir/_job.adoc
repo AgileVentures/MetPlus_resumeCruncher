@@ -49,7 +49,7 @@ include::{snippets}/job/update-success/response-fields.adoc[]
 
 '''
 
-==== Create job with ID that already exists
+==== Example: Create job with ID that already exists
 
 Response
 include::{snippets}/job/update-not-exists/http-response.adoc[]
@@ -78,7 +78,7 @@ include::{snippets}/job/match-success/response-fields.adoc[]
 
 '''
 
-==== Cannot find the Resume to match jobs against
+==== Example: Cannot find the Resume to match jobs against
 
 Response
 include::{snippets}/job/match-not-exists/http-response.adoc[]
@@ -86,7 +86,7 @@ Parameters on response
 include::{snippets}/job/match-not-exists/response-fields.adoc[]
 
 
-==== Unable to find Job that match the Resume
+==== Example: Unable to find Job that match the Resume
 
 Response
 include::{snippets}/job/match-not-found/http-response.adoc[]

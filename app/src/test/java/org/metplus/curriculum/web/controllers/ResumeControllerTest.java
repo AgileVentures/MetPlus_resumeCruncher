@@ -70,12 +70,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Created by Joao Pereira on 03/11/2015.
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({CurriculumControllerTest.UploadEndpoint.class,
-                     CurriculumControllerTest.DownloadEndpoint.class,
-                     CurriculumControllerTest.MatchEndpoint.class,
-                     CurriculumControllerTest.MatchEndpointWithJobId.class})
-public class CurriculumControllerTest {
-    public static class DefaultCurriculumTest extends BaseControllerTest implements BeforeAfterInterface{
+@Suite.SuiteClasses({ResumeControllerTest.UploadEndpoint.class,
+                     ResumeControllerTest.DownloadEndpoint.class,
+                     ResumeControllerTest.MatchEndpoint.class,
+                     ResumeControllerTest.MatchEndpointWithJobId.class})
+public class ResumeControllerTest {
+    public static class DefaultResumeTest extends BaseControllerTest implements BeforeAfterInterface{
         @Autowired
         protected WebApplicationContext ctx;
 
@@ -109,7 +109,7 @@ public class CurriculumControllerTest {
             this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx)
                     .addFilter(springSecurityFilterChain)
                     .apply(documentationConfiguration(this.restDocumentation))
-                    .alwaysDo(document("curriculum/{method-name}/{step}/",
+                    .alwaysDo(document("resume/{method-name}/{step}/",
                             preprocessRequest(prettyPrint()),
                             preprocessResponse(prettyPrint())))
                     .build();
@@ -142,15 +142,15 @@ public class CurriculumControllerTest {
     }
 
     @RunWith(SpringJUnit4ClassRunner.class)
-    public static class UploadEndpoint extends DefaultCurriculumTest {
+    public static class UploadEndpoint extends DefaultResumeTest {
 
         @Test
-        public void testUploadCurriculum() throws Exception {
+        public void testUploadresume() throws Exception {
             final InputStream file = getClass().getClassLoader().getResourceAsStream("line_with_bold.pdf");
             final MockMultipartFile multipartFile = new MockMultipartFile("file", file);
 
             MockHttpServletResponse response = mockMvc
-                    .perform(fileUpload("/api/v1/curriculum/upload")
+                    .perform(fileUpload("/api/v1/resume/upload")
                             .file(multipartFile)
                             .accept(MediaType.APPLICATION_JSON)
                             .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -160,12 +160,12 @@ public class CurriculumControllerTest {
                     )
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
-                    .andDo(document("curriculum/upload",
+                    .andDo(document("resume/upload",
                             requestHeaders(headerWithName("X-Auth-Token")
                                     .description("Authentication token retrieved from the authentication")),
                             requestParameters(
-                                    parameterWithName("userId").description("Identifier of the curriculum"),
-                                    parameterWithName("name").description("Name of the curriculum file")
+                                    parameterWithName("userId").description("Identifier of the resume"),
+                                    parameterWithName("name").description("Name of the resume file")
                             ),
                             responseFields(
                                     fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
@@ -184,19 +184,19 @@ public class CurriculumControllerTest {
     }
 
     @RunWith(SpringJUnit4ClassRunner.class)
-    public static class DownloadEndpoint extends DefaultCurriculumTest {
+    public static class DownloadEndpoint extends DefaultResumeTest {
 
         @Test
-        public void testDownloadCurriculum() throws Exception {
+        public void testDownloadresume() throws Exception {
             final InputStream file = getClass().getClassLoader().getResourceAsStream("line_with_bold.pdf");
             final MockMultipartFile multipartFile = new MockMultipartFile("file", file);
 
             MockHttpServletResponse response = mockMvc.perform(
-                    get("/api/v1/curriculum/asdasdasd")
+                    get("/api/v1/resume/asdasdasd")
                             .header("X-Auth-Token", token))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType("application/octet-stream"))
-                    .andDo(document("curriculum/download",
+                    .andDo(document("resume/download",
                             requestHeaders(headerWithName("X-Auth-Token")
                                     .description("Authentication token retrieved from the authentication"))
                     ))
@@ -206,12 +206,12 @@ public class CurriculumControllerTest {
         }
 
         @Test
-        public void testUnableToFindCurriculumDownloadCurriculum() throws Exception {
+        public void testUnableToFindresumeDownloadresume() throws Exception {
 
-            MockHttpServletResponse response = mockMvc.perform(get("/api/v1/curriculum/notpresentuser")
+            MockHttpServletResponse response = mockMvc.perform(get("/api/v1/resume/notpresentuser")
                     .header("X-Auth-Token", token))
                     .andExpect(status().isOk())
-                    .andDo(document("curriculum/download-error",
+                    .andDo(document("resume/download-error",
                             requestHeaders(headerWithName("X-Auth-Token")
                                     .description("Authentication token retrieved from the authentication")),
                             responseFields(
@@ -228,7 +228,7 @@ public class CurriculumControllerTest {
     }
 
     @RunWith(MockitoJUnitRunner.class)
-    public static class MatchEndpoint extends DefaultCurriculumTest {
+    public static class MatchEndpoint extends DefaultResumeTest {
         @Mock
         protected JobRepository jobRepository;
         @Mock
@@ -241,7 +241,7 @@ public class CurriculumControllerTest {
         @Override
         public void before(){
 
-            mockMvc = MockMvcBuilders.standaloneSetup(new CurriculumController(jobRepository, resumeRepository, matcherList, resumeCruncher))
+            mockMvc = MockMvcBuilders.standaloneSetup(new ResumeController(jobRepository, resumeRepository, matcherList, resumeCruncher))
                     .setValidator(validator())
                     .apply(documentationConfiguration(this.restDocumentation))
                     .build();
@@ -262,13 +262,13 @@ public class CurriculumControllerTest {
             allMatchers.add(matcher2);
             Mockito.when(matcherList.getMatchers()).thenReturn(allMatchers);
 
-            MockHttpServletResponse response = mockMvc.perform(post("/api/v1/curriculum/match")
+            MockHttpServletResponse response = mockMvc.perform(post("/api/v1/resume/match")
                     .header("X-Auth-Token", token)
                     .accept(MediaType.APPLICATION_JSON)
                     .param("title", "Stone mason")
                     .param("description", "Stone mason that is able to build some nice walls"))
                     .andExpect(status().isOk())
-                    .andDo(document("curriculum/match-no-resumes",
+                    .andDo(document("resume/match-no-resumes",
                             requestHeaders(headerWithName("X-Auth-Token")
                                     .description("Authentication token retrieved from the authentication")),
                             requestParameters(parameterWithName("title")
@@ -288,7 +288,7 @@ public class CurriculumControllerTest {
         }
     }
     @RunWith(MockitoJUnitRunner.class)
-    public static class MatchEndpointWithJobId extends DefaultCurriculumTest {
+    public static class MatchEndpointWithJobId extends DefaultResumeTest {
         @Mock
         protected JobRepository jobRepository;
         @Mock
@@ -301,7 +301,7 @@ public class CurriculumControllerTest {
         @Override
         public void before(){
 
-            mockMvc = MockMvcBuilders.standaloneSetup(new CurriculumController(jobRepository, resumeRepository, matcherList, resumeCruncher))
+            mockMvc = MockMvcBuilders.standaloneSetup(new ResumeController(jobRepository, resumeRepository, matcherList, resumeCruncher))
                     .setValidator(validator())
                     .apply(documentationConfiguration(this.restDocumentation))
                     .build();
@@ -323,11 +323,11 @@ public class CurriculumControllerTest {
             allMatchers.add(matcher2);
             Mockito.when(matcherList.getMatchers()).thenReturn(allMatchers);
 
-            MockHttpServletResponse response = mockMvc.perform(get("/api/v1/curriculum/match/{jobId}", 1)
+            MockHttpServletResponse response = mockMvc.perform(get("/api/v1/resume/match/{jobId}", 1)
                     .header("X-Auth-Token", token)
                     .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
-                    .andDo(document("curriculum/match-no-resumes-job-id",
+                    .andDo(document("resume/match-no-resumes-job-id",
                             requestHeaders(headerWithName("X-Auth-Token")
                                     .description("Authentication token retrieved from the authentication")),
                             pathParameters(
@@ -359,14 +359,19 @@ public class CurriculumControllerTest {
             Mockito.when(jobRepository.findByJobId("1")).thenReturn(job);
 
             Resume resume1 = new Resume("1");
+            resume1.setStarRating(4.2);
             Resume resume2 = new Resume("2");
+            resume2.setStarRating(3.2);
             Resume resume3 = new Resume("3");
+            resume3.setStarRating(5.);
+            Resume resume4 = new Resume("2");
+            resume4.setStarRating(1.25);
             List<Resume> matcher1Resumes = new ArrayList<>();
             matcher1Resumes.add(resume1);
             matcher1Resumes.add(resume2);
             List<Resume> matcher2Resumes = new ArrayList<>();
             matcher2Resumes.add(resume3);
-            matcher2Resumes.add(resume2);
+            matcher2Resumes.add(resume4);
 
             Matcher matcher1 = Mockito.mock(Matcher.class);
             Mockito.when(matcher1.getCruncherName()).thenReturn("matcher1");
@@ -380,11 +385,11 @@ public class CurriculumControllerTest {
             allMatchers.add(matcher2);
             Mockito.when(matcherList.getMatchers()).thenReturn(allMatchers);
 
-            MockHttpServletResponse response = mockMvc.perform(get("/api/v1/curriculum/match/{jobId}", 1)
+            MockHttpServletResponse response = mockMvc.perform(get("/api/v1/resume/match/{jobId}", 1)
                     .header("X-Auth-Token", token)
                     .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
-                    .andDo(document("curriculum/multiple-match-resumes-job-id",
+                    .andDo(document("resume/multiple-match-resumes-job-id",
                             requestHeaders(headerWithName("X-Auth-Token")
                                     .description("Authentication token retrieved from the authentication")),
                             pathParameters(
@@ -393,20 +398,20 @@ public class CurriculumControllerTest {
                             responseFields(
                                     fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
                                     fieldWithPath("message").description("Message associated with the result code"),
-                                    fieldWithPath("resumes").description("Hash with the identifiers of the resumes matched for each cruncher")
+                                    fieldWithPath("resumes").description("Hash with the identifiers of the resumes and the star rating matched for each cruncher")
                             )
                     ))
                     .andExpect(jsonPath("$.resultCode", is(ResultCodes.SUCCESS.toString())))
                     .andExpect(jsonPath("$.resumes.matcher1", hasSize(2)))
                     .andExpect(jsonPath("$.resumes.matcher1[0].resumeId", is("1")))
-                    .andExpect(jsonPath("$.resumes.matcher1[0].probability", is(0.)))
+                    .andExpect(jsonPath("$.resumes.matcher1[0].stars", is(4.2)))
                     .andExpect(jsonPath("$.resumes.matcher1[1].resumeId", is("2")))
-                    .andExpect(jsonPath("$.resumes.matcher1[1].probability", is(0.)))
+                    .andExpect(jsonPath("$.resumes.matcher1[1].stars", is(3.2)))
                     .andExpect(jsonPath("$.resumes.matcher2", hasSize(2)))
                     .andExpect(jsonPath("$.resumes.matcher2[0].resumeId", is("3")))
-                    .andExpect(jsonPath("$.resumes.matcher2[0].probability", is(0.)))
+                    .andExpect(jsonPath("$.resumes.matcher2[0].stars", is(5.)))
                     .andExpect(jsonPath("$.resumes.matcher2[1].resumeId", is("2")))
-                    .andExpect(jsonPath("$.resumes.matcher2[1].probability", is(0.)))
+                    .andExpect(jsonPath("$.resumes.matcher2[1].stars", is(1.25)))
                     .andReturn().getResponse();
             Mockito.verify(jobRepository).findByJobId("1");
             Mockito.verify(matcher1).match(Mockito.any(Job.class));

@@ -32,8 +32,8 @@ import java.util.List;
 @RestController
 @RequestMapping({BaseController.baseUrl + "/curriculum", BaseController.baseUrl + "/resume"})
 @PreAuthorize("hasAuthority('ROLE_DOMAIN_USER')")
-public class CurriculumController {
-    private static Logger logger = LoggerFactory.getLogger(CurriculumController.class);
+public class ResumeController {
+    private static Logger logger = LoggerFactory.getLogger(ResumeController.class);
 
     @Autowired
     private ResumeCruncher resumeCruncher;
@@ -50,8 +50,8 @@ public class CurriculumController {
     @Autowired
     private MatcherList matcherList;
 
-    public CurriculumController(){}
-    public CurriculumController(JobRepository jobRepository, ResumeRepository resumeRepository, MatcherList matcherList, ResumeCruncher resumeCruncher) {
+    public ResumeController(){}
+    public ResumeController(JobRepository jobRepository, ResumeRepository resumeRepository, MatcherList matcherList, ResumeCruncher resumeCruncher) {
         this.jobRepository = jobRepository;
         this.resumeRepository = resumeRepository;
         this.matcherList = matcherList;

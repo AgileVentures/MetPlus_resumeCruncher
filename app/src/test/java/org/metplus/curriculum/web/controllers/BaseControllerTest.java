@@ -19,7 +19,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 @ActiveProfiles("development")
 @Profile("unit-test")
-//@ContextConfiguration(classes = {SpringMongoConfig.class, DatabaseConfig.class, AdminController.class, CurriculumController.class, AuthenticationController.class, ResumeCruncher.class},)
+//@ContextConfiguration(classes = {SpringMongoConfig.class, DatabaseConfig.class, AdminController.class, ResumeController.class, AuthenticationController.class, ResumeCruncher.class},)
 //@ContextConfiguration(loader=AnnotationConfigWebContextLoader.class, classes = {Application.class, SecurityConfig.class})
 @ContextConfiguration(loader=SpringApplicationContextLoader.class, classes = {Application.class, SecurityConfig.class})
 @WebAppConfiguration

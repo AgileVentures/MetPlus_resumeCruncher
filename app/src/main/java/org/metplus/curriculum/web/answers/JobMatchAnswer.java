@@ -15,13 +15,40 @@ import java.util.Map;
  */
 public class JobMatchAnswer extends GenericAnswer {
 
-    Map<String, List<String>> jobs;
+
+    static class JobWithProbability {
+        private String jobId;
+        private double stars;
+
+        public JobWithProbability(String jobId, double stars) {
+            this.jobId = jobId;
+            this.stars = stars;
+        }
+
+        public String getJobId() {
+            return jobId;
+        }
+
+        public void setJobId(String jobId) {
+            this.jobId = jobId;
+        }
+
+        public double getStars() {
+            return stars;
+        }
+
+        public void setStars(double stars) {
+            this.stars = stars;
+        }
+    }
+
+    Map<String, List<JobWithProbability>> jobs;
 
     /**
      * Retrieve all jobs information
      * @return Map with Jobs that match per matcher
      */
-    public Map<String, List<String>> getJobs() {
+    public Map<String, List<JobWithProbability>> getJobs() {
         if(jobs == null)
             jobs = new HashMap<>();
         return jobs;
@@ -31,7 +58,7 @@ public class JobMatchAnswer extends GenericAnswer {
      * Set the jobs that match
      * @param jobs Map with Jobs that match per matcher
      */
-    public void setJobs(Map<String, List<String>> jobs) {
+    public void setJobs(Map<String, List<JobWithProbability>> jobs) {
         this.jobs = jobs;
     }
 
@@ -43,7 +70,7 @@ public class JobMatchAnswer extends GenericAnswer {
     public void addJob(String cruncherName, Job job) {
         if(!getJobs().containsKey(cruncherName))
             getJobs().put(cruncherName, new ArrayList<>());
-        getJobs().get(cruncherName).add(job.getJobId());
+        getJobs().get(cruncherName).add(new JobWithProbability(job.getJobId(), job.getStarRating()));
     }
 
     @Override
