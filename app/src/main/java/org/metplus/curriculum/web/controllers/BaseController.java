@@ -5,7 +5,8 @@ package org.metplus.curriculum.web.controllers;
  */
 public class BaseController {
     final static public String baseUrl = "/api/v1/";
-    final static public String authenticationUrl = baseUrl + "authenticate";
+    final static public String authenticationUrlV1 = "/api/v1/authenticate";
+    final static public String authenticationUrl = "/api/v2/authenticate";
 
     final static public String baseUrlApi = "/api/v";
 

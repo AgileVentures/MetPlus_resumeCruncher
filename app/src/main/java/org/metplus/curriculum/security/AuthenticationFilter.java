@@ -104,7 +104,9 @@ public class AuthenticationFilter extends GenericFilterBean {
     private boolean postToAuthenticate(HttpServletRequest httpRequest, String resourcePath) {
         logger.debug("postToAuthenticate(" + httpRequest + ", " + resourcePath + ")");
         return (BaseController.authenticationUrl.equalsIgnoreCase(resourcePath) ||
-                BaseController.authenticationUrl.equalsIgnoreCase(resourcePath.substring(0, resourcePath.length()-1)))
+                BaseController.authenticationUrl.equalsIgnoreCase(resourcePath.substring(0, resourcePath.length()-1)) ||
+                BaseController.authenticationUrlV1.equalsIgnoreCase(resourcePath) ||
+                BaseController.authenticationUrlV1.equalsIgnoreCase(resourcePath.substring(0, resourcePath.length()-1)))
                 && httpRequest.getMethod().equals("POST");
     }
 
