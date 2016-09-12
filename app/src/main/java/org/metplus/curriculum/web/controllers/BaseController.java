@@ -7,6 +7,8 @@ public class BaseController {
     final static public String baseUrl = "/api/v1/";
     final static public String authenticationUrl = baseUrl + "authenticate";
 
+    final static public String baseUrlApi = "/api/v";
+
     public static final String AUTOCONFIG_ENDPOINT = "/autoconfig";
     public static final String BEANS_ENDPOINT = "/beans";
     public static final String CONFIGPROPS_ENDPOINT = "/configprops";

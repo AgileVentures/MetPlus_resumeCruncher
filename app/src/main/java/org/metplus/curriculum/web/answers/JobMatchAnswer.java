@@ -13,16 +13,13 @@ import java.util.Map;
  * Class that represents all the Job that
  * match a specific resume
  */
-public class JobMatchAnswer extends GenericAnswer {
+public class JobMatchAnswer<T> extends GenericAnswer {
 
-
-    static class JobWithProbability {
+    static class JobAnswer {
         private String jobId;
-        private double stars;
 
-        public JobWithProbability(String jobId, double stars) {
+        public JobAnswer(String jobId) {
             this.jobId = jobId;
-            this.stars = stars;
         }
 
         public String getJobId() {
@@ -31,6 +28,15 @@ public class JobMatchAnswer extends GenericAnswer {
 
         public void setJobId(String jobId) {
             this.jobId = jobId;
+        }
+    }
+
+    public static class JobWithProbability extends JobAnswer {
+        private double stars;
+
+        public JobWithProbability(String jobId, double stars) {
+            super(jobId);
+            this.stars = stars;
         }
 
         public double getStars() {
@@ -42,13 +48,13 @@ public class JobMatchAnswer extends GenericAnswer {
         }
     }
 
-    Map<String, List<JobWithProbability>> jobs;
+    Map<String, List<T>> jobs;
 
     /**
      * Retrieve all jobs information
      * @return Map with Jobs that match per matcher
      */
-    public Map<String, List<JobWithProbability>> getJobs() {
+    public Map<String, List<T>> getJobs() {
         if(jobs == null)
             jobs = new HashMap<>();
         return jobs;
@@ -58,7 +64,7 @@ public class JobMatchAnswer extends GenericAnswer {
      * Set the jobs that match
      * @param jobs Map with Jobs that match per matcher
      */
-    public void setJobs(Map<String, List<JobWithProbability>> jobs) {
+    public void setJobs(Map<String, List<T>> jobs) {
         this.jobs = jobs;
     }
 
@@ -67,10 +73,13 @@ public class JobMatchAnswer extends GenericAnswer {
      * @param cruncherName Cruncher name
      * @param job Job to add
      */
-    public void addJob(String cruncherName, Job job) {
+    public void addJob(String cruncherName, Job job, boolean withProbability) {
         if(!getJobs().containsKey(cruncherName))
             getJobs().put(cruncherName, new ArrayList<>());
-        getJobs().get(cruncherName).add(new JobWithProbability(job.getJobId(), job.getStarRating()));
+        if(withProbability)
+            getJobs().get(cruncherName).add((T)new JobWithProbability(job.getJobId(), job.getStarRating()));
+        else
+            getJobs().get(cruncherName).add((T)job.getJobId());
     }
 
     @Override
