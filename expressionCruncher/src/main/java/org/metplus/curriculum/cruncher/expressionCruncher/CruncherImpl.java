@@ -5,6 +5,8 @@ import org.metplus.curriculum.cruncher.CruncherMetaData;
 import org.metplus.curriculum.database.domain.MetaData;
 import org.metplus.curriculum.database.domain.MetaDataField;
 import org.metplus.curriculum.database.domain.Resume;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -14,6 +16,7 @@ import java.util.*;
  * Created by Joao Pereira on 23/07/2015.
  */
 public class CruncherImpl implements Cruncher {
+    private static final Logger logger = LoggerFactory.getLogger(CruncherImpl.class);
     public static final String CRUNCHER_NAME = "ExpressionCruncher";
     /**
      * Output saved
@@ -154,6 +157,7 @@ public class CruncherImpl implements Cruncher {
      * @return Hash table with the accumulated results
      */
     public Map<String, Integer> calculate(String expression) {
+        logger.trace("calculate(" + expression + ")");
         String auxExpression = expression;
 
         // Remove the expressions that should be ignored
@@ -162,13 +166,11 @@ public class CruncherImpl implements Cruncher {
                 ignore = "\\b" + ignore + "\\b";
             auxExpression = auxExpression.replaceAll(ignore, " ");
         }
-        System.out.println("After ignore list removed:" + auxExpression);
 
         // Convert everything to lower case if the search should be case insensitive
         if (!isCaseSensitive()) {
             auxExpression = auxExpression.toLowerCase();
         }
-        System.out.println("After case sensitive:" + auxExpression);
 
         // Merge all expressions or words
         for (String key: mergeList.keySet()) {
@@ -176,7 +178,7 @@ public class CruncherImpl implements Cruncher {
                 auxExpression = auxExpression.replaceAll(convert, " " + key + " ");
             }
         }
-        System.out.println("After merge:" + auxExpression);
+
         result = new HashMap<>();
         // Do the reduce to words
         for (String phrase: auxExpression.split("\\.")) {
@@ -192,7 +194,7 @@ public class CruncherImpl implements Cruncher {
                 }
             }
         }
-        System.out.println("result:" + result);
+        logger.trace("result:" + result);
 
         return result;
     }

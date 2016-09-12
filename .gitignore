@@ -1,9 +1,14 @@
 *.iml
 build/
+bin/
+.classpath
+.project
+.settings/
 .gradle/
 .idea/
 *.p12
 *.ipr
 *.iws
+*/.gitignore
 app/src/main/resources/logback.xml
 *.jar

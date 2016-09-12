@@ -3,7 +3,7 @@ spring:
 
 logging.level: INFO
 logging.level.org.hibernate: ERROR
-logging.level.com.mongodb: SEVERE
+logging.level.com.mongodb: ERROR
 logging.level.org.springframework: WARN
 
 backend.admin.role: BACKEND_ADMIN
@@ -39,7 +39,7 @@ logging.level.org.metplus: INFO
 
 ---
 spring:
-  profiles: unit-test
+  profiles: unit-database
 
 server:
   port: 8443

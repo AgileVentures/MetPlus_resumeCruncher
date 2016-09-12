@@ -1,6 +1,7 @@
 package org.metplus.curriculum.web.controllers;
 
 import org.metplus.curriculum.Application;
+import org.metplus.curriculum.api.WebMvcConfig;
 import org.metplus.curriculum.security.SecurityConfig;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,12 +20,10 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 @ActiveProfiles("development")
 @Profile("unit-test")
-//@ContextConfiguration(classes = {SpringMongoConfig.class, DatabaseConfig.class, AdminController.class, CurriculumController.class, AuthenticationController.class, ResumeCruncher.class},)
-//@ContextConfiguration(loader=AnnotationConfigWebContextLoader.class, classes = {Application.class, SecurityConfig.class})
-@ContextConfiguration(loader=SpringApplicationContextLoader.class, classes = {Application.class, SecurityConfig.class})
+@ContextConfiguration(loader=SpringApplicationContextLoader.class, classes = {Application.class, SecurityConfig.class, WebMvcConfig.class})
 @WebAppConfiguration
 @SpringBootApplication
-@SpringApplicationConfiguration(classes = Application.class, locations = "resources/", initializers = ConfigFileApplicationContextInitializer.class)
+@SpringApplicationConfiguration(classes = {Application.class, WebMvcConfig.class}, locations = "resources/", initializers = ConfigFileApplicationContextInitializer.class)
 @EnableAutoConfiguration
 @EnableConfigurationProperties
 public class BaseControllerTest {

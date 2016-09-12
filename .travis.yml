@@ -7,7 +7,7 @@ services:
 - mongodb
 env:
   global:
-  - SPRING_PROFILES_ACTIVE="unit-test"
+  - SPRING_PROFILES_ACTIVE="unit-database"
 before_install:
 - chmod +x gradlew
 install: "./gradlew :app:assemble"
