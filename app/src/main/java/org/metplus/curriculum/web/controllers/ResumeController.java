@@ -1,6 +1,7 @@
 package org.metplus.curriculum.web.controllers;
 
 
+import org.metplus.curriculum.api.APIVersion;
 import org.metplus.curriculum.cruncher.MatcherList;
 import org.metplus.curriculum.cruncher.Matcher;
 import org.metplus.curriculum.database.config.SpringMongoConfig;
@@ -30,8 +31,9 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping({BaseController.baseUrl + "/curriculum", BaseController.baseUrl + "/resume"})
+@RequestMapping({"curriculum", "resume"})
 @PreAuthorize("hasAuthority('ROLE_DOMAIN_USER')")
+@APIVersion({1,2})
 public class ResumeController {
     private static Logger logger = LoggerFactory.getLogger(ResumeController.class);
 
@@ -141,11 +143,26 @@ public class ResumeController {
 
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
+    @RequestMapping(value = "/match", method = RequestMethod.POST)
+    @APIVersion(1)
+    @ResponseBody
+    private ResponseEntity<GenericAnswer> matchv1(@RequestParam("title") final String title,
+                                                  @RequestParam("description") final String description) {
+        return match(title, description, false);
+    }
 
     @RequestMapping(value = "/match", method = RequestMethod.POST)
+    @APIVersion(2)
     @ResponseBody
-    public ResponseEntity<GenericAnswer> match(@RequestParam("title") final String title,
-                                               @RequestParam("description") final String description) {
+    private ResponseEntity<GenericAnswer> matchv2(@RequestParam("title") final String title,
+                                                  @RequestParam("description") final String description) {
+        return match(title, description, true);
+    }
+
+    public ResponseEntity<GenericAnswer> match(final String title,
+                                               final String description,
+                                               boolean withProbability
+                                               ) {
         logger.debug("Match resumes with title: '" + title + "', description: '" + description + "'");
         if(title == null || title.length() == 0) {
             logger.error("Matching resumes with empty Title is not allowed");
@@ -155,7 +172,11 @@ public class ResumeController {
             return new ResponseEntity<>(answer, HttpStatus.BAD_REQUEST);
         }
         List<Resume> matchedResumes = null;
-        ResumeMatchAnswer answer = new ResumeMatchAnswer();
+        ResumeMatchAnswer answer = null;
+        if(withProbability)
+            answer =new ResumeMatchAnswer<ResumeMatchAnswer.ResumeWithProbability>();
+        else
+            answer = new ResumeMatchAnswer<String>();
         for(Matcher matcher: matcherList.getMatchers()) {
             matchedResumes = matcher.match(title, description);
             if(matchedResumes == null) {
@@ -166,7 +187,7 @@ public class ResumeController {
                 return new ResponseEntity<>(errorAnswer, HttpStatus.BAD_REQUEST);
             }
             for(Resume resume: matchedResumes) {
-                answer.addResume(matcher.getCruncherName(), resume);
+                answer.addResume(matcher.getCruncherName(), resume, withProbability);
             }
         }
         answer.setMessage("Success");
@@ -176,8 +197,19 @@ public class ResumeController {
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
     @RequestMapping(value = "/match/{jobId}", method = RequestMethod.GET)
+    @APIVersion(1)
     @ResponseBody
-    public ResponseEntity<GenericAnswer> match(@PathVariable("jobId") final String jobId) {
+    private ResponseEntity<GenericAnswer> matchv1(@PathVariable("jobId") final String jobId) {
+        return match(jobId, false);
+    }
+
+    @RequestMapping(value = "/match/{jobId}", method = RequestMethod.GET)
+    @APIVersion(2)
+    @ResponseBody
+    private ResponseEntity<GenericAnswer> matchv2(@PathVariable("jobId") final String jobId) {
+        return match(jobId, true);
+    }
+    private ResponseEntity<GenericAnswer> match(final String jobId, boolean withProbability) {
         logger.debug("Match resumes with job id: '" + jobId + "'");
         if(jobId == null || jobId.length() == 0) {
             logger.error("Matching resumes with empty job identifier");
@@ -200,7 +232,7 @@ public class ResumeController {
                 return new ResponseEntity<>(errorAnswer, HttpStatus.BAD_REQUEST);
             }
             for(Resume resume: matchedResumes) {
-                answer.addResume(matcher.getCruncherName(), resume);
+                answer.addResume(matcher.getCruncherName(), resume, withProbability);
             }
         }
         answer.setMessage("Success");

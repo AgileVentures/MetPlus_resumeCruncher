@@ -20,7 +20,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 @ActiveProfiles("development")
 @Profile("unit-test")
-@ContextConfiguration(loader=SpringApplicationContextLoader.class, classes = {Application.class, SecurityConfig.class, WebMvcConfig.class}, locations = {"classpath:"})
+@ContextConfiguration(loader=SpringApplicationContextLoader.class, classes = {Application.class, SecurityConfig.class, WebMvcConfig.class})
 @WebAppConfiguration
 @SpringBootApplication
 @SpringApplicationConfiguration(classes = {Application.class, WebMvcConfig.class}, locations = "resources/", initializers = ConfigFileApplicationContextInitializer.class)

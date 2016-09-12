@@ -58,37 +58,76 @@ include::{snippets}/job/update-not-exists/response-fields.adoc[]
 
 = Match jobs with resume
 
-== HTTP Request
+== API Version 1
+
+=== HTTP Request
 
 Request
-include::{snippets}/job/match-success/http-request.adoc[]
+include::{snippets}/job/match-success/v1/http-request.adoc[]
 Headers
-include::{snippets}/job/match-success/request-headers.adoc[]
+include::{snippets}/job/match-success/v1/request-headers.adoc[]
 Path Parameters
-include::{snippets}/job/match-success/path-parameters.adoc[]
+include::{snippets}/job/match-success/v1/path-parameters.adoc[]
 
-== HTTP Answers
+=== HTTP Answers
 
-=== Success
+==== Success
 
 Response
-include::{snippets}/job/match-success/http-response.adoc[]
+include::{snippets}/job/match-success/v1/http-response.adoc[]
 Parameters on response
-include::{snippets}/job/match-success/response-fields.adoc[]
+include::{snippets}/job/match-success/v1/response-fields.adoc[]
 
 '''
 
-==== Example: Cannot find the Resume to match jobs against
+===== Example: Cannot find the Resume to match jobs against
 
 Response
-include::{snippets}/job/match-not-exists/http-response.adoc[]
+include::{snippets}/job/match-not-exists/v1/http-response.adoc[]
 Parameters on response
-include::{snippets}/job/match-not-exists/response-fields.adoc[]
+include::{snippets}/job/match-not-exists/v1/response-fields.adoc[]
 
 
-==== Example: Unable to find Job that match the Resume
+===== Example: Unable to find Job that match the Resume
 
 Response
-include::{snippets}/job/match-not-found/http-response.adoc[]
+include::{snippets}/job/match-not-found/v1/http-response.adoc[]
 Parameters on response
-include::{snippets}/job/match-not-found/response-fields.adoc[]
+include::{snippets}/job/match-not-found/v1/response-fields.adoc[]
+
+== API Version 2
+
+=== HTTP Request
+
+Request
+include::{snippets}/job/match-success/v2/http-request.adoc[]
+Headers
+include::{snippets}/job/match-success/v2/request-headers.adoc[]
+Path Parameters
+include::{snippets}/job/match-success/v2/path-parameters.adoc[]
+
+=== HTTP Answers
+
+==== Success
+
+Response
+include::{snippets}/job/match-success/v2/http-response.adoc[]
+Parameters on response
+include::{snippets}/job/match-success/v2/response-fields.adoc[]
+
+'''
+
+===== Example: Cannot find the Resume to match jobs against
+
+Response
+include::{snippets}/job/match-not-exists/v2/http-response.adoc[]
+Parameters on response
+include::{snippets}/job/match-not-exists/v2/response-fields.adoc[]
+
+
+===== Example: Unable to find Job that match the Resume
+
+Response
+include::{snippets}/job/match-not-found/v2/http-response.adoc[]
+Parameters on response
+include::{snippets}/job/match-not-found/v2/response-fields.adoc[]

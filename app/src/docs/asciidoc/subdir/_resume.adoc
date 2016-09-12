@@ -44,61 +44,125 @@ include::{snippets}/resume/download-error/response-fields.adoc[]
 
 = Match Resumes with job description
 
-== Example: No Resumes found
+== API Version 1
+
+=== Example: No Resumes found
 
 Request
-include::{snippets}/resume/match-no-resumes/http-request.adoc[]
+include::{snippets}/resume/match-no-resumes/v1/http-request.adoc[]
 Headers
-include::{snippets}/resume/match-no-resumes/request-headers.adoc[]
+include::{snippets}/resume/match-no-resumes/v1/request-headers.adoc[]
 Parameters
-include::{snippets}/resume/match-no-resumes/request-parameters.adoc[]
+include::{snippets}/resume/match-no-resumes/v1/request-parameters.adoc[]
 
 Response
-include::{snippets}/resume/match-no-resumes/http-response.adoc[]
+include::{snippets}/resume/match-no-resumes/v1/http-response.adoc[]
 Parameters on response
-include::{snippets}/resume/match-no-resumes/response-fields.adoc[]
+include::{snippets}/resume/match-no-resumes/v1/response-fields.adoc[]
 
-== Example: 3 Resumes found
+=== Example: 3 Resumes found
 
 Request
-include::{snippets}/resume/match-no-resumes/http-request.adoc[]
+include::{snippets}/resume/match-no-resumes/v1/http-request.adoc[]
 Headers
-include::{snippets}/resume/match-no-resumes/request-headers.adoc[]
+include::{snippets}/resume/match-no-resumes/v1/request-headers.adoc[]
 Parameters
-include::{snippets}/resume/match-no-resumes/request-parameters.adoc[]
+include::{snippets}/resume/match-no-resumes/v1/request-parameters.adoc[]
 
 Response
-include::{snippets}/resume/multiple-match-resumes-job-id/http-response.adoc[]
+include::{snippets}/resume/multiple-match-resumes-job-id/v1/http-response.adoc[]
 Parameters on response
-include::{snippets}/resume/multiple-match-resumes-job-id/response-fields.adoc[]
+include::{snippets}/resume/multiple-match-resumes-job-id/v1/response-fields.adoc[]
 
+
+== API Version 2
+
+=== Example: No Resumes found
+
+Request
+include::{snippets}/resume/match-no-resumes/v2/http-request.adoc[]
+Headers
+include::{snippets}/resume/match-no-resumes/v2/request-headers.adoc[]
+Parameters
+include::{snippets}/resume/match-no-resumes/v2/request-parameters.adoc[]
+
+Response
+include::{snippets}/resume/match-no-resumes/v2/http-response.adoc[]
+Parameters on response
+include::{snippets}/resume/match-no-resumes/v2/response-fields.adoc[]
+
+=== Example: 3 Resumes found
+
+Request
+include::{snippets}/resume/match-no-resumes/v2/http-request.adoc[]
+Headers
+include::{snippets}/resume/match-no-resumes/v2/request-headers.adoc[]
+Parameters
+include::{snippets}/resume/match-no-resumes/v2/request-parameters.adoc[]
+
+Response
+include::{snippets}/resume/multiple-match-resumes-job-id/v2/http-response.adoc[]
+Parameters on response
+include::{snippets}/resume/multiple-match-resumes-job-id/v2/response-fields.adoc[]
 
 = Match Resumes with job identifier
 
-== Example: No Resumes found
+== API Version 1
+
+=== Example: No Resumes found
 
 Request
-include::{snippets}/resume/match-no-resumes-job-id/http-request.adoc[]
+include::{snippets}/resume/match-no-resumes-job-id/v1/http-request.adoc[]
 Headers
-include::{snippets}/resume/match-no-resumes-job-id/request-headers.adoc[]
+include::{snippets}/resume/match-no-resumes-job-id/v1/request-headers.adoc[]
 Parameters
-include::{snippets}/resume/match-no-resumes-job-id/path-parameters.adoc[]
+include::{snippets}/resume/match-no-resumes-job-id/v1/path-parameters.adoc[]
 
 Response
-include::{snippets}/resume/match-no-resumes-job-id/http-response.adoc[]
+include::{snippets}/resume/match-no-resumes-job-id/v1/http-response.adoc[]
 Parameters on response
-include::{snippets}/resume/match-no-resumes-job-id/response-fields.adoc[]
+include::{snippets}/resume/match-no-resumes-job-id/v1/response-fields.adoc[]
 
-== Example: 3 Resumes found
+=== Example: 3 Resumes found
 
 Request
-include::{snippets}/resume/multiple-match-resumes-job-id/http-request.adoc[]
+include::{snippets}/resume/multiple-match-resumes-job-id/v1/http-request.adoc[]
 Headers
-include::{snippets}/resume/multiple-match-resumes-job-id/request-headers.adoc[]
+include::{snippets}/resume/multiple-match-resumes-job-id/v1/request-headers.adoc[]
 Parameters
-include::{snippets}/resume/multiple-match-resumes-job-id/path-parameters.adoc[]
+include::{snippets}/resume/multiple-match-resumes-job-id/v1/path-parameters.adoc[]
 
 Response
-include::{snippets}/resume/multiple-match-resumes-job-id/http-response.adoc[]
+include::{snippets}/resume/multiple-match-resumes-job-id/v1/http-response.adoc[]
 Parameters on response
-include::{snippets}/resume/multiple-match-resumes-job-id/response-fields.adoc[]
+include::{snippets}/resume/multiple-match-resumes-job-id/v1/response-fields.adoc[]
+
+== API Version 2
+
+=== Example: No Resumes found
+
+Request
+include::{snippets}/resume/match-no-resumes-job-id/v2/http-request.adoc[]
+Headers
+include::{snippets}/resume/match-no-resumes-job-id/v2/request-headers.adoc[]
+Parameters
+include::{snippets}/resume/match-no-resumes-job-id/v2/path-parameters.adoc[]
+
+Response
+include::{snippets}/resume/match-no-resumes-job-id/v2/http-response.adoc[]
+Parameters on response
+include::{snippets}/resume/match-no-resumes-job-id/v2/response-fields.adoc[]
+
+=== Example: 3 Resumes found
+
+Request
+include::{snippets}/resume/multiple-match-resumes-job-id/v2/http-request.adoc[]
+Headers
+include::{snippets}/resume/multiple-match-resumes-job-id/v2/request-headers.adoc[]
+Parameters
+include::{snippets}/resume/multiple-match-resumes-job-id/v2/path-parameters.adoc[]
+
+Response
+include::{snippets}/resume/multiple-match-resumes-job-id/v2/http-response.adoc[]
+Parameters on response
+include::{snippets}/resume/multiple-match-resumes-job-id/v2/response-fields.adoc[]
