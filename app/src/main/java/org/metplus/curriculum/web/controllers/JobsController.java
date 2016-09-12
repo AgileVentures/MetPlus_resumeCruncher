@@ -1,5 +1,6 @@
 package org.metplus.curriculum.web.controllers;
 
+import org.metplus.curriculum.api.APIVersion;
 import org.metplus.curriculum.cruncher.Matcher;
 import org.metplus.curriculum.cruncher.MatcherList;
 import org.metplus.curriculum.database.domain.Job;
@@ -25,8 +26,9 @@ import java.util.List;
  * all the requests related with jobs
  */
 @RestController
-@RequestMapping(BaseController.baseUrl + "job")
+@RequestMapping("job")
 @PreAuthorize("hasAuthority('ROLE_DOMAIN_USER')")
+@APIVersion({1,2})
 public class JobsController {
     public JobsController(){}
     public JobsController(JobRepository jobRepository, ResumeRepository resumeRepository, MatcherList matcherList, JobCruncher jobCruncher) {
@@ -117,9 +119,20 @@ public class JobsController {
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
     @RequestMapping(value = "/match/{resumeId}", method = RequestMethod.GET)
+    @APIVersion({2})
     @ResponseBody
-    public ResponseEntity<GenericAnswer> match(@PathVariable("resumeId") final String resumeId){
-        logger.trace("match(" + resumeId + ")");
+    public ResponseEntity<GenericAnswer> matchv2(@PathVariable("resumeId") final String resumeId){
+        return match(resumeId, true);
+    }
+    @RequestMapping(value = "/match/{resumeId}", method = RequestMethod.GET)
+    @APIVersion({1})
+    @ResponseBody
+    public ResponseEntity<GenericAnswer> matchv1(@PathVariable("resumeId") final String resumeId){
+        return match(resumeId, false);
+    }
+
+    private ResponseEntity<GenericAnswer> match(String resumeId, boolean withProbabilityAnswer){
+        logger.debug("match(" + resumeId + ", " + withProbabilityAnswer + ")");
         Resume resume = resumeRepository.findByUserId(resumeId);
         if(resume == null) {
             logger.error("Unable to find resume with id '{}'", resumeId);
@@ -130,7 +143,11 @@ public class JobsController {
         }
         logger.debug("Start processing the Jobs");
         List<Job> matchedJobs = null;
-        JobMatchAnswer answer = new JobMatchAnswer();
+        JobMatchAnswer answer = null;
+        if(withProbabilityAnswer)
+            answer = new JobMatchAnswer<JobMatchAnswer.JobWithProbability>();
+        else
+            answer = new JobMatchAnswer<String>();
         for(Matcher matcher: matcherList.getMatchers()) {
             matchedJobs = matcher.match(resume.getCruncherData(matcher.getCruncherName()));
             if(matchedJobs == null) {
@@ -141,12 +158,30 @@ public class JobsController {
                 return new ResponseEntity<>(answer, HttpStatus.OK);
             }
             for(Job job: matchedJobs) {
-                answer.addJob(matcher.getCruncherName(), job);
+                answer.addJob(matcher.getCruncherName(), job, withProbabilityAnswer);
             }
         }
         answer.setMessage("Success");
         answer.setResultCode(ResultCodes.SUCCESS);
         logger.debug("Done processing: " + answer);
+        return new ResponseEntity<>(answer, HttpStatus.OK);
+    }
+
+
+    @RequestMapping(value = "/reindex", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<GenericAnswer> reindex() {
+        logger.debug("reindex()");
+        GenericAnswer answer = new GenericAnswer();
+        int total = 0;
+        for(Job job: jobRepository.findAll()) {
+            jobCruncher.addWork(job);
+            total++;
+        }
+        answer.setMessage("Going to reindex " + total + " jobs");
+        answer.setResultCode(ResultCodes.SUCCESS);
+
+        logger.debug("Result is: " + answer);
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
 }

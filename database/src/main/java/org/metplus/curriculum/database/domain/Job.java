@@ -1,5 +1,6 @@
 package org.metplus.curriculum.database.domain;
 
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -22,6 +23,9 @@ public class Job extends DocumentWithMetaData {
 
     @Field
     private DocumentWithMetaData descriptionMetaData;
+
+    @Transient
+    private double starRating;
 
     /**
      * Retrieve the Meta data from crunching the title
@@ -143,5 +147,21 @@ public class Job extends DocumentWithMetaData {
      */
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    /**
+     * Retrieve the startRating of the Job
+     * @return Start rating
+     */
+    public double getStarRating() {
+        return starRating;
+    }
+
+    /**
+     * Set the start rating of the Job
+     * @param starRating Star rating
+     */
+    public void setStarRating(double starRating) {
+        this.starRating = starRating;
     }
 }

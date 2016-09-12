@@ -17,4 +17,5 @@ public interface Cruncher {
      * @return Name of the cruncher
      */
     String getCruncherName();
+
 }

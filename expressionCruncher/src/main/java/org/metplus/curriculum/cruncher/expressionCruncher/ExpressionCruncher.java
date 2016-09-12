@@ -8,6 +8,8 @@ import org.metplus.curriculum.database.repository.JobRepository;
 import org.metplus.curriculum.database.repository.ResumeRepository;
 import org.metplus.curriculum.database.repository.SettingsRepository;
 import org.metplus.curriculum.init.CruncherInitializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -20,6 +22,7 @@ import java.util.*;
 @Component
 @ConfigurationProperties(locations = "classpath:expressionCruncher.yml", prefix = "config")
 public class ExpressionCruncher extends CruncherInitializer {
+    private static Logger logger = LoggerFactory.getLogger(ExpressionCruncher.class);
     private static final String IGNORE_LIST = "IgnoreList";
     private static final String MERGE_LIST = "MergeList";
     private static final String CASE_SENSITIVE = "CaseSensitive";
@@ -76,35 +79,41 @@ public class ExpressionCruncher extends CruncherInitializer {
 
     @Override
     public void init() {
+        logger.trace("init()");
         try {
             CruncherSettings settings = null;
             try {
                 settings = repository.findAll().iterator().next().getCruncherSettings(CruncherImpl.CRUNCHER_NAME);
             } catch(NoSuchElementException e) {
+                logger.info("Settings not present creating basic settings before start");
                 repository.save(new Settings());
                 settings = repository.findAll().iterator().next().getCruncherSettings(CruncherImpl.CRUNCHER_NAME);
             }
+            logger.info("ignore list: " + ignoreList);
             ignoreList = (List)settings.getSetting(IGNORE_LIST).getData();
             caseSensitive = (boolean)settings.getSetting(CASE_SENSITIVE).getData();
             mergeList = (Map) settings.getSetting(MERGE_LIST).getData();
             ignoreListWordSearch = (boolean) settings.getSetting(IGNORE_LIST_WORD).getData();
-            System.out.println("===================================================================");
-            System.out.println("Case sensitive: " + caseSensitive);
-            System.out.println("Ignore list: " + ignoreList);
-            System.out.println("Ignore List Search Word: " + ignoreListWordSearch);
-            System.out.println("Merge List: " + mergeList);
-            System.out.println("===================================================================");
+
+            logger.info("Using database settings");
+            logger.info("===================================================================");
+            logger.info("Case sensitive: " + caseSensitive);
+            logger.info("Ignore list: " + ignoreList);
+            logger.info("Ignore List Search Word: " + ignoreListWordSearch);
+            logger.info("Merge List: " + mergeList);
+            logger.info("===================================================================");
 
             cruncherImpl = new CruncherImpl(ignoreList, mergeList);
             cruncherImpl.setCaseSensitive(caseSensitive);
             cruncherImpl.setIgnoreListSearchWord(ignoreListWordSearch);
         } catch (CruncherSettingsNotFound cruncherSettingsNotFound) {
-            System.out.println("===================================================================");
-            System.out.println("Case sensitive: " + caseSensitive);
-            System.out.println("Ignore list: " + ignoreList);
-            System.out.println("Ignore List Search Word: " + ignoreListWordSearch);
-            System.out.println("Merge List: " + mergeList);
-            System.out.println("===================================================================");
+            logger.info("Using local settings");
+            logger.info("===================================================================");
+            logger.info("Case sensitive: " + caseSensitive);
+            logger.info("Ignore list: " + ignoreList);
+            logger.info("Ignore List Search Word: " + ignoreListWordSearch);
+            logger.info("Merge List: " + mergeList);
+            logger.info("===================================================================");
             cruncherImpl = new CruncherImpl(ignoreList, mergeList);
             cruncherImpl.setCaseSensitive(caseSensitive);
             cruncherImpl.setIgnoreListSearchWord(ignoreListWordSearch);

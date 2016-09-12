@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.metplus.curriculum.database.domain.Job;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,15 +15,51 @@ import java.util.Map;
  * Class that represents all the Job that
  * match a specific resume
  */
-public class JobMatchAnswer extends GenericAnswer {
+public class JobMatchAnswer<T> extends GenericAnswer {
 
-    Map<String, List<String>> jobs;
+    static class JobAnswer {
+        private String jobId;
+
+        public JobAnswer(String jobId) {
+            this.jobId = jobId;
+        }
+
+        public String getJobId() {
+            return jobId;
+        }
+
+        public void setJobId(String jobId) {
+            this.jobId = jobId;
+        }
+    }
+
+    public static class JobWithProbability extends JobAnswer {
+        private double stars;
+
+        public JobWithProbability(String jobId, double stars) {
+            super(jobId);
+            setStars(stars);
+        }
+
+        public double getStars() {
+            return stars;
+        }
+
+        public void setStars(double stars) {
+            DecimalFormat df = new DecimalFormat("#.#");
+            df.setRoundingMode(RoundingMode.FLOOR);
+
+            this.stars = Double.parseDouble(df.format(new Double(stars)));
+        }
+    }
+
+    Map<String, List<T>> jobs;
 
     /**
      * Retrieve all jobs information
      * @return Map with Jobs that match per matcher
      */
-    public Map<String, List<String>> getJobs() {
+    public Map<String, List<T>> getJobs() {
         if(jobs == null)
             jobs = new HashMap<>();
         return jobs;
@@ -31,7 +69,7 @@ public class JobMatchAnswer extends GenericAnswer {
      * Set the jobs that match
      * @param jobs Map with Jobs that match per matcher
      */
-    public void setJobs(Map<String, List<String>> jobs) {
+    public void setJobs(Map<String, List<T>> jobs) {
         this.jobs = jobs;
     }
 
@@ -40,10 +78,13 @@ public class JobMatchAnswer extends GenericAnswer {
      * @param cruncherName Cruncher name
      * @param job Job to add
      */
-    public void addJob(String cruncherName, Job job) {
+    public void addJob(String cruncherName, Job job, boolean withProbability) {
         if(!getJobs().containsKey(cruncherName))
             getJobs().put(cruncherName, new ArrayList<>());
-        getJobs().get(cruncherName).add(job.getJobId());
+        if(withProbability)
+            getJobs().get(cruncherName).add((T)new JobWithProbability(job.getJobId(), job.getStarRating()));
+        else
+            getJobs().get(cruncherName).add((T)job.getJobId());
     }
 
     @Override

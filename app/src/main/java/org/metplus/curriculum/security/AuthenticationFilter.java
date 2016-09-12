@@ -49,7 +49,7 @@ public class AuthenticationFilter extends GenericFilterBean {
         String resourcePath = new UrlPathHelper().getPathWithinApplication(httpRequest);
 
         try {
-            logger.error("BAMMMMMMM {} by X-Auth-Username method", username);
+            logger.debug("Login with {} by X-Auth-Username method", username);
             if (postToAuthenticate(httpRequest, resourcePath)) {
                 logger.error("Trying to authenticate user {} by X-Auth-Username method", username);
                 processUsernamePasswordAuthentication(httpResponse, username, password);
@@ -102,7 +102,12 @@ public class AuthenticationFilter extends GenericFilterBean {
     }
 
     private boolean postToAuthenticate(HttpServletRequest httpRequest, String resourcePath) {
-        return BaseController.authenticationUrl.equalsIgnoreCase(resourcePath) && httpRequest.getMethod().equals("POST");
+        logger.debug("postToAuthenticate(" + httpRequest + ", " + resourcePath + ")");
+        return (BaseController.authenticationUrl.equalsIgnoreCase(resourcePath) ||
+                BaseController.authenticationUrl.equalsIgnoreCase(resourcePath.substring(0, resourcePath.length()-1)) ||
+                BaseController.authenticationUrlV1.equalsIgnoreCase(resourcePath) ||
+                BaseController.authenticationUrlV1.equalsIgnoreCase(resourcePath.substring(0, resourcePath.length()-1)))
+                && httpRequest.getMethod().equals("POST");
     }
 
     private void processUsernamePasswordAuthentication(HttpServletResponse httpResponse, Optional<String> username, Optional<String> password) throws IOException {
@@ -133,6 +138,7 @@ public class AuthenticationFilter extends GenericFilterBean {
     private Authentication tryToAuthenticate(Authentication requestAuthentication) {
         Authentication responseAuthentication = authenticationManager.authenticate(requestAuthentication);
         if (responseAuthentication == null || !responseAuthentication.isAuthenticated()) {
+            logger.error("Unable to authenticate");
             throw new InternalAuthenticationServiceException("Unable to authenticate Domain User for provided credentials");
         }
         logger.debug("User successfully authenticated");
