@@ -512,7 +512,7 @@ public class ResumeControllerTest {
             Resume resume1 = new Resume("1");
             resume1.setStarRating(4.2);
             Resume resume2 = new Resume("2");
-            resume2.setStarRating(3.2);
+            resume2.setStarRating(3.26);
             Resume resume3 = new Resume("3");
             resume3.setStarRating(5.);
             Resume resume4 = new Resume("2");
@@ -562,7 +562,7 @@ public class ResumeControllerTest {
                     .andExpect(jsonPath("$.resumes.matcher2[0].resumeId", is("3")))
                     .andExpect(jsonPath("$.resumes.matcher2[0].stars", is(5.)))
                     .andExpect(jsonPath("$.resumes.matcher2[1].resumeId", is("2")))
-                    .andExpect(jsonPath("$.resumes.matcher2[1].stars", is(1.25)))
+                    .andExpect(jsonPath("$.resumes.matcher2[1].stars", is(1.2)))
                     .andReturn().getResponse();
             Mockito.verify(jobRepository).findByJobId("1");
             Mockito.verify(matcher1).match(Mockito.any(Job.class));

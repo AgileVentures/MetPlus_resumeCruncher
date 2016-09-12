@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.metplus.curriculum.database.domain.Job;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +38,7 @@ public class JobMatchAnswer<T> extends GenericAnswer {
 
         public JobWithProbability(String jobId, double stars) {
             super(jobId);
-            this.stars = stars;
+            setStars(stars);
         }
 
         public double getStars() {
@@ -44,7 +46,10 @@ public class JobMatchAnswer<T> extends GenericAnswer {
         }
 
         public void setStars(double stars) {
-            this.stars = stars;
+            DecimalFormat df = new DecimalFormat("#.#");
+            df.setRoundingMode(RoundingMode.FLOOR);
+
+            this.stars = Double.parseDouble(df.format(new Double(stars)));
         }
     }
 

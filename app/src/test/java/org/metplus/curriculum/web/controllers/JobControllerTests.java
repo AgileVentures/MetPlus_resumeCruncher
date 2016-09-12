@@ -23,12 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.RequestPostProcessor;
-import org.springframework.test.web.servlet.setup.ConfigurableMockMvcBuilder;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcConfigurer;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -41,8 +36,6 @@ import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -502,7 +495,7 @@ public class JobControllerTests {
 
             Job job1 = new Job();
             job1.setJobId("1");
-            job1.setStarRating(4.2);
+            job1.setStarRating(4.23);
             Job job2 = new Job();
             job2.setStarRating(1.0);
             job2.setJobId("2");
@@ -511,7 +504,7 @@ public class JobControllerTests {
             job3.setStarRating(3.);
             Job job4 = new Job();
             job4.setJobId("2");
-            job4.setStarRating(0.5);
+            job4.setStarRating(0.51);
             List<Job> matcher1Resumes = new ArrayList<>();
             matcher1Resumes.add(job1);
             matcher1Resumes.add(job2);
