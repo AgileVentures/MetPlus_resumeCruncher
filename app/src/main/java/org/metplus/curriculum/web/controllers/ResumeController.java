@@ -146,7 +146,7 @@ public class ResumeController {
     @RequestMapping(value = "/match", method = RequestMethod.POST)
     @APIVersion(1)
     @ResponseBody
-    private ResponseEntity<GenericAnswer> matchv1(@RequestParam("title") final String title,
+    public ResponseEntity<GenericAnswer> matchv1(@RequestParam("title") final String title,
                                                   @RequestParam("description") final String description) {
         return match(title, description, false);
     }
@@ -154,12 +154,12 @@ public class ResumeController {
     @RequestMapping(value = "/match", method = RequestMethod.POST)
     @APIVersion(2)
     @ResponseBody
-    private ResponseEntity<GenericAnswer> matchv2(@RequestParam("title") final String title,
+    public ResponseEntity<GenericAnswer> matchv2(@RequestParam("title") final String title,
                                                   @RequestParam("description") final String description) {
         return match(title, description, true);
     }
 
-    public ResponseEntity<GenericAnswer> match(final String title,
+    private ResponseEntity<GenericAnswer> match(final String title,
                                                final String description,
                                                boolean withProbability
                                                ) {
@@ -199,14 +199,14 @@ public class ResumeController {
     @RequestMapping(value = "/match/{jobId}", method = RequestMethod.GET)
     @APIVersion(1)
     @ResponseBody
-    private ResponseEntity<GenericAnswer> matchv1(@PathVariable("jobId") final String jobId) {
+    public ResponseEntity<GenericAnswer> matchv1(@PathVariable("jobId") final String jobId) {
         return match(jobId, false);
     }
 
     @RequestMapping(value = "/match/{jobId}", method = RequestMethod.GET)
     @APIVersion(2)
     @ResponseBody
-    private ResponseEntity<GenericAnswer> matchv2(@PathVariable("jobId") final String jobId) {
+    public ResponseEntity<GenericAnswer> matchv2(@PathVariable("jobId") final String jobId) {
         return match(jobId, true);
     }
     private ResponseEntity<GenericAnswer> match(final String jobId, boolean withProbability) {
