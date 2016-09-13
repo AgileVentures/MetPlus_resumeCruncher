@@ -118,7 +118,7 @@ public class MatcherImpl implements Matcher<Resume, Job> {
                 topResumeFields.add(category.getKey());
                 foundGoodCategory = true;
             } else
-                base.add(null);
+                topResumeFields.add("");
             if(topResumeFields.size() == weightMatrix.length)
                 break;
         }
@@ -143,6 +143,7 @@ public class MatcherImpl implements Matcher<Resume, Job> {
         List<Map.Entry<String, MetaDataField>> titleTopCategories = titleMetaData.getOrderedFields(new DoubleFieldComparator());
         List<Map.Entry<String, MetaDataField>> descriptionTopCategories = descriptionMetaData.getOrderedFields(new DoubleFieldComparator());
         List<Map.Entry<String, MetaDataField>> topCategoriesToMatch = new ArrayList<>();
+        List<String> alreadyPresent = new ArrayList<>();
         if(!titleTopCategories.get(0).getKey().equals(titleMetaData.getBestMatchCategory())) {
             topCategoriesToMatch.add(new AbstractMap.SimpleEntry(titleMetaData.getBestMatchCategory(), new MetaDataField<Double>(Double.POSITIVE_INFINITY)));
         }
@@ -153,13 +154,17 @@ public class MatcherImpl implements Matcher<Resume, Job> {
             addedNew = false;
             if(titleTopCategories.size() > i && pickTitle) {
                 topCategoriesToMatch.add(titleTopCategories.get(i));
+                alreadyPresent.add(titleTopCategories.get(i).getKey());
                 addedNew = true;
             }
             if(descriptionTopCategories.size() > i && !pickTitle) {
-                topCategoriesToMatch.add(descriptionTopCategories.get(0));
+                if(!alreadyPresent.contains(descriptionTopCategories.get(i).getKey())) {
+                    topCategoriesToMatch.add(descriptionTopCategories.get(i));
+                    alreadyPresent.add(titleTopCategories.get(i).getKey());
+                }
                 addedNew = true;
             }
-            if(i == 1) {
+            if(i == 1 && pickTitle) {
                 pickTitle = false;
                 i = -1;
             }
