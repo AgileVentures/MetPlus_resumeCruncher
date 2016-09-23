@@ -28,7 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping("job")
 @PreAuthorize("hasAuthority('ROLE_DOMAIN_USER')")
-@APIVersion({1,2})
+@APIVersion({1, 2, BaseController.VERSION_TESTING})
 public class JobsController {
     public JobsController(){}
     public JobsController(JobRepository jobRepository, ResumeRepository resumeRepository, MatcherList matcherList, JobCruncher jobCruncher) {

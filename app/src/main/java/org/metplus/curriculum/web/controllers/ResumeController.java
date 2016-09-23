@@ -33,7 +33,7 @@ import java.util.List;
 @RestController
 @RequestMapping({"curriculum", "resume"})
 @PreAuthorize("hasAuthority('ROLE_DOMAIN_USER')")
-@APIVersion({1,2})
+@APIVersion({1, 2, BaseController.VERSION_TESTING})
 public class ResumeController {
     private static Logger logger = LoggerFactory.getLogger(ResumeController.class);
 
@@ -209,6 +209,17 @@ public class ResumeController {
     public ResponseEntity<GenericAnswer> matchv2(@PathVariable("jobId") final String jobId) {
         return match(jobId, true);
     }
+
+
+    @RequestMapping(value = "/match", method = RequestMethod.POST)
+    @APIVersion(BaseController.VERSION_TESTING)
+    @ResponseBody
+    public ResponseEntity<GenericAnswer> matchCannedReponse(@PathVariable("jobId") final String jobId) {
+
+        GenericAnswer answer = new GenericAnswer();
+        return new ResponseEntity<>(answer, HttpStatus.OK);
+    }
+
     private ResponseEntity<GenericAnswer> match(final String jobId, boolean withProbability) {
         logger.debug("Match resumes with job id: '" + jobId + "'");
         if(jobId == null || jobId.length() == 0) {
