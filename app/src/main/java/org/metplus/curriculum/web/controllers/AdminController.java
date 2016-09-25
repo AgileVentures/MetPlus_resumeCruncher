@@ -1,5 +1,6 @@
 package org.metplus.curriculum.web.controllers;
 
+import org.metplus.curriculum.api.APIVersion;
 import org.metplus.curriculum.database.domain.Settings;
 import org.metplus.curriculum.database.exceptions.MandatorySettingNotPresent;
 import org.metplus.curriculum.database.repository.SettingsRepository;
@@ -15,7 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @RestController
-@RequestMapping(BaseController.baseUrl + "/admin")
+@APIVersion({1,2})
+@RequestMapping("admin")
 public class AdminController {
     private static final Logger LOG = LoggerFactory.getLogger(AdminController.class);
     @Autowired
@@ -26,7 +28,7 @@ public class AdminController {
      * @summary Retrieve Cruncher settings
      * @return A list of settings
      */
-    @RequestMapping(value = "/settings", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "settings", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public ResponseEntity<Settings> mainPage() {
         LOG.debug("mainPage()");
@@ -42,7 +44,7 @@ public class AdminController {
      * @summary Save settings
      * @return The answer stating if the settings were saved or not
      */
-    @RequestMapping(value = "/settings", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+    @RequestMapping(value = "settings", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     @ResponseBody
     public ResponseEntity<Settings> save(@RequestBody Settings settings) throws MandatorySettingNotPresent {
         LOG.info("Post is: " + settings);

@@ -9,6 +9,7 @@ import org.metplus.curriculum.database.exceptions.ResumeNotFound;
 import org.metplus.curriculum.database.exceptions.ResumeReadException;
 import org.metplus.curriculum.exceptions.CurriculumException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.gridfs.GridFsOperations;
@@ -28,6 +29,8 @@ public class Resume extends DocumentWithMetaData {
     @Field
     private String userId;
 
+    @Transient
+    private double starRating;
 
     @Autowired
     private GridFsOperations gridOperation;
@@ -134,5 +137,19 @@ public class Resume extends DocumentWithMetaData {
         return userId;
     }
 
+    /**
+     * Retrieve the starRating of the resume
+     * @return Start ratting of the resume
+     */
+    public double getStarRating() {
+        return starRating;
+    }
 
+    /**
+     * Set the start ratting of the resume
+     * @param starRating
+     */
+    public void setStarRating(double starRating) {
+        this.starRating = starRating;
+    }
 }

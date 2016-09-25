@@ -5,29 +5,25 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.metplus.curriculum.api.WebMvcConfig;
 import org.metplus.curriculum.cruncher.CruncherMetaData;
 import org.metplus.curriculum.cruncher.Matcher;
 import org.metplus.curriculum.cruncher.MatcherList;
-import org.metplus.curriculum.cruncher.expressionCruncher.MatcherImpl;
 import org.metplus.curriculum.database.domain.Job;
 import org.metplus.curriculum.database.domain.MetaData;
 import org.metplus.curriculum.database.domain.Resume;
 import org.metplus.curriculum.database.repository.JobRepository;
 import org.metplus.curriculum.database.repository.ResumeRepository;
 import org.metplus.curriculum.process.JobCruncher;
+import org.metplus.curriculum.test.MyStandaloneBuilder;
 import org.metplus.curriculum.web.answers.ResultCodes;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.internal.matchers.Null;
+import org.mockito.*;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -40,8 +36,6 @@ import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -62,9 +56,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(Suite.class)
 @Suite.SuiteClasses({JobControllerTests.CreateEndpoint.class,
                      JobControllerTests.UpdateEndpoint.class,
-                     JobControllerTests.MatchEndpoint.class})
+                     JobControllerTests.MatchEndpointV1.class,
+                     JobControllerTests.MatchEndpointV2.class})
 public class JobControllerTests {
-
     public static class DefaultJobTest extends BaseControllerTest {
 
         @Autowired
@@ -89,7 +83,8 @@ public class JobControllerTests {
 
         @Before
         public void setUp() throws Exception {
-            mockMvc = MockMvcBuilders.standaloneSetup(new JobsController(jobRepository, resumeRepository, matcherList, jobCruncher))
+            MockitoAnnotations.initMocks(this);
+            mockMvc = new MyStandaloneBuilder(new JobsController(jobRepository, resumeRepository, matcherList, jobCruncher), new WebMvcConfig())
                     .setValidator(validator())
                     .apply(documentationConfiguration(this.restDocumentation))
                     .build();
@@ -319,7 +314,7 @@ public class JobControllerTests {
     }
 
     @RunWith(MockitoJUnitRunner.class)
-    public static class MatchEndpoint extends DefaultJobTest {
+    public static class MatchEndpointV1 extends DefaultJobTest {
         @Test
         public void doNotExist() throws Exception {
             Mockito.when(resumeRepository.findByUserId("1")).thenReturn(null);
@@ -333,7 +328,7 @@ public class JobControllerTests {
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                     .andExpect(jsonPath("$.resultCode", is(ResultCodes.RESUME_NOT_FOUND.toString())))
-                    .andDo(document("job/match-not-exists",
+                    .andDo(document("job/match-not-exists/v1",
                             requestHeaders(headerWithName("X-Auth-Token")
                                     .description("Authentication token retrieved from the authentication")),
                             pathParameters(parameterWithName("resumeId").description("User identifier of the resume")),
@@ -354,17 +349,23 @@ public class JobControllerTests {
             Mockito.when(resumeRepository.findByUserId("1")).thenReturn(resume);
 
             Job job1 = new Job();
-            job1.setJobId("job1");
+            job1.setJobId("1");
+            job1.setStarRating(4.2);
             Job job2 = new Job();
-            job2.setJobId("job2");
+            job2.setStarRating(1.0);
+            job2.setJobId("2");
             Job job3 = new Job();
-            job3.setJobId("job3");
+            job3.setJobId("3");
+            job3.setStarRating(3.);
+            Job job4 = new Job();
+            job4.setJobId("2");
+            job4.setStarRating(0.5);
             List<Job> matcher1Resumes = new ArrayList<>();
             matcher1Resumes.add(job1);
             matcher1Resumes.add(job2);
             List<Job> matcher2Resumes = new ArrayList<>();
             matcher2Resumes.add(job3);
-            matcher2Resumes.add(job2);
+            matcher2Resumes.add(job4);
 
             Matcher matcher1 = Mockito.mock(Matcher.class);
             Mockito.when(matcher1.getCruncherName()).thenReturn("matcher1");
@@ -389,12 +390,12 @@ public class JobControllerTests {
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                     .andExpect(jsonPath("$.resultCode", is(ResultCodes.SUCCESS.toString())))
                     .andExpect(jsonPath("$.jobs.matcher1", hasSize(2)))
-                    .andExpect(jsonPath("$.jobs.matcher1[0]", is("job1")))
-                    .andExpect(jsonPath("$.jobs.matcher1[1]", is("job2")))
+                    .andExpect(jsonPath("$.jobs.matcher1[0]", is("1")))
+                    .andExpect(jsonPath("$.jobs.matcher1[1]", is("2")))
                     .andExpect(jsonPath("$.jobs.matcher2", hasSize(2)))
-                    .andExpect(jsonPath("$.jobs.matcher2[0]", is("job3")))
-                    .andExpect(jsonPath("$.jobs.matcher2[1]", is("job2")))
-                    .andDo(document("job/match-success",
+                    .andExpect(jsonPath("$.jobs.matcher2[0]", is("3")))
+                    .andExpect(jsonPath("$.jobs.matcher2[1]", is("2")))
+                    .andDo(document("job/match-success/v1",
                             requestHeaders(headerWithName("X-Auth-Token")
                                     .description("Authentication token retrieved from the authentication")),
                             pathParameters(parameterWithName("resumeId").description("User identifier of the resume")),
@@ -440,7 +441,156 @@ public class JobControllerTests {
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                     .andExpect(jsonPath("$.resultCode", is(ResultCodes.SUCCESS.toString())))
                     .andExpect(jsonPath("$.jobs").value(is(new java.util.LinkedHashMap())))
-                    .andDo(document("job/match-not-found",
+                    .andDo(document("job/match-not-found/v1",
+                            requestHeaders(headerWithName("X-Auth-Token")
+                                    .description("Authentication token retrieved from the authentication")),
+                            pathParameters(parameterWithName("resumeId").description("User identifier of the resume")),
+                            responseFields(
+                                    fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
+                                    fieldWithPath("message").description("Message associated with the result code"),
+                                    fieldWithPath("jobs").description("Hash with a list of job ids matched by each cruncher")
+                            )
+                    ));
+            Mockito.verify(resumeRepository).findByUserId("1");
+            Mockito.verify(matcher1).match(Mockito.any(CruncherMetaData.class));
+            Mockito.verify(matcher2).match(Mockito.any(CruncherMetaData.class));
+        }
+    }
+
+
+    @RunWith(MockitoJUnitRunner.class)
+    public static class MatchEndpointV2 extends DefaultJobTest {
+        @Test
+        public void doNotExist() throws Exception {
+            Mockito.when(resumeRepository.findByUserId("1")).thenReturn(null);
+
+            mockMvc.perform(
+                    RestDocumentationRequestBuilders.get("/api/v2/job/match/{resumeId}", "1")
+                            .accept(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .header("X-Auth-Token", "1234")
+            )
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
+                    .andExpect(jsonPath("$.resultCode", is(ResultCodes.RESUME_NOT_FOUND.toString())))
+                    .andDo(document("job/match-not-exists/v2",
+                            requestHeaders(headerWithName("X-Auth-Token")
+                                    .description("Authentication token retrieved from the authentication")),
+                            pathParameters(parameterWithName("resumeId").description("User identifier of the resume")),
+                            responseFields(
+                                    fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
+                                    fieldWithPath("message").description("Message associated with the result code")
+                            )
+                    ));
+            Mockito.verify(resumeRepository).findByUserId("1");
+        }
+        @Test
+        public void success() throws Exception {
+            Map<String, MetaData> metaData1 = new HashMap<>();
+            metaData1.put("matcher1", new MetaData());
+            metaData1.put("matcher2", new MetaData());
+            Resume resume = new Resume("1");
+            resume.setMetaData(metaData1);
+            Mockito.when(resumeRepository.findByUserId("1")).thenReturn(resume);
+
+            Job job1 = new Job();
+            job1.setJobId("1");
+            job1.setStarRating(4.23);
+            Job job2 = new Job();
+            job2.setStarRating(1.0);
+            job2.setJobId("2");
+            Job job3 = new Job();
+            job3.setJobId("3");
+            job3.setStarRating(3.);
+            Job job4 = new Job();
+            job4.setJobId("2");
+            job4.setStarRating(0.51);
+            List<Job> matcher1Resumes = new ArrayList<>();
+            matcher1Resumes.add(job1);
+            matcher1Resumes.add(job2);
+            List<Job> matcher2Resumes = new ArrayList<>();
+            matcher2Resumes.add(job3);
+            matcher2Resumes.add(job4);
+
+            Matcher matcher1 = Mockito.mock(Matcher.class);
+            Mockito.when(matcher1.getCruncherName()).thenReturn("matcher1");
+            Mockito.when(matcher1.match(Mockito.any(CruncherMetaData.class))).thenReturn(matcher1Resumes);
+            Matcher matcher2 = Mockito.mock(Matcher.class);
+            Mockito.when(matcher2.getCruncherName()).thenReturn("matcher2");
+            Mockito.when(matcher2.match(Mockito.any(CruncherMetaData.class))).thenReturn(matcher2Resumes);
+
+            List<Matcher> allMatchers = new ArrayList<>();
+            allMatchers.add(matcher1);
+            allMatchers.add(matcher2);
+            Mockito.when(matcherList.getMatchers()).thenReturn(allMatchers);
+
+
+            mockMvc.perform(
+                    RestDocumentationRequestBuilders.get("/api/v2/job/match/{resumeId}", "1")
+                            .accept(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .header("X-Auth-Token", "1234")
+            )
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
+                    .andExpect(jsonPath("$.resultCode", is(ResultCodes.SUCCESS.toString())))
+                    .andExpect(jsonPath("$.jobs.matcher1", hasSize(2)))
+                    .andExpect(jsonPath("$.jobs.matcher1[0].jobId", is("1")))
+                    .andExpect(jsonPath("$.jobs.matcher1[0].stars", is(4.2)))
+                    .andExpect(jsonPath("$.jobs.matcher1[1].jobId", is("2")))
+                    .andExpect(jsonPath("$.jobs.matcher1[1].stars", is(1.0)))
+                    .andExpect(jsonPath("$.jobs.matcher2", hasSize(2)))
+                    .andExpect(jsonPath("$.jobs.matcher2[0].jobId", is("3")))
+                    .andExpect(jsonPath("$.jobs.matcher2[0].stars", is(3.)))
+                    .andExpect(jsonPath("$.jobs.matcher2[1].jobId", is("2")))
+                    .andExpect(jsonPath("$.jobs.matcher2[1].stars", is(.5)))
+                    .andDo(document("job/match-success/v2",
+                            requestHeaders(headerWithName("X-Auth-Token")
+                                    .description("Authentication token retrieved from the authentication")),
+                            pathParameters(parameterWithName("resumeId").description("User identifier of the resume")),
+                            responseFields(
+                                    fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
+                                    fieldWithPath("message").description("Message associated with the result code"),
+                                    fieldWithPath("jobs").description("Hash with a list of job IDs and the star rating matched by each cruncher")
+                            )
+                    ));
+            Mockito.verify(resumeRepository).findByUserId("1");
+            Mockito.verify(matcher1).match(Mockito.any(CruncherMetaData.class));
+            Mockito.verify(matcher2).match(Mockito.any(CruncherMetaData.class));
+        }
+        @Test
+        public void noMatches() throws Exception {
+            Map<String, MetaData> metaData1 = new HashMap<>();
+            metaData1.put("matcher1", new MetaData());
+            metaData1.put("matcher2", new MetaData());
+            Resume resume = new Resume("1");
+            resume.setMetaData(metaData1);
+            Mockito.when(resumeRepository.findByUserId("1")).thenReturn(resume);
+
+            Matcher matcher1 = Mockito.mock(Matcher.class);
+            Mockito.when(matcher1.getCruncherName()).thenReturn("matcher1");
+            Mockito.when(matcher1.match(Mockito.any(CruncherMetaData.class))).thenReturn(new ArrayList<>());
+            Matcher matcher2 = Mockito.mock(Matcher.class);
+            Mockito.when(matcher2.getCruncherName()).thenReturn("matcher2");
+            Mockito.when(matcher2.match(Mockito.any(CruncherMetaData.class))).thenReturn(new ArrayList<>());
+
+            List<Matcher> allMatchers = new ArrayList<>();
+            allMatchers.add(matcher1);
+            allMatchers.add(matcher2);
+            Mockito.when(matcherList.getMatchers()).thenReturn(allMatchers);
+
+
+            mockMvc.perform(
+                    RestDocumentationRequestBuilders.get("/api/v2/job/match/{resumeId}", "1")
+                            .accept(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .header("X-Auth-Token", "1234")
+            )
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
+                    .andExpect(jsonPath("$.resultCode", is(ResultCodes.SUCCESS.toString())))
+                    .andExpect(jsonPath("$.jobs").value(is(new java.util.LinkedHashMap())))
+                    .andDo(document("job/match-not-found/v2",
                             requestHeaders(headerWithName("X-Auth-Token")
                                     .description("Authentication token retrieved from the authentication")),
                             pathParameters(parameterWithName("resumeId").description("User identifier of the resume")),

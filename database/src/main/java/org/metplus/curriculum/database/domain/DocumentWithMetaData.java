@@ -40,6 +40,8 @@ public class DocumentWithMetaData extends AbstractDocument {
      */
     @JsonIgnore
     public boolean isCruncherDataAvailable(String cruncherName) {
+        if(getMetaData() == null)
+            return false;
         return getMetaData().containsKey(cruncherName);
     }
 
@@ -49,6 +51,8 @@ public class DocumentWithMetaData extends AbstractDocument {
      * @return Cruncher meta data
      */
     public MetaData getCruncherData(String cruncherName) {
+        if(getMetaData() == null)
+            return null;
         return getMetaData().get(cruncherName);
     }
 }

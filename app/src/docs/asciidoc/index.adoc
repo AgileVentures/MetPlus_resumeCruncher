@@ -1,6 +1,6 @@
 = PETS Resume cruncher API Documentation
 Joao Pereira <joaopapereira@gmail.com> {localdate}
-:revnumber: 0.1.0
+:revnumber: 0.2.0
 :example-caption!:
 ifndef::imagesdir[:imagesdir: images]
 ifndef::sourcedir[:sourcedir: ../java]
@@ -16,9 +16,9 @@ This API can is used to upload/download Resumes from the Mongo Database
 include::subdir/_authentication.adoc[leveloffset=+2]
 
 
-== Curriculum Operations
+== Resume Operations
 
-include::subdir/_curriculum.adoc[leveloffset=+2]
+include::subdir/_resume.adoc[leveloffset=+2]
 
 == Jobs Operations
 
