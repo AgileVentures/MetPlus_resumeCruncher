@@ -131,6 +131,37 @@ public class JobsController {
         return match(resumeId, false);
     }
 
+    @RequestMapping(value = "/match/{resumeId}", method = RequestMethod.GET)
+    @APIVersion({BaseController.VERSION_TESTING})
+    @ResponseBody
+    public ResponseEntity<GenericAnswer> matchCannedAnswer(@PathVariable("resumeId") final String resumeId){
+
+        final double[] jobStars = {1.8, 4.1, 2.6, 4.9, 3.2,
+                1.8, 4.1, 2.6, 4.9, 3.2};
+        JobMatchAnswer answer = new JobMatchAnswer();
+        double jobIdentifiers = Double.valueOf(resumeId);
+        if(jobIdentifiers > 0 && jobIdentifiers < 11) {
+            for(int i = 0 ; i  < jobStars.length ; i++ ) {
+                Job job = jobRepository.findByJobId(Integer.toString(i));
+                if(job != null) {
+                    job.setStarRating(jobStars[i]);
+                    answer.addJob("NaiveBayes", job, true);
+                }
+            }
+        } else if(jobIdentifiers % 5 != 0) {
+            for(int i = 0 ; i < 4 ; i++) {
+                Job job = jobRepository.findByJobId(Double.toString(jobIdentifiers + i));
+                if(job != null) {
+                    job.setStarRating(jobStars[i]);
+                    answer.addJob("NaiveBayes", job, true);
+                }
+            }
+        }
+        answer.setMessage("Success");
+        answer.setResultCode(ResultCodes.SUCCESS);
+        return new ResponseEntity<>(answer, HttpStatus.OK);
+    }
+
     private ResponseEntity<GenericAnswer> match(String resumeId, boolean withProbabilityAnswer){
         logger.debug("match(" + resumeId + ", " + withProbabilityAnswer + ")");
         Resume resume = resumeRepository.findByUserId(resumeId);

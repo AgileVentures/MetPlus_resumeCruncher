@@ -215,8 +215,29 @@ public class ResumeController {
     @APIVersion(BaseController.VERSION_TESTING)
     @ResponseBody
     public ResponseEntity<GenericAnswer> matchCannedReponse(@PathVariable("jobId") final String jobId) {
-
-        GenericAnswer answer = new GenericAnswer();
+        final double[] resumeStars = {1.8, 4.1, 2.6, 4.9, 3.2,
+                                      1.8, 4.1, 2.6, 4.9, 3.2};
+        ResumeMatchAnswer answer = new ResumeMatchAnswer();
+        double jobIdentifier = Double.valueOf(jobId);
+        if(jobIdentifier > 0 && jobIdentifier < 11) {
+            for(int i = 0 ; i  < resumeStars.length ; i++ ) {
+                Resume resume = resumeRepository.findByUserId(Integer.toString(i));
+                if(resume != null) {
+                    resume.setStarRating(resumeStars[i]);
+                    answer.addResume("NaiveBayes", resume, true);
+                }
+            }
+        } else if(jobIdentifier % 5 != 0) {
+            for(int i = 0 ; i < 4 ; i++) {
+                Resume resume = resumeRepository.findByUserId(Double.toString(jobIdentifier + i));
+                if(resume != null) {
+                    resume.setStarRating(resumeStars[i]);
+                    answer.addResume("NaiveBayes", resume, true);
+                }
+            }
+        }
+        answer.setMessage("Success");
+        answer.setResultCode(ResultCodes.SUCCESS);
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
 
