@@ -17,4 +17,6 @@ public class BaseController {
     public static final String MAPPINGS_ENDPOINT = "/mappings";
     public static final String METRICS_ENDPOINT = "/metrics";
     public static final String SHUTDOWN_ENDPOINT = "/shutdown";
+
+    public static final int VERSION_TESTING = 99999;
 }
