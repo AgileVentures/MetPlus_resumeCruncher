@@ -33,7 +33,7 @@ import java.util.List;
 @RestController
 @RequestMapping({"curriculum", "resume"})
 @PreAuthorize("hasAuthority('ROLE_DOMAIN_USER')")
-@APIVersion({1,2})
+@APIVersion({1, 2, BaseController.VERSION_TESTING})
 public class ResumeController {
     private static Logger logger = LoggerFactory.getLogger(ResumeController.class);
 
@@ -209,6 +209,38 @@ public class ResumeController {
     public ResponseEntity<GenericAnswer> matchv2(@PathVariable("jobId") final String jobId) {
         return match(jobId, true);
     }
+
+
+    @RequestMapping(value = "/match", method = RequestMethod.POST)
+    @APIVersion(BaseController.VERSION_TESTING)
+    @ResponseBody
+    public ResponseEntity<GenericAnswer> matchCannedReponse(@PathVariable("jobId") final String jobId) {
+        final double[] resumeStars = {1.8, 4.1, 2.6, 4.9, 3.2,
+                                      1.8, 4.1, 2.6, 4.9, 3.2};
+        ResumeMatchAnswer answer = new ResumeMatchAnswer();
+        double jobIdentifier = Double.valueOf(jobId);
+        if(jobIdentifier > 0 && jobIdentifier < 11) {
+            for(int i = 0 ; i  < resumeStars.length ; i++ ) {
+                Resume resume = resumeRepository.findByUserId(Integer.toString(i));
+                if(resume != null) {
+                    resume.setStarRating(resumeStars[i]);
+                    answer.addResume("NaiveBayes", resume, true);
+                }
+            }
+        } else if(jobIdentifier % 5 != 0) {
+            for(int i = 0 ; i < 4 ; i++) {
+                Resume resume = resumeRepository.findByUserId(Double.toString(jobIdentifier + i));
+                if(resume != null) {
+                    resume.setStarRating(resumeStars[i]);
+                    answer.addResume("NaiveBayes", resume, true);
+                }
+            }
+        }
+        answer.setMessage("Success");
+        answer.setResultCode(ResultCodes.SUCCESS);
+        return new ResponseEntity<>(answer, HttpStatus.OK);
+    }
+
     private ResponseEntity<GenericAnswer> match(final String jobId, boolean withProbability) {
         logger.debug("Match resumes with job id: '" + jobId + "'");
         if(jobId == null || jobId.length() == 0) {
