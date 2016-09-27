@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @RestController
-@APIVersion({1,2})
+@APIVersion({1, 2, BaseController.VERSION_TESTING})
 @RequestMapping("admin")
 public class AdminController {
     private static final Logger LOG = LoggerFactory.getLogger(AdminController.class);

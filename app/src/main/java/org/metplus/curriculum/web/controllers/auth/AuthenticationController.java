@@ -14,7 +14,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
  * Created by joaopereira on 2/14/2016.
  */
 @RestController
-@APIVersion({1,2})
+@APIVersion({1, 2, BaseController.VERSION_TESTING})
 public class AuthenticationController extends BaseController {
 
     // tag::authenticate[]

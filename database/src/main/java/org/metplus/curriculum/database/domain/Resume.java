@@ -40,6 +40,12 @@ public class Resume extends DocumentWithMetaData {
         this.userId = userId;
     }
 
+    public Resume(String userId, double starRating) {
+        super();
+        this.userId = userId;
+        this.starRating = starRating;
+    }
+
     /**
      * Retrieve the resume file
      * @return Stream of the file
