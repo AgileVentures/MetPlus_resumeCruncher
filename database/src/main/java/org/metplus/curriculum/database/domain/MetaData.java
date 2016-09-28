@@ -15,7 +15,7 @@ import java.util.*;
 @Document
 public class MetaData extends AbstractDocument implements CruncherMetaData {
     @Field
-    private Map<String, MetaDataField> fields;
+    private Map<String, MetaDataField> fields = new HashMap<>();
 
     @JsonIgnore
     private List<String> orderedFields;
