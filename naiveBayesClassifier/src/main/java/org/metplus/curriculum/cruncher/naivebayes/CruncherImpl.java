@@ -77,6 +77,7 @@ public class CruncherImpl implements Cruncher {
             allMetaData.addField(metaData.getCategory(), field);
             output += ("" + metaData.getCategory() + ": " + metaData.getProbability() + ", ");
         }
+        allMetaData.setTotalProbability(maxProbability);
         logger.debug(output + "], Best Match: " + allMetaData.getBestMatchCategory() + ": " + allMetaData.getTotalProbability());
         return allMetaData;
     }
