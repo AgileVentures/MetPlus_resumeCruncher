@@ -35,6 +35,10 @@ public class Resume extends DocumentWithMetaData {
     @Autowired
     private GridFsOperations gridOperation;
 
+    public Resume() {
+        super();
+    }
+
     public Resume(String userId) {
         super();
         this.userId = userId;
