@@ -68,15 +68,16 @@ public class CruncherImpl implements Cruncher {
                 allMetaData.setBestMatchCategory(metaData.getCategory());
                 maxProbability = metaData.getProbability();
             }
-            output += ("" + metaData.getCategory() + ": " + metaData.getProbability() + ", ");
 
             if(metaData.getProbability() <= 0)
                 break;
+
+            output += ("" + metaData.getCategory() + ": " + metaData.getProbability() + ", ");
             MetaDataField<Float> field = new MetaDataField<>(metaData.getProbability());
             allMetaData.addField(metaData.getCategory(), field);
             output += ("" + metaData.getCategory() + ": " + metaData.getProbability() + ", ");
         }
-        logger.debug(output + "]");
+        logger.debug(output + "], Best Match: " + allMetaData.getBestMatchCategory() + ": " + allMetaData.getTotalProbability());
         return allMetaData;
     }
 
