@@ -211,7 +211,7 @@ public class ResumeController {
     }
 
 
-    @RequestMapping(value = "/match/{jobId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/match/{jobId}", method = RequestMethod.GET)
     @APIVersion(BaseController.VERSION_TESTING)
     @ResponseBody
     public ResponseEntity<GenericAnswer> matchCannedReponse(@PathVariable("jobId") final String jobId) {
