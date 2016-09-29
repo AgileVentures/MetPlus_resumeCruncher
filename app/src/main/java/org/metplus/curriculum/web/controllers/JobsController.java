@@ -166,7 +166,7 @@ public class JobsController {
         logger.debug("match(" + resumeId + ", " + withProbabilityAnswer + ")");
         Resume resume = resumeRepository.findByUserId(resumeId);
         if(resume == null) {
-            logger.error("Unable to find resume with id '{}'", resumeId);
+            logger.warn("Unable to find resume with id '{}'", resumeId);
             GenericAnswer answer = new GenericAnswer();
             answer.setResultCode(ResultCodes.RESUME_NOT_FOUND);
             answer.setMessage("Cannot find the resume");
