@@ -10,6 +10,11 @@
         <tags>tag1:value1,tag2:value2</tags>
         <!-- Optional, allows to select the ravenFactory -->
         <!--<ravenFactory>com.getsentry.raven.DefaultRavenFactory</ravenFactory>-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
     </appender>
 
     <root level="warn">
