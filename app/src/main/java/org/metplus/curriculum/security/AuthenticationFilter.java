@@ -51,7 +51,7 @@ public class AuthenticationFilter extends GenericFilterBean {
         try {
             logger.debug("Login with {} by X-Auth-Username method", username);
             if (postToAuthenticate(httpRequest, resourcePath)) {
-                logger.error("Trying to authenticate user {} by X-Auth-Username method", username);
+                logger.info("Trying to authenticate user {} by X-Auth-Username method", username);
                 processUsernamePasswordAuthentication(httpResponse, username, password);
                 return;
             }
@@ -103,11 +103,11 @@ public class AuthenticationFilter extends GenericFilterBean {
 
     private boolean postToAuthenticate(HttpServletRequest httpRequest, String resourcePath) {
         logger.debug("postToAuthenticate(" + httpRequest + ", " + resourcePath + ")");
-        return (BaseController.authenticationUrl.equalsIgnoreCase(resourcePath) ||
-                BaseController.authenticationUrl.equalsIgnoreCase(resourcePath.substring(0, resourcePath.length()-1)) ||
-                BaseController.authenticationUrlV1.equalsIgnoreCase(resourcePath) ||
-                BaseController.authenticationUrlV1.equalsIgnoreCase(resourcePath.substring(0, resourcePath.length()-1)))
-                && httpRequest.getMethod().equals("POST");
+        boolean authUrl = false;
+        for(String url: BaseController.authenticationUrls) {
+            authUrl = authUrl || url.equalsIgnoreCase(resourcePath) || url.equalsIgnoreCase(resourcePath.substring(0, resourcePath.length()-1));
+        }
+        return authUrl && httpRequest.getMethod().equals("POST");
     }
 
     private void processUsernamePasswordAuthentication(HttpServletResponse httpResponse, Optional<String> username, Optional<String> password) throws IOException {
