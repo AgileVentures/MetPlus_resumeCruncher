@@ -97,6 +97,7 @@ public class MatcherImpl implements Matcher<Resume, Job> {
         return result;
     }
 
+
     @Override
     public List<Job> match(CruncherMetaData metadata) {
         logger.trace("match(" + metadata + ")");
@@ -108,8 +109,8 @@ public class MatcherImpl implements Matcher<Resume, Job> {
         return cruncher.getCruncherName();
     }
 
-    private double matchProbability(List<String> base, NaiveBayesMetaData compareTo) {
-        double total = 1.0f;
+    protected double matchProbability(List<String> base, NaiveBayesMetaData compareTo) {
+        double total = 0.0f;
         // Retrieve the categories that are also present in the title and description
         List<String> topResumeFields = new ArrayList<> ();
         boolean foundGoodCategory = false;
@@ -127,9 +128,14 @@ public class MatcherImpl implements Matcher<Resume, Job> {
             logger.trace("No categories in common");
             return -1;
         }
+        return matchProbability(base, topResumeFields);
+    }
+
+    protected double matchProbability(List<String> base, List<String> compareTo) {
+        double total = 0.0f;
         int currentIndex = 0;
         for(String categoryName: base) {
-            int index = topResumeFields.indexOf(categoryName);
+            int index = compareTo.indexOf(categoryName);
             if(index != -1) {
                 total += weightMatrix[currentIndex] + ((currentIndex<index?-1:1) * weightMatrix[index]);
             }
