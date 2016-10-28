@@ -111,6 +111,8 @@ public class MatcherImpl implements Matcher<Resume, Job> {
         return cruncher.getCruncherName();
     }
 
+
+    @Override
     public double matchSimilarity(Resume resume, Job job) {
         logger.trace("matchResumes(" + resume + ", " + job + ")");
         NaiveBayesMetaData data = (NaiveBayesMetaData)resume.getCruncherData(getCruncherName());

@@ -41,5 +41,11 @@ public interface Matcher<T, E> {
      */
     String getCruncherName();
 
-
+    /**
+     * Check the similarity between a resume and a job
+     * @param resume
+     * @param job
+     * @return Range between 0 and 5 being 5 similar
+     */
+    double matchSimilarity(T resume, E job);
 }
