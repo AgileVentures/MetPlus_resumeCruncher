@@ -26,6 +26,8 @@ public class MatcherImpl implements Matcher<Resume, Job> {
 
     private final int[] weightMatrix = {800, 400, 200, 100, 50};
 
+    public static int NUM_STARS = 5;
+
     private int maxWeight;
 
     /**
@@ -90,12 +92,13 @@ public class MatcherImpl implements Matcher<Resume, Job> {
             }
             double probability =  matchProbability(topCategoriesNamesToMatch, data);
             if(probability > 0) {
-                resume.setStarRating(probability * 5);
+                resume.setStarRating(probability * NUM_STARS);
                 result.add(resume);
             }
         }
         return result;
     }
+
 
     @Override
     public List<Job> match(CruncherMetaData metadata) {
@@ -108,8 +111,41 @@ public class MatcherImpl implements Matcher<Resume, Job> {
         return cruncher.getCruncherName();
     }
 
-    private double matchProbability(List<String> base, NaiveBayesMetaData compareTo) {
-        double total = 1.0f;
+
+    @Override
+    public double matchSimilarity(Resume resume, Job job) {
+        logger.trace("matchResumes(" + resume + ", " + job + ")");
+        NaiveBayesMetaData data = (NaiveBayesMetaData)resume.getCruncherData(getCruncherName());
+        if(data == null) {
+            logger.warn("Resume with id: " + resume.getUserId() + " do not have meta data for cruncher");
+            return -1;
+        }
+        NaiveBayesMetaData titleMetaData = (NaiveBayesMetaData)job.getTitleCruncherData(getCruncherName());
+        NaiveBayesMetaData descriptionMetaData = (NaiveBayesMetaData)job.getDescriptionCruncherData(getCruncherName());
+        if(titleMetaData == null)
+            titleMetaData = new NaiveBayesMetaData();
+        if(descriptionMetaData == null)
+            descriptionMetaData = new NaiveBayesMetaData();
+
+        List<Map.Entry<String, MetaDataField>> topCategoriesToMatch = getTopCategoriesOnJobs(titleMetaData, descriptionMetaData);
+        List<String> topCategoriesNamesToMatch = new ArrayList<>();
+        for(Map.Entry<String, MetaDataField> entry: topCategoriesToMatch) {
+            topCategoriesNamesToMatch.add(entry.getKey());
+            if(topCategoriesNamesToMatch.size() == weightMatrix.length)
+                break;
+        }
+
+        double probability =  matchProbability(topCategoriesNamesToMatch, data);
+        if(probability <= 0) {
+            probability = 0;
+        } else {
+            probability *= NUM_STARS;
+        }
+        return probability;
+    }
+
+    protected double matchProbability(List<String> base, NaiveBayesMetaData compareTo) {
+        double total = 0.0f;
         // Retrieve the categories that are also present in the title and description
         List<String> topResumeFields = new ArrayList<> ();
         boolean foundGoodCategory = false;
@@ -127,9 +163,14 @@ public class MatcherImpl implements Matcher<Resume, Job> {
             logger.trace("No categories in common");
             return -1;
         }
+        return matchProbability(base, topResumeFields);
+    }
+
+    protected double matchProbability(List<String> base, List<String> compareTo) {
+        double total = 0.0f;
         int currentIndex = 0;
         for(String categoryName: base) {
-            int index = topResumeFields.indexOf(categoryName);
+            int index = compareTo.indexOf(categoryName);
             if(index != -1) {
                 total += weightMatrix[currentIndex] + ((currentIndex<index?-1:1) * weightMatrix[index]);
             }
@@ -144,7 +185,8 @@ public class MatcherImpl implements Matcher<Resume, Job> {
         List<Map.Entry<String, MetaDataField>> descriptionTopCategories = descriptionMetaData.getOrderedFields(new DoubleFieldComparator());
         List<Map.Entry<String, MetaDataField>> topCategoriesToMatch = new ArrayList<>();
         List<String> alreadyPresent = new ArrayList<>();
-        if(!titleTopCategories.get(0).getKey().equals(titleMetaData.getBestMatchCategory())) {
+        if(!titleTopCategories.get(0).getKey().equals(titleMetaData.getBestMatchCategory()) &&
+                titleMetaData.getBestMatchCategory() != null) {
             topCategoriesToMatch.add(new AbstractMap.SimpleEntry(titleMetaData.getBestMatchCategory(), new MetaDataField<Double>(Double.POSITIVE_INFINITY)));
         }
         int i = 0;
@@ -160,13 +202,14 @@ public class MatcherImpl implements Matcher<Resume, Job> {
             if(descriptionTopCategories.size() > i && !pickTitle) {
                 if(!alreadyPresent.contains(descriptionTopCategories.get(i).getKey())) {
                     topCategoriesToMatch.add(descriptionTopCategories.get(i));
-                    alreadyPresent.add(titleTopCategories.get(i).getKey());
+                    alreadyPresent.add(descriptionTopCategories.get(i).getKey());
                 }
                 addedNew = true;
             }
             if(i == 1 && pickTitle) {
                 pickTitle = false;
                 i = -1;
+                addedNew = true;
             }
 
             i++;

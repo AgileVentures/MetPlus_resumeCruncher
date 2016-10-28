@@ -15,6 +15,7 @@ import org.metplus.curriculum.process.ResumeCruncher;
 import org.metplus.curriculum.web.answers.GenericAnswer;
 import org.metplus.curriculum.web.answers.ResultCodes;
 import org.metplus.curriculum.web.answers.ResumeMatchAnswer;
+import org.metplus.curriculum.web.answers.StarAnswer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -210,6 +211,86 @@ public class ResumeController {
         return match(jobId, true);
     }
 
+    @RequestMapping(value = "/{resumeId}/compare/{jobId}", method = RequestMethod.GET)
+    @APIVersion(2)
+    @ResponseBody
+    public ResponseEntity<GenericAnswer> compareResumeAgainstJob(@PathVariable("resumeId") final String resumeId, @PathVariable("jobId") final String jobId) {
+        logger.debug("Match resumes with job id: '" + jobId + "'");
+        if(jobId == null || jobId.length() == 0) {
+            logger.error("Comparing Resume with empty job identifier");
+            GenericAnswer answer = new GenericAnswer();
+            answer.setMessage("Empty job identifier");
+            answer.setResultCode(ResultCodes.FATAL_ERROR);
+            return new ResponseEntity<>(answer, HttpStatus.BAD_REQUEST);
+        }
+        if(resumeId == null || resumeId.length() == 0) {
+            logger.error("Comparing Resume with empty resume id");
+            GenericAnswer answer = new GenericAnswer();
+            answer.setMessage("Empty resume identifier");
+            answer.setResultCode(ResultCodes.FATAL_ERROR);
+            return new ResponseEntity<>(answer, HttpStatus.BAD_REQUEST);
+        }
+        List<Resume> matchedResumes = null;
+        Job job = jobRepository.findByJobId(jobId);
+        if(job == null) {
+            logger.error("Unable to find job with id: " + jobId);
+            GenericAnswer answer = new GenericAnswer();
+            answer.setMessage("No job found with id: " + jobId);
+            answer.setResultCode(ResultCodes.JOB_NOT_FOUND);
+            return new ResponseEntity<>(answer, HttpStatus.NOT_FOUND);
+        }
+        Resume resume = resumeRepository.findByUserId(resumeId);
+        if(resume == null) {
+            logger.error("Unable to find resume with id: " + resumeId);
+            GenericAnswer answer = new GenericAnswer();
+            answer.setMessage("No resume found with id: " + resumeId);
+            answer.setResultCode(ResultCodes.RESUME_NOT_FOUND);
+            return new ResponseEntity<>(answer, HttpStatus.NOT_FOUND);
+        }
+
+        StarAnswer answer = new StarAnswer();
+        for(Matcher matcher: matcherList.getMatchers()) {
+            answer.addStarRating(matcher.getCruncherName(), matcher.matchSimilarity(resume, job));
+        }
+
+        answer.setMessage("Success");
+        answer.setResultCode(ResultCodes.SUCCESS);
+
+        logger.debug("Result is: " + answer);
+        return new ResponseEntity<>(answer, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{resumeId}/compare/{jobId}", method = RequestMethod.GET)
+    @APIVersion(BaseController.VERSION_TESTING)
+    @ResponseBody
+    public ResponseEntity<GenericAnswer> compareResumeAgainstJobCanned(
+            @PathVariable("resumeId") final String resumeId,
+            @PathVariable("jobId") final String jobId) {
+        logger.debug("Match resumes with job id: '" + jobId + "'");
+        int jobIdentifier = Integer.valueOf(jobId);
+        int resumeIdentifier = Integer.valueOf(resumeId);
+        double stars[][] = {{1.1, 1.2, 3., 4.3, 5.},
+                             {1.2, 1.3, 3.1, 4.4, 4.9}};
+
+        int starsId = -1;
+        StarAnswer answer = new StarAnswer();
+        if(resumeIdentifier == 1)
+            starsId = jobIdentifier;
+        if(starsId < 0 || starsId >= stars[0].length)
+            return compareResumeAgainstJob(resumeId, jobId);
+
+        int cruncherId = 0;
+        for(Matcher matcher: matcherList.getMatchers()) {
+            answer.addStarRating(matcher.getCruncherName(), stars[cruncherId][starsId]);
+            cruncherId++;
+        }
+
+        answer.setMessage("Success");
+        answer.setResultCode(ResultCodes.SUCCESS);
+
+        logger.debug("Result is: " + answer);
+        return new ResponseEntity<>(answer, HttpStatus.OK);
+    }
 
     @RequestMapping(value = "/match/{jobId}", method = RequestMethod.GET)
     @APIVersion(BaseController.VERSION_TESTING)
