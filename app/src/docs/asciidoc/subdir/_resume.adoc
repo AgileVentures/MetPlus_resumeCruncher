@@ -166,3 +166,56 @@ Response
 include::{snippets}/resume/multiple-match-resumes-job-id/v2/http-response.adoc[]
 Parameters on response
 include::{snippets}/resume/multiple-match-resumes-job-id/v2/response-fields.adoc[]
+
+
+= Compare a Resume against a Job
+
+== API Version 1
+
+**
+Not Supported
+**
+
+== API Version 2
+
+=== Example: No Resume found
+
+Request
+include::{snippets}/resume/compare-resume-not-found/http-request.adoc[]
+Headers
+include::{snippets}/resume/compare-resume-not-found/request-headers.adoc[]
+Parameters
+include::{snippets}/resume/compare-resume-not-found/path-parameters.adoc[]
+
+Response
+include::{snippets}/resume/compare-resume-not-found/http-response.adoc[]
+Parameters on response
+include::{snippets}/resume/compare-resume-not-found/response-fields.adoc[]
+
+=== Example: No Job found
+
+Request
+include::{snippets}/resume/compare-job-not-found/http-request.adoc[]
+Headers
+include::{snippets}/resume/compare-job-not-found/request-headers.adoc[]
+Parameters
+include::{snippets}/resume/compare-job-not-found/path-parameters.adoc[]
+
+Response
+include::{snippets}/resume/compare-job-not-found/http-response.adoc[]
+Parameters on response
+include::{snippets}/resume/compare-job-not-found/response-fields.adoc[]
+
+=== Example: Match available
+
+Request
+include::{snippets}/resume/compare-success/http-request.adoc[]
+Headers
+include::{snippets}/resume/compare-success/request-headers.adoc[]
+Parameters
+include::{snippets}/resume/compare-success/path-parameters.adoc[]
+
+Response
+include::{snippets}/resume/compare-success/http-response.adoc[]
+Parameters on response
+include::{snippets}/resume/compare-success/response-fields.adoc[]

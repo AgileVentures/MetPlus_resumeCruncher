@@ -15,6 +15,7 @@ import org.metplus.curriculum.process.ResumeCruncher;
 import org.metplus.curriculum.web.answers.GenericAnswer;
 import org.metplus.curriculum.web.answers.ResultCodes;
 import org.metplus.curriculum.web.answers.ResumeMatchAnswer;
+import org.metplus.curriculum.web.answers.StarAnswer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -208,6 +209,55 @@ public class ResumeController {
     @ResponseBody
     public ResponseEntity<GenericAnswer> matchv2(@PathVariable("jobId") final String jobId) {
         return match(jobId, true);
+    }
+
+    @RequestMapping(value = "/{resumeId}/compare/{jobId}", method = RequestMethod.GET)
+    @APIVersion(2)
+    @ResponseBody
+    public ResponseEntity<GenericAnswer> compareResumeAgainstJob(@PathVariable("resumeId") final String resumeId, @PathVariable("jobId") final String jobId) {
+        logger.debug("Match resumes with job id: '" + jobId + "'");
+        if(jobId == null || jobId.length() == 0) {
+            logger.error("Comparing Resume with empty job identifier");
+            GenericAnswer answer = new GenericAnswer();
+            answer.setMessage("Empty job identifier");
+            answer.setResultCode(ResultCodes.FATAL_ERROR);
+            return new ResponseEntity<>(answer, HttpStatus.BAD_REQUEST);
+        }
+        if(resumeId == null || resumeId.length() == 0) {
+            logger.error("Comparing Resume with empty resume id");
+            GenericAnswer answer = new GenericAnswer();
+            answer.setMessage("Empty resume identifier");
+            answer.setResultCode(ResultCodes.FATAL_ERROR);
+            return new ResponseEntity<>(answer, HttpStatus.BAD_REQUEST);
+        }
+        List<Resume> matchedResumes = null;
+        Job job = jobRepository.findByJobId(jobId);
+        if(job == null) {
+            logger.error("Unable to find job with id: " + jobId);
+            GenericAnswer answer = new GenericAnswer();
+            answer.setMessage("No job found with id: " + jobId);
+            answer.setResultCode(ResultCodes.JOB_NOT_FOUND);
+            return new ResponseEntity<>(answer, HttpStatus.NOT_FOUND);
+        }
+        Resume resume = resumeRepository.findByUserId(resumeId);
+        if(resume == null) {
+            logger.error("Unable to find resume with id: " + resumeId);
+            GenericAnswer answer = new GenericAnswer();
+            answer.setMessage("No resume found with id: " + jobId);
+            answer.setResultCode(ResultCodes.RESUME_NOT_FOUND);
+            return new ResponseEntity<>(answer, HttpStatus.NOT_FOUND);
+        }
+
+        StarAnswer answer = new StarAnswer();
+        for(Matcher matcher: matcherList.getMatchers()) {
+            answer.addResume(matcher.getCruncherName(), matcher.matchSimilarity(resume, job));
+        }
+
+        answer.setMessage("Success");
+        answer.setResultCode(ResultCodes.SUCCESS);
+
+        logger.debug("Result is: " + answer);
+        return new ResponseEntity<>(answer, HttpStatus.OK);
     }
 
 
