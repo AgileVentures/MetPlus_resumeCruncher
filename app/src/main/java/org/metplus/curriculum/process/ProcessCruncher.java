@@ -47,7 +47,11 @@ public abstract class ProcessCruncher<Work> {
             Work work = null;
             while ((work = nextWork()) != null) {
                 logger.debug("Going to process work");
-                process(work);
+                try {
+                    process(work);
+                } catch(Exception exp) {
+                    logger.error("Unhandled exception on work: " + work + ":" + exp);
+                }
             }
             logger.debug("No more work to process, sleep waiting");
             try {

@@ -37,7 +37,7 @@ public class StarAnswer extends GenericAnswer {
      * @param cruncherName Cruncher name
      * @param starRating Start rating
      */
-    public void addResume(String cruncherName, double starRating) {
+    public void addStarRating(String cruncherName, double starRating) {
         getStars().put(cruncherName, starRating);
     }
 
