@@ -28,7 +28,6 @@ import static org.junit.Assert.assertEquals;
                      MatcherImplTest.MatchProbability_ListAndMetaData.class,
                      MatcherImplTest.CompareJobResume.class})
 public class MatcherImplTest {
-    @RunWith(MockitoJUnitRunner.class)
     public static class Base implements BeforeAfterInterface {
         @Rule
         public BeforeAfterRule beforeAfter = new BeforeAfterRule(this);
@@ -52,6 +51,7 @@ public class MatcherImplTest {
         }
     }
 
+    @RunWith(MockitoJUnitRunner.class)
     public static class MatchProbability_TwoLists extends Base {
         List<String> categories1;
         @Override
@@ -113,6 +113,7 @@ public class MatcherImplTest {
             assertEquals(0.27, matcher.matchProbability(categories1, categories2), 0.01);
         }
     }
+    @RunWith(MockitoJUnitRunner.class)
     public static class MatchProbability_ListAndMetaData extends Base {
         List<String> categories1;
         @Override
@@ -174,6 +175,7 @@ public class MatcherImplTest {
     }
 
 
+    @RunWith(MockitoJUnitRunner.class)
     public static class CompareJobResume extends Base {
         protected Resume resume;
         protected Job job;
