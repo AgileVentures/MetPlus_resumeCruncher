@@ -29,10 +29,13 @@ mkdir -p $deploy_dir
 #cp -ad /tmp/src/* $local_source_dir
 
 restore_saved_artifacts
+ls -ltra
 
 export JAVA_HOME=/etc/alternatives/java_sdk_1.8.0  
 export PATH=$JAVA_HOME/bin:$PATH
 pushd $local_source_dir &> /dev/null
+ls -ltra
+
 sed -i.bak "s#SENTRY_DSN#$SENTRY_DSN#" app/src/main/resources/prod_logback.xml
 mv app/src/main/resources/prod_logback.xml app/src/main/resources/logback.xml
 SPRING_PROFILES_ACTIVE=production ./gradlew wrapper stage
