@@ -20,6 +20,7 @@ function restore_saved_artifacts() {
 #local_source_dir=/opt/wildfly/source
 #mkdir -p $local_source_dir
 local_source_dir=$(pwd)/src
+find / | grep gradlew
 
 # Resulting WAR files will be deployed to /wildfly/standalone/deployments
 deploy_dir=/wildfly/standalone/deployments
