@@ -332,8 +332,15 @@ public class ResumeController {
             return new ResponseEntity<>(answer, HttpStatus.BAD_REQUEST);
         }
         List<Resume> matchedResumes = null;
-        ResumeMatchAnswer answer = new ResumeMatchAnswer();
         Job job = jobRepository.findByJobId(jobId);
+        if(job == null) {
+            logger.error("Unable to find job with id: " + jobId);
+            GenericAnswer answer = new GenericAnswer();
+            answer.setMessage("No job with id: " + jobId);
+            answer.setResultCode(ResultCodes.JOB_NOT_FOUND);
+            return new ResponseEntity<>(answer, HttpStatus.BAD_REQUEST);
+        }
+        ResumeMatchAnswer answer = new ResumeMatchAnswer();
         for(Matcher matcher: matcherList.getMatchers()) {
             logger.debug("Checking for matcher: " + matcher.getCruncherName());
             matchedResumes = matcher.match(job);
