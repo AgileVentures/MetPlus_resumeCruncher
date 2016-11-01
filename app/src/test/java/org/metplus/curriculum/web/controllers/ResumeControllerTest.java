@@ -344,6 +344,30 @@ public class ResumeControllerTest {
             token = "123-1234-1234";
         }
         @Test
+        public void jobNotFound() throws Exception {
+            Mockito.when(jobRepository.findByJobId("1")).thenReturn(null);
+
+            MockHttpServletResponse response = mockMvc.perform(get("/api/v1/resume/match/{jobId}", 1)
+                    .header("X-Auth-Token", token)
+                    .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().is4xxClientError())
+                    .andDo(document("resume/match-job-not-found/v1",
+                            requestHeaders(headerWithName("X-Auth-Token")
+                                    .description("Authentication token retrieved from the authentication")),
+                            pathParameters(
+                                    parameterWithName("jobId").description("Job Identifier to retrieve the Resumes that match the job")
+                            ),
+                            responseFields(
+                                    fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
+                                    fieldWithPath("message").description("Message associated with the result code")
+                            )
+                    ))
+                    .andReturn().getResponse();
+            ResumeMatchAnswer answer = new ObjectMapper().readValue(response.getContentAsString(), ResumeMatchAnswer.class);
+            assertEquals("Result code is not correct", ResultCodes.JOB_NOT_FOUND, answer.getResultCode());
+            assertEquals("Number of resumes should be 0", 0, answer.getResumes().size());
+        }
+        @Test
         public void noMatches() throws Exception {
 
 
@@ -358,6 +382,7 @@ public class ResumeControllerTest {
             allMatchers.add(matcher1);
             allMatchers.add(matcher2);
             Mockito.when(matcherList.getMatchers()).thenReturn(allMatchers);
+            Mockito.when(jobRepository.findByJobId("1")).thenReturn(new Job());
 
             MockHttpServletResponse response = mockMvc.perform(get("/api/v1/resume/match/{jobId}", 1)
                     .header("X-Auth-Token", token)
@@ -461,6 +486,31 @@ public class ResumeControllerTest {
             token = "123-1234-1234";
         }
         @Test
+        public void jobNotFound() throws Exception {
+
+            Mockito.when(jobRepository.findByJobId("1")).thenReturn(null);
+
+            MockHttpServletResponse response = mockMvc.perform(get("/api/v2/resume/match/{jobId}", 1)
+                    .header("X-Auth-Token", token)
+                    .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().is4xxClientError())
+                    .andDo(document("resume/match-job-not-found/v2",
+                            requestHeaders(headerWithName("X-Auth-Token")
+                                    .description("Authentication token retrieved from the authentication")),
+                            pathParameters(
+                                    parameterWithName("jobId").description("Job Identifier to retrieve the Resumes that match the job")
+                            ),
+                            responseFields(
+                                    fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
+                                    fieldWithPath("message").description("Message associated with the result code")
+                            )
+                    ))
+                    .andReturn().getResponse();
+            ResumeMatchAnswer answer = new ObjectMapper().readValue(response.getContentAsString(), ResumeMatchAnswer.class);
+            assertEquals("Result code is not correct", ResultCodes.JOB_NOT_FOUND, answer.getResultCode());
+            assertEquals("Number of resumes should be 0", 0, answer.getResumes().size());
+        }
+        @Test
         public void noMatches() throws Exception {
 
 
@@ -475,6 +525,7 @@ public class ResumeControllerTest {
             allMatchers.add(matcher1);
             allMatchers.add(matcher2);
             Mockito.when(matcherList.getMatchers()).thenReturn(allMatchers);
+            Mockito.when(jobRepository.findByJobId("1")).thenReturn(new Job());
 
             MockHttpServletResponse response = mockMvc.perform(get("/api/v2/resume/match/{jobId}", 1)
                     .header("X-Auth-Token", token)

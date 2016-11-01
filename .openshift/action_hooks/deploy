@@ -11,7 +11,7 @@ export GRADLE_HOME=$OPENSHIFT_DATA_DIR/gradle-1.12
 export PATH=$GRADLE_HOME/bin:$PATH
 sed -i.bak "s#SENTRY_DSN#$SENTRY_DSN#" app/src/main/resources/prod_logback.xml
 mv app/src/main/resources/prod_logback.xml app/src/main/resources/logback.xml
-./gradlew wrapper stage
+./gradlew --no-daemon wrapper stage
 mv app/build/libs/app.jar cruncher.jar
-./gradlew clean
+./gradlew --no-daemon clean
 rm -Rf $GRADLE_USER_HOME/caches/*
