@@ -109,6 +109,20 @@ include::{snippets}/resume/multiple-match-resumes-job-id/v2/response-fields.adoc
 
 == API Version 1
 
+=== Example: Job Cannot be found
+
+Request
+include::{snippets}/resume/match-job-not-found/v1/http-request.adoc[]
+Headers
+include::{snippets}/resume/match-job-not-found/v1/request-headers.adoc[]
+Parameters
+include::{snippets}/resume/match-job-not-found/v1/path-parameters.adoc[]
+
+Response
+include::{snippets}/resume/match-job-not-found/v1/http-response.adoc[]
+Parameters on response
+include::{snippets}/resume/match-job-not-found/v1/response-fields.adoc[]
+
 === Example: No Resumes found
 
 Request
@@ -138,6 +152,20 @@ Parameters on response
 include::{snippets}/resume/multiple-match-resumes-job-id/v1/response-fields.adoc[]
 
 == API Version 2
+
+=== Example: Job Cannot be found
+
+Request
+include::{snippets}/resume/match-job-not-found/v2/http-request.adoc[]
+Headers
+include::{snippets}/resume/match-job-not-found/v2/request-headers.adoc[]
+Parameters
+include::{snippets}/resume/match-job-not-found/v2/path-parameters.adoc[]
+
+Response
+include::{snippets}/resume/match-job-not-found/v2/http-response.adoc[]
+Parameters on response
+include::{snippets}/resume/match-job-not-found/v2/response-fields.adoc[]
 
 === Example: No Resumes found
 
