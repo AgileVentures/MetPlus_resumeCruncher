@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Created by joaopereira on 8/16/2016.
@@ -103,7 +104,45 @@ public class MatcherImpl implements Matcher<Resume, Job> {
     @Override
     public List<Job> match(CruncherMetaData metadata) {
         logger.trace("match(" + metadata + ")");
-        return null;
+        if(metadata == null) {
+            logger.warn("Metadata is null");
+            return null;
+        }
+        List<String> topResumeCategories = new ArrayList<>();
+        for(Map.Entry<String, MetaDataField> entry:
+                ((NaiveBayesMetaData)metadata).getOrderedFields(new DoubleFieldComparator()) ) {
+            topResumeCategories.add(entry.getKey());
+            if(topResumeCategories.size() == weightMatrix.length)
+                break;
+        }
+
+        logger.debug("Top categories are: " + topResumeCategories.toString());
+
+        List<Job> result = new ArrayList<>();
+        for(Job job: jobRepository.findAll()) {
+            logger.debug("Check job: " + job.getJobId());
+            NaiveBayesMetaData titleMetaData = (NaiveBayesMetaData) job.getTitleCruncherData(getCruncherName());
+            NaiveBayesMetaData descriptionMetaData = (NaiveBayesMetaData) job.getDescriptionCruncherData(getCruncherName());
+            if(titleMetaData == null) {
+                logger.warn("Job " + job.getJobId() + " does not have meta data");
+                continue;
+            }
+            if(descriptionMetaData == null)
+                descriptionMetaData = new NaiveBayesMetaData();
+
+            List<Map.Entry<String, MetaDataField>> topCategoriesToMatch =
+                    getTopCategoriesOnJobs(titleMetaData, descriptionMetaData);
+            List<String> jobCategories = new ArrayList<>();
+            for(Map.Entry<String, MetaDataField> category: topCategoriesToMatch) {
+                jobCategories.add(category.getKey());
+            }
+            double probability = matchProbability(topResumeCategories, jobCategories);
+            if(probability > 0) {
+                job.setStarRating(probability * NUM_STARS);
+                result.add(job);
+            }
+        }
+        return result;
     }
 
     @Override
