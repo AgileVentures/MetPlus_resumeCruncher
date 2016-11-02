@@ -88,7 +88,7 @@ public class JobsController {
 
     @RequestMapping(value = "/{jobId}/update", method = RequestMethod.PATCH)
     @ResponseBody
-    public ResponseEntity<GenericAnswer> update(final String jobId,
+    public ResponseEntity<GenericAnswer> update(@PathVariable("jobId") final String jobId,
                                                 @RequestParam(value = "title", required = false) String title,
                                                 @RequestParam(value = "description", required = false) String description){
         logger.trace("update(" + jobId + ", " + title + ", " + description + ")");

@@ -36,11 +36,13 @@ include::{snippets}/job/update-success/http-request.adoc[]
 Headers
 include::{snippets}/job/update-success/request-headers.adoc[]
 Parameters
+include::{snippets}/job/update-success/path-parameters.adoc[]
+Parameters
 include::{snippets}/job/update-success/request-parameters.adoc[]
 
 == HTTP Answers
 
-=== Success
+=== Example: Update the Job Successfully
 
 Response
 include::{snippets}/job/update-success/http-response.adoc[]
@@ -49,7 +51,7 @@ include::{snippets}/job/update-success/response-fields.adoc[]
 
 '''
 
-==== Example: Create job with ID that already exists
+==== Example: Update job that do not exist
 
 Response
 include::{snippets}/job/update-not-exists/http-response.adoc[]
