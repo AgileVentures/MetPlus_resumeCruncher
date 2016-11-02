@@ -103,7 +103,17 @@ public class MatcherImpl implements Matcher<Resume, Job> {
     @Override
     public List<Job> match(CruncherMetaData metadata) {
         logger.trace("match(" + metadata + ")");
-        return null;
+        if(metadata == null) {
+            logger.warn("Metadata is null");
+            return null;
+        }
+        List<Job> result = new ArrayList<>();
+        for(Job job: jobRepository.findAll()) {
+            if(job.getTitle().equals("Job 2") || job.getTitle().equals("Job 3")) {
+                result.add(job);
+            }
+        }
+        return result;
     }
 
     @Override

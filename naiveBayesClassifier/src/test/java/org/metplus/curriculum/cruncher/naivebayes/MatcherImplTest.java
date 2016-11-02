@@ -4,6 +4,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.metplus.curriculum.cruncher.CruncherMetaData;
 import org.metplus.curriculum.database.domain.*;
 import org.metplus.curriculum.database.repository.JobRepository;
 import org.metplus.curriculum.database.repository.ResumeRepository;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * Created by joaopereira on 10/27/2016.
@@ -26,7 +28,8 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({MatcherImplTest.MatchProbability_TwoLists.class,
                      MatcherImplTest.MatchProbability_ListAndMetaData.class,
-                     MatcherImplTest.CompareJobResume.class})
+                     MatcherImplTest.CompareJobResume.class,
+                     MatcherImplTest.MatchJobs.class})
 public class MatcherImplTest {
     public static class Base implements BeforeAfterInterface {
         @Rule
@@ -298,5 +301,63 @@ public class MatcherImplTest {
             setJobMetaData(titleData, descriptionData);
             assertEquals(0.56, matcher.matchSimilarity(resume, job), 0.01);
         }
+    }
+    @RunWith(MockitoJUnitRunner.class)
+    public static class MatchJobs extends Base {
+        List<String> categories1;
+        NaiveBayesMetaData resumeData;
+        List<Job> allJobs;
+        Job job1;
+        Job job2;
+        Job job3;
+        Job job4;
+        @Override
+        public void before() {
+            super.before();
+            resumeData = new NaiveBayesMetaData();
+            resumeData.addField("cat 1", new MetaDataField(5.));
+            resumeData.addField("cat 2", new MetaDataField(4.));
+            resumeData.addField("cat 3", new MetaDataField(3.));
+            resumeData.addField("cat 4", new MetaDataField(2.));
+            resumeData.addField("cat 5", new MetaDataField(1.));
+            job1 = new Job();
+            job1.setTitle("Job 1");
+            job1.setDescription("desc 1");
+            job2 = new Job();
+            job2.setTitle("Job 2");
+            job2.setDescription("desc 2");
+            job3 = new Job();
+            job3.setTitle("Job 3");
+            job3.setDescription("desc 3");
+            job4 = new Job();
+            job4.setTitle("Job 4");
+            job4.setDescription("desc 4");
+
+            allJobs = new ArrayList<>();
+            List<Job> repJobs = new ArrayList<>();
+            repJobs.add(job1);
+            repJobs.add(job2);
+            repJobs.add(job3);
+            repJobs.add(job4);
+            Mockito.when(jobRepository.findAll()).thenReturn(repJobs);
+        }
+
+        @Test
+        public void nullMetadata() {
+            List<Job> result = matcher.match((CruncherMetaData) null);
+            assertNull(result);
+        }
+
+        @Test
+        public void allMatch() {
+            allJobs.add(job2);
+            allJobs.add(job3);
+
+            List<Job> result = matcher.match(resumeData);
+            assertEquals(allJobs, result);
+            assertEquals(1.3, result.get(0).getStarRating(), 0);
+            assertEquals(4., result.get(1).getStarRating(), 0);
+        }
+
     }
 }
