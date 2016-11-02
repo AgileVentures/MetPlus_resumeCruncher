@@ -182,7 +182,7 @@ public class JobControllerTests {
         public void doNotExist() throws Exception {
             Mockito.when(jobRepository.findByJobId("1")).thenReturn(null);
 
-            mockMvc.perform(patch("/api/v1/job/1/update")
+            mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/v1/job/1/update")
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .param("jobId", "1")
@@ -220,10 +220,9 @@ public class JobControllerTests {
             job.setDescription("My current description");
             Mockito.when(jobRepository.findByJobId("1")).thenReturn(job);
 
-            mockMvc.perform(patch("/api/v1/job/1/update")
+            mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/v1/job/{jobId}/update", "1")
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.MULTIPART_FORM_DATA)
-                    .param("jobId", "1")
                     .param("title", "Job title")
                     .param("description", "My awsome job description")
                     .header("X-Auth-Token", "1234")
@@ -234,8 +233,8 @@ public class JobControllerTests {
                     .andDo(document("job/update-success",
                             requestHeaders(headerWithName("X-Auth-Token")
                                     .description("Authentication token retrieved from the authentication")),
+                            pathParameters(parameterWithName("jobId").description("Job Identifier to create")),
                             requestParameters(
-                                    parameterWithName("jobId").description("Job Identifier to create"),
                                     parameterWithName("title").description("Title of the job(Optional)"),
                                     parameterWithName("description").description("Description of the job(Optional)")
                             ),
@@ -262,7 +261,7 @@ public class JobControllerTests {
             job.setDescription("My current description");
             Mockito.when(jobRepository.findByJobId("1")).thenReturn(job);
 
-            mockMvc.perform(patch("/api/v1/job/1/update")
+            mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/v1/job/1/update")
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .param("jobId", "1")
@@ -291,7 +290,7 @@ public class JobControllerTests {
             job.setDescription("My current description");
             Mockito.when(jobRepository.findByJobId("1")).thenReturn(job);
 
-            mockMvc.perform(patch("/api/v1/job/1/update")
+            mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/v1/job/1/update")
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .param("jobId", "1")
