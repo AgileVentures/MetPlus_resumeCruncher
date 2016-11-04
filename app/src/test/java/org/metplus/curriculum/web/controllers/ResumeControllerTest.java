@@ -26,6 +26,7 @@ import org.metplus.curriculum.test.MyStandaloneBuilder;
 import org.metplus.curriculum.web.answers.GenericAnswer;
 import org.metplus.curriculum.web.answers.ResultCodes;
 import org.metplus.curriculum.web.answers.ResumeMatchAnswer;
+import org.metplus.curriculum.web.answers.StarAnswer;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -78,7 +79,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                      ResumeControllerTest.MatchEndpointv1.class,
                      ResumeControllerTest.MatchEndpointv2.class,
                      ResumeControllerTest.MatchEndpointWithJobIdv1.class,
-                     ResumeControllerTest.MatchEndpointWithJobIdv2.class})
+                     ResumeControllerTest.MatchEndpointWithJobIdv2.class,
+                     ResumeControllerTest.CompareEndpointv2.class})
 public class ResumeControllerTest {
     public static class DefaultResumeTest extends BaseControllerTest implements BeforeAfterInterface{
         @Autowired
@@ -342,6 +344,30 @@ public class ResumeControllerTest {
             token = "123-1234-1234";
         }
         @Test
+        public void jobNotFound() throws Exception {
+            Mockito.when(jobRepository.findByJobId("1")).thenReturn(null);
+
+            MockHttpServletResponse response = mockMvc.perform(get("/api/v1/resume/match/{jobId}", 1)
+                    .header("X-Auth-Token", token)
+                    .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().is4xxClientError())
+                    .andDo(document("resume/match-job-not-found/v1",
+                            requestHeaders(headerWithName("X-Auth-Token")
+                                    .description("Authentication token retrieved from the authentication")),
+                            pathParameters(
+                                    parameterWithName("jobId").description("Job Identifier to retrieve the Resumes that match the job")
+                            ),
+                            responseFields(
+                                    fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
+                                    fieldWithPath("message").description("Message associated with the result code")
+                            )
+                    ))
+                    .andReturn().getResponse();
+            ResumeMatchAnswer answer = new ObjectMapper().readValue(response.getContentAsString(), ResumeMatchAnswer.class);
+            assertEquals("Result code is not correct", ResultCodes.JOB_NOT_FOUND, answer.getResultCode());
+            assertEquals("Number of resumes should be 0", 0, answer.getResumes().size());
+        }
+        @Test
         public void noMatches() throws Exception {
 
 
@@ -356,6 +382,7 @@ public class ResumeControllerTest {
             allMatchers.add(matcher1);
             allMatchers.add(matcher2);
             Mockito.when(matcherList.getMatchers()).thenReturn(allMatchers);
+            Mockito.when(jobRepository.findByJobId("1")).thenReturn(new Job());
 
             MockHttpServletResponse response = mockMvc.perform(get("/api/v1/resume/match/{jobId}", 1)
                     .header("X-Auth-Token", token)
@@ -459,6 +486,31 @@ public class ResumeControllerTest {
             token = "123-1234-1234";
         }
         @Test
+        public void jobNotFound() throws Exception {
+
+            Mockito.when(jobRepository.findByJobId("1")).thenReturn(null);
+
+            MockHttpServletResponse response = mockMvc.perform(get("/api/v2/resume/match/{jobId}", 1)
+                    .header("X-Auth-Token", token)
+                    .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().is4xxClientError())
+                    .andDo(document("resume/match-job-not-found/v2",
+                            requestHeaders(headerWithName("X-Auth-Token")
+                                    .description("Authentication token retrieved from the authentication")),
+                            pathParameters(
+                                    parameterWithName("jobId").description("Job Identifier to retrieve the Resumes that match the job")
+                            ),
+                            responseFields(
+                                    fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
+                                    fieldWithPath("message").description("Message associated with the result code")
+                            )
+                    ))
+                    .andReturn().getResponse();
+            ResumeMatchAnswer answer = new ObjectMapper().readValue(response.getContentAsString(), ResumeMatchAnswer.class);
+            assertEquals("Result code is not correct", ResultCodes.JOB_NOT_FOUND, answer.getResultCode());
+            assertEquals("Number of resumes should be 0", 0, answer.getResumes().size());
+        }
+        @Test
         public void noMatches() throws Exception {
 
 
@@ -473,6 +525,7 @@ public class ResumeControllerTest {
             allMatchers.add(matcher1);
             allMatchers.add(matcher2);
             Mockito.when(matcherList.getMatchers()).thenReturn(allMatchers);
+            Mockito.when(jobRepository.findByJobId("1")).thenReturn(new Job());
 
             MockHttpServletResponse response = mockMvc.perform(get("/api/v2/resume/match/{jobId}", 1)
                     .header("X-Auth-Token", token)
@@ -567,6 +620,119 @@ public class ResumeControllerTest {
             Mockito.verify(jobRepository).findByJobId("1");
             Mockito.verify(matcher1).match(Mockito.any(Job.class));
             Mockito.verify(matcher2).match(Mockito.any(Job.class));
+        }
+    }
+    @RunWith(MockitoJUnitRunner.class)
+    public static class CompareEndpointv2 extends DefaultResumeTest {
+        @Override
+        public void before(){
+            mockMvc = new MyStandaloneBuilder(new ResumeController(jobRepository, resumeRepository, matcherList, resumeCruncher), new WebMvcConfig())
+                    .setValidator(validator())
+                    .apply(documentationConfiguration(this.restDocumentation))
+                    .build();
+            token = "123-1234-1234";
+        }
+        @Test
+        public void cannotFindJob() throws Exception {
+
+
+            Mockito.when(jobRepository.findByJobId("13")).thenReturn(null);
+
+            MockHttpServletResponse response = mockMvc.perform(get("/api/v2/resume/{resumeId}/compare/{jobId}", "12", "13")
+                    .header("X-Auth-Token", token)
+                    .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isNotFound())
+                    .andDo(document("resume/compare-job-not-found",
+                            requestHeaders(headerWithName("X-Auth-Token")
+                                    .description("Authentication token retrieved from the authentication")),
+                            pathParameters(
+                                    parameterWithName("resumeId").description("Resume Identifier to compare against the Job"),
+                                    parameterWithName("jobId").description("Job Identifier compare against the Resume")
+                            ),
+                            responseFields(
+                                    fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
+                                    fieldWithPath("message").description("Message associated with the result code")
+                            )
+                    ))
+                    .andReturn().getResponse();
+            StarAnswer answer = new ObjectMapper().readValue(response.getContentAsString(), StarAnswer.class);
+            assertEquals("Result code is not correct", ResultCodes.JOB_NOT_FOUND, answer.getResultCode());
+            assertEquals("Number of resumes should be 0", 0, answer.getStars().size());
+        }
+
+        @Test
+        public void cannotFindResume() throws Exception {
+
+
+            Mockito.when(jobRepository.findByJobId("13")).thenReturn(new Job());
+            Mockito.when(resumeRepository.findByUserId("12")).thenReturn(null);
+
+            MockHttpServletResponse response = mockMvc.perform(get("/api/v2/resume/{resumeId}/compare/{jobId}", "12", "13")
+                    .header("X-Auth-Token", token)
+                    .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isNotFound())
+                    .andDo(document("resume/compare-resume-not-found",
+                            requestHeaders(headerWithName("X-Auth-Token")
+                                    .description("Authentication token retrieved from the authentication")),
+                            pathParameters(
+                                    parameterWithName("resumeId").description("Resume Identifier to compare against the Job"),
+                                    parameterWithName("jobId").description("Job Identifier compare against the Resume")
+                            ),
+                            responseFields(
+                                    fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
+                                    fieldWithPath("message").description("Message associated with the result code")
+                            )
+                    ))
+                    .andReturn().getResponse();
+            StarAnswer answer = new ObjectMapper().readValue(response.getContentAsString(), StarAnswer.class);
+            assertEquals("Result code is not correct", ResultCodes.RESUME_NOT_FOUND, answer.getResultCode());
+            assertEquals("Number of resumes should be 0", 0, answer.getStars().size());
+        }
+        @Test
+        public void compareResult() throws Exception {
+
+            Job job = new Job();
+            job.setJobId("13");
+            Resume resume = new Resume("12");
+
+            Matcher matcher1 = Mockito.mock(Matcher.class);
+            Mockito.when(matcher1.getCruncherName()).thenReturn("matcher1");
+            Mockito.when(matcher1.matchSimilarity(resume, job)).thenReturn(3.2);
+            Matcher matcher2 = Mockito.mock(Matcher.class);
+            Mockito.when(matcher2.getCruncherName()).thenReturn("matcher2");
+            Mockito.when(matcher2.matchSimilarity(resume, job)).thenReturn(4.1);
+
+            List<Matcher> allMatchers = new ArrayList<>();
+            allMatchers.add(matcher1);
+            allMatchers.add(matcher2);
+            Mockito.when(matcherList.getMatchers()).thenReturn(allMatchers);
+
+            Mockito.when(jobRepository.findByJobId("13")).thenReturn(job);
+            Mockito.when(resumeRepository.findByUserId("12")).thenReturn(resume);
+
+            MockHttpServletResponse response = mockMvc.perform(get("/api/v2/resume/{resumeId}/compare/{jobId}", "12", "13")
+                    .header("X-Auth-Token", token)
+                    .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andDo(document("resume/compare-success",
+                            requestHeaders(headerWithName("X-Auth-Token")
+                                    .description("Authentication token retrieved from the authentication")),
+                            pathParameters(
+                                    parameterWithName("resumeId").description("Resume Identifier to compare against the Job"),
+                                    parameterWithName("jobId").description("Job Identifier compare against the Resume")
+                            ),
+                            responseFields(
+                                    fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
+                                    fieldWithPath("message").description("Message associated with the result code"),
+                                    fieldWithPath("stars").description("Hash with the star rating per cruncher")
+                            )
+                    ))
+                    .andReturn().getResponse();
+            StarAnswer answer = new ObjectMapper().readValue(response.getContentAsString(), StarAnswer.class);
+            assertEquals("Result code is not correct", ResultCodes.SUCCESS, answer.getResultCode());
+            assertEquals("Number of resumes should be 0", 2, answer.getStars().size());
+            assertEquals("Stars for matcher1", 3.2, answer.getStars().get("matcher1"), 0);
+            assertEquals("Stars for matcher2", 4.1, answer.getStars().get("matcher2"), 0);
         }
     }
 }

@@ -30,8 +30,20 @@ public class JobCruncher extends ProcessCruncher<Job>{
         Map<String, MetaData> allDescriptionMetaData = new HashMap<>();
         Map<String, MetaData> allTitleMetaData = new HashMap<>();
         for(Cruncher cruncher: allCrunchers.getCrunchers()) {
-            MetaData titleMetaData = (MetaData) cruncher.crunch(job.getTitle());
-            MetaData descriptionMetaData = (MetaData) cruncher.crunch(job.getDescription());
+            MetaData titleMetaData = new MetaData();
+            try {
+                titleMetaData = (MetaData) cruncher.crunch(job.getTitle());
+            }catch(Exception exp) {
+                logger.warn("Error crunching the title of job: " + job.getJobId() + ": " + exp);
+                exp.printStackTrace();
+            }
+            MetaData descriptionMetaData = new MetaData();
+            try {
+                descriptionMetaData = (MetaData) cruncher.crunch(job.getDescription());
+            }catch(Exception exp) {
+                logger.warn("Error crunching the description of job: " + job.getJobId() + ": " + exp);
+                exp.printStackTrace();
+            }
             allTitleMetaData.put(cruncher.getCruncherName(), titleMetaData);
             allDescriptionMetaData.put(cruncher.getCruncherName(), descriptionMetaData);
         }

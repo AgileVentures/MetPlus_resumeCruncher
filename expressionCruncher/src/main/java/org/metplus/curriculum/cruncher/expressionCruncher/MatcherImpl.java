@@ -105,6 +105,42 @@ public class MatcherImpl implements Matcher<Resume, Job> {
     }
 
     @Override
+    public double matchSimilarity(Resume resume, Job job) {
+        logger.trace("match(" + job + ")");
+        String titleExpression;
+        String descriptionExpression;
+        try {
+            titleExpression = ((ExpressionCruncherMetaData) job.getTitleCruncherData(getCruncherName())).getMostReferedExpression();
+            descriptionExpression = ((ExpressionCruncherMetaData) job.getDescriptionCruncherData(getCruncherName())).getMostReferedExpression();
+        } catch(Exception exp) {
+            logger.error("Unable to retrieve the most common expression");
+            logger.error(exp.getLocalizedMessage());
+            return 0;
+        }
+        List<Resume> resultTitle = new ArrayList<>();
+        List<Resume> resultDescription = new ArrayList<>();
+        logger.debug("Checking viability of the resume: " + resume);
+        // Retrieve the meta data of the resume
+        ExpressionCruncherMetaData metaDataCruncher = (ExpressionCruncherMetaData)resume.getCruncherData(cruncher.getCruncherName());
+        if(metaDataCruncher != null) {
+            String resumeExpression = metaDataCruncher.getMostReferedExpression();
+            if (resumeExpression == null || resumeExpression.length() == 0)
+                resumeExpression = resume.getCruncherData(cruncher.getCruncherName())
+                        .getOrderedFields(new ResumeFieldComparator()).get(0).getKey();
+            // Does resume and title have the same most common expression
+            if (resumeExpression.compareTo(titleExpression) == 0) {
+                logger.debug("Resume checks up with the title");
+                resultTitle.add(resume);
+                // Does resume and description have the same most common expression
+            } else if (resumeExpression.compareTo(descriptionExpression) == 0) {
+                logger.debug("Resume checks up with the description");
+                resultDescription.add(resume);
+            }
+        }
+        return resultTitle.size() * 3 + resultDescription.size() * 2;
+    }
+
+    @Override
     public List<Job> match(CruncherMetaData metadata) {
         logger.trace("match(" + metadata + ")");
         // Retrieve the meta data into a good object type

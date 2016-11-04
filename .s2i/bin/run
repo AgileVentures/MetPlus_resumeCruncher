@@ -1,0 +1,6 @@
+#!/bin/sh
+
+export JAVA_HOME=/etc/alternatives/java_sdk_1.7.0
+export PATH=$JAVA_HOME/bin:$PATH
+nohup java $JAVA_OPTS -Dserver.port=${OPENSHIFT_DIY_PORT} -Dserver.address=${OPENSHIFT_DIY_IP} -Dpets-db.uri=${MONGOLAB_URI} -Dbackend.admin.username=${APP_USERNAME} -Dbackend.admin.password=${APP_PASSWORD} -jar $OPENSHIFT_REPO_DIR/cruncher.jar > ${OPENSHIFT_DIY_LOG_DIR}/cruncher.log 2>&1 &
+
