@@ -44,7 +44,7 @@ public class MatcherImpl implements Matcher<Resume, Job> {
             maxWeight += weight * 2;
     }
 
-    @Override
+
     public List<Resume> match(String title, String description) {
         logger.trace("match(" + title + "," + description + ")");
         NaiveBayesMetaData titleMetaData =(NaiveBayesMetaData)cruncher.crunch(title);
@@ -58,7 +58,7 @@ public class MatcherImpl implements Matcher<Resume, Job> {
         return matchResumes(titleMetaData, descriptionMetaData);
     }
 
-    @Override
+
     public List<Resume> match(Job job) {
         logger.trace("match(" + job + ")");
         if(job == null)
@@ -101,7 +101,7 @@ public class MatcherImpl implements Matcher<Resume, Job> {
     }
 
 
-    @Override
+
     public List<Job> match(CruncherMetaData metadata) {
         logger.trace("match(" + metadata + ")");
         if(metadata == null) {
@@ -143,6 +143,16 @@ public class MatcherImpl implements Matcher<Resume, Job> {
             }
         }
         return result;
+    }
+
+    @Override
+    public List<Job> match(Resume resume) {
+        return null;
+    }
+
+    @Override
+    public List<Resume> matchInverse(Job entry) {
+        return null;
     }
 
     @Override

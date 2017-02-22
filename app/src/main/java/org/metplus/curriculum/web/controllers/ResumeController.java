@@ -143,7 +143,7 @@ public class ResumeController {
 
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
-    @RequestMapping(value = "/match", method = RequestMethod.POST)
+    /*@RequestMapping(value = "/match", method = RequestMethod.POST)
     @APIVersion(1)
     @ResponseBody
     public ResponseEntity<GenericAnswer> matchv1(@RequestParam("title") final String title,
@@ -196,6 +196,7 @@ public class ResumeController {
         logger.debug("Result is: " + answer);
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
+    */
     @RequestMapping(value = "/match/{jobId}", method = RequestMethod.GET)
     @APIVersion(1)
     @ResponseBody

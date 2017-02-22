@@ -1,5 +1,6 @@
 package org.metplus.curriculum.cruncher.naivebayes;
 
+import org.metplus.curriculum.cruncher.Matcher;
 import org.metplus.curriculum.database.domain.*;
 import org.metplus.curriculum.database.repository.JobRepository;
 import org.metplus.curriculum.database.repository.ResumeRepository;
@@ -9,7 +10,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Arrays.stream;
 
-public class MatchImpl implements Match<Resume, Job> {
+public class MatchImpl implements Matcher<Resume, Job> {
 
     private JobRepository jobRepository;
     private CruncherImpl cruncher;
@@ -33,7 +34,7 @@ public class MatchImpl implements Match<Resume, Job> {
     @Override
     public List<Job> match(Resume resume) {
         List<Job> result = new ArrayList<>();
-        if (isResumeValid(resume))
+        if (!isResumeValid(resume))
             return result;
 
         List<String> resumeCategories = getCategoryListFromMetaData(resume, MAX_NUMBER_CATEGORIES);
@@ -55,7 +56,7 @@ public class MatchImpl implements Match<Resume, Job> {
     @Override
     public List<Resume> matchInverse(Job job) {
         List<Resume> results = new ArrayList<>();
-        if (isJobValid(job))
+        if (!isJobValid(job))
             return results;
         List<Resume> allResumes = (List<Resume>) resumeRepository.findAll();
 
@@ -72,6 +73,22 @@ public class MatchImpl implements Match<Resume, Job> {
         }
 
         return results;
+    }
+
+    @Override
+    public String getCruncherName() {
+        return cruncher.getCruncherName();
+    }
+
+    @Override
+    public double matchSimilarity(Resume resume, Job job) {
+        if(!isResumeValid(resume) || !isJobValid(job))
+            return 0;
+
+        List<String> jobCategories = getJobCategories(job);
+        List<String> resumeCategories = getCategoryListFromMetaData(resume, MAX_NUMBER_CATEGORIES);
+
+        return calculateStarRating(resumeCategories, jobCategories);
     }
 
     private List<String> getJobCategories(Job job) {
@@ -94,15 +111,15 @@ public class MatchImpl implements Match<Resume, Job> {
     }
 
     private boolean isResumeValid(Resume resume) {
-        return resume == null ||
+        return !(resume == null ||
                 resume.getMetaData().size() == 0 ||
                 resume.getMetaData().get(cruncher.getCruncherName())
-                        .getFields().size() == 0;
+                        .getFields().size() == 0);
     }
 
     private boolean isJobValid(Job job) {
-        return job == null
-                || !job.haveCruncherData(cruncher.getCruncherName());
+        return !(job == null
+                || !job.haveCruncherData(cruncher.getCruncherName()));
     }
 
     double calculateStarRating(List<String> base, List<String> compare) {
