@@ -67,7 +67,6 @@ public class ResumeController {
                 @RequestParam("userId") String id,
                 @RequestParam("name") String name,
                 @RequestParam("file") MultipartFile file) {
-        System.out.println("Inside function");
         logger.debug("File '" + name + "' is being uploaded to user: '" + id + "'");
         GenericAnswer answer = new GenericAnswer();
 

@@ -205,6 +205,12 @@ public class MatcherImpl implements Matcher<Resume, Job> {
         return matchProbability(base, topResumeFields);
     }
 
+    private String convertKeyName(String key) {
+        if(!key.contains("_job") && !key.contains("_resume"))
+            return key;
+        return key.substring(0, key.lastIndexOf("_"));
+    }
+
     protected double matchProbability(List<String> base, List<String> compareTo) {
         double total = 0.0f;
         int currentIndex = 0;

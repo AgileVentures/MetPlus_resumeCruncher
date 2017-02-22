@@ -70,9 +70,8 @@ public class CruncherImpl implements Cruncher {
             }
 
             if(metaData.getProbability() <= 0)
-                break;
+                continue;
 
-            output += ("" + metaData.getCategory() + ": " + metaData.getProbability() + ", ");
             MetaDataField<Float> field = new MetaDataField<>(metaData.getProbability());
             allMetaData.addField(metaData.getCategory(), field);
             output += ("" + metaData.getCategory() + ": " + metaData.getProbability() + ", ");
@@ -152,9 +151,11 @@ public class CruncherImpl implements Cruncher {
             }
         }
         for(String expression: newText.split("\\s")) {
-            if(expression.length() == 0)
+            if(expression.trim().length() == 0)
                 continue;
             String token = expression.replaceAll("@@@@", " ").replaceAll("[^a-z0-9 ]", "");
+            if(token.trim().length() == 0)
+                continue;
             result.add(token);
         }
         return result;

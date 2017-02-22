@@ -5,11 +5,14 @@ spring:
   profiles: development
 
 pets-db:
-    name: expression_counter_db
-    host: ds049651.mongolab.com
-    port: 49651
+#    name: expression_counter_db
+#    host: ds049651.mongolab.com
+#    port: 49651
     username: testing_user
     password: testing_user
+    name: resumeCruncher
+    host: localhost
+    port: 27017
 ---
 spring:
   profiles: production
