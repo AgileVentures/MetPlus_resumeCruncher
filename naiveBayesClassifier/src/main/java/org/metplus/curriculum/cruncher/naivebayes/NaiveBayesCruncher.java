@@ -134,7 +134,7 @@ public class NaiveBayesCruncher extends CruncherInitializer {
             learnDatabase = null;
         }
 
-        resumeMatcher = new MatcherImpl(cruncherImpl, resumeRepository, jobRepository);
+        resumeMatcher = new MatcherImpl(cruncherImpl, jobRepository, resumeRepository);
     }
 
     public void save() {
