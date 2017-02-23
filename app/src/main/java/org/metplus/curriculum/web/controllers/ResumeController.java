@@ -290,7 +290,7 @@ public class ResumeController {
         ResumeMatchAnswer answer = new ResumeMatchAnswer();
         for(Matcher matcher: matcherList.getMatchers()) {
             logger.debug("Checking for matcher: " + matcher.getCruncherName());
-            matchedResumes = matcher.match(job);
+            matchedResumes = matcher.matchInverse(job);
             if(matchedResumes == null) {
                 logger.error("Matching resumes with empty job identifier");
                 GenericAnswer errorAnswer = new GenericAnswer();
