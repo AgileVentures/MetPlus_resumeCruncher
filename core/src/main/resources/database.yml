@@ -33,3 +33,5 @@ pets-db:
   name: expression_counter_db
   host: localhost
   port: 27017
+  username: travis
+  password: test
