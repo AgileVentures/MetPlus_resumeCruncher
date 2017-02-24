@@ -11,7 +11,7 @@ env:
 before_install:
   - mongo mydb_test --eval 'db.addUser("travis", "test");'
   - chmod +x gradlew
-install: "./gradlew :app:assemble"
+install: "SPRING_PROFILES_ACTIVE=\"unit-database\" ./gradlew :app:assemble"
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
