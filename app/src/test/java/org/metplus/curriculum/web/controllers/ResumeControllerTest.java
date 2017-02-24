@@ -330,10 +330,10 @@ public class ResumeControllerTest {
 
             Matcher matcher1 = Mockito.mock(Matcher.class);
             Mockito.when(matcher1.getCruncherName()).thenReturn("matcher1");
-            Mockito.when(matcher1.match(Mockito.any(Job.class))).thenReturn(matcher1Resumes);
+            Mockito.when(matcher1.matchInverse(Mockito.any(Job.class))).thenReturn(matcher1Resumes);
             Matcher matcher2 = Mockito.mock(Matcher.class);
             Mockito.when(matcher2.getCruncherName()).thenReturn("matcher2");
-            Mockito.when(matcher2.match(Mockito.any(Job.class))).thenReturn(matcher2Resumes);
+            Mockito.when(matcher2.matchInverse(Mockito.any(Job.class))).thenReturn(matcher2Resumes);
 
             List<Matcher> allMatchers = new ArrayList<>();
             allMatchers.add(matcher1);
@@ -365,8 +365,8 @@ public class ResumeControllerTest {
                     .andExpect(jsonPath("$.resumes.matcher2[1]", is("2")))
                     .andReturn().getResponse();
             Mockito.verify(jobRepository).findByJobId("1");
-            Mockito.verify(matcher1).match(Mockito.any(Job.class));
-            Mockito.verify(matcher2).match(Mockito.any(Job.class));
+            Mockito.verify(matcher1).matchInverse(Mockito.any(Job.class));
+            Mockito.verify(matcher2).matchInverse(Mockito.any(Job.class));
         }
     }
     @RunWith(MockitoJUnitRunner.class)
@@ -473,10 +473,10 @@ public class ResumeControllerTest {
 
             Matcher matcher1 = Mockito.mock(Matcher.class);
             Mockito.when(matcher1.getCruncherName()).thenReturn("matcher1");
-            Mockito.when(matcher1.match(Mockito.any(Job.class))).thenReturn(matcher1Resumes);
+            Mockito.when(matcher1.matchInverse(Mockito.any(Job.class))).thenReturn(matcher1Resumes);
             Matcher matcher2 = Mockito.mock(Matcher.class);
             Mockito.when(matcher2.getCruncherName()).thenReturn("matcher2");
-            Mockito.when(matcher2.match(Mockito.any(Job.class))).thenReturn(matcher2Resumes);
+            Mockito.when(matcher2.matchInverse(Mockito.any(Job.class))).thenReturn(matcher2Resumes);
 
             List<Matcher> allMatchers = new ArrayList<>();
             allMatchers.add(matcher1);
@@ -512,8 +512,8 @@ public class ResumeControllerTest {
                     .andExpect(jsonPath("$.resumes.matcher2[1].stars", is(1.2)))
                     .andReturn().getResponse();
             Mockito.verify(jobRepository).findByJobId("1");
-            Mockito.verify(matcher1).match(Mockito.any(Job.class));
-            Mockito.verify(matcher2).match(Mockito.any(Job.class));
+            Mockito.verify(matcher1).matchInverse(Mockito.any(Job.class));
+            Mockito.verify(matcher2).matchInverse(Mockito.any(Job.class));
         }
     }
     @RunWith(MockitoJUnitRunner.class)
