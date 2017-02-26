@@ -67,7 +67,6 @@ public class ResumeController {
                 @RequestParam("userId") String id,
                 @RequestParam("name") String name,
                 @RequestParam("file") MultipartFile file) {
-        System.out.println("Inside function");
         logger.debug("File '" + name + "' is being uploaded to user: '" + id + "'");
         GenericAnswer answer = new GenericAnswer();
 
@@ -144,59 +143,7 @@ public class ResumeController {
 
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
-    @RequestMapping(value = "/match", method = RequestMethod.POST)
-    @APIVersion(1)
-    @ResponseBody
-    public ResponseEntity<GenericAnswer> matchv1(@RequestParam("title") final String title,
-                                                  @RequestParam("description") final String description) {
-        return match(title, description, false);
-    }
 
-    @RequestMapping(value = "/match", method = RequestMethod.POST)
-    @APIVersion(2)
-    @ResponseBody
-    public ResponseEntity<GenericAnswer> matchv2(@RequestParam("title") final String title,
-                                                  @RequestParam("description") final String description) {
-        return match(title, description, true);
-    }
-
-    private ResponseEntity<GenericAnswer> match(final String title,
-                                               final String description,
-                                               boolean withProbability
-                                               ) {
-        logger.debug("Match resumes with title: '" + title + "', description: '" + description + "'");
-        if(title == null || title.length() == 0) {
-            logger.error("Matching resumes with empty Title is not allowed");
-            GenericAnswer answer = new GenericAnswer();
-            answer.setMessage("Title cannot be empty");
-            answer.setResultCode(ResultCodes.FATAL_ERROR);
-            return new ResponseEntity<>(answer, HttpStatus.BAD_REQUEST);
-        }
-        List<Resume> matchedResumes = null;
-        ResumeMatchAnswer answer = null;
-        if(withProbability)
-            answer =new ResumeMatchAnswer<ResumeMatchAnswer.ResumeWithProbability>();
-        else
-            answer = new ResumeMatchAnswer<String>();
-        for(Matcher matcher: matcherList.getMatchers()) {
-            matchedResumes = matcher.match(title, description);
-            if(matchedResumes == null) {
-                logger.error("Matching resumes with job title and description");
-                GenericAnswer errorAnswer = new GenericAnswer();
-                errorAnswer.setMessage("Not all information is crunched");
-                errorAnswer.setResultCode(ResultCodes.FATAL_ERROR);
-                return new ResponseEntity<>(errorAnswer, HttpStatus.BAD_REQUEST);
-            }
-            for(Resume resume: matchedResumes) {
-                answer.addResume(matcher.getCruncherName(), resume, withProbability);
-            }
-        }
-        answer.setMessage("Success");
-        answer.setResultCode(ResultCodes.SUCCESS);
-
-        logger.debug("Result is: " + answer);
-        return new ResponseEntity<>(answer, HttpStatus.OK);
-    }
     @RequestMapping(value = "/match/{jobId}", method = RequestMethod.GET)
     @APIVersion(1)
     @ResponseBody
@@ -343,7 +290,7 @@ public class ResumeController {
         ResumeMatchAnswer answer = new ResumeMatchAnswer();
         for(Matcher matcher: matcherList.getMatchers()) {
             logger.debug("Checking for matcher: " + matcher.getCruncherName());
-            matchedResumes = matcher.match(job);
+            matchedResumes = matcher.matchInverse(job);
             if(matchedResumes == null) {
                 logger.error("Matching resumes with empty job identifier");
                 GenericAnswer errorAnswer = new GenericAnswer();

@@ -1,18 +1,19 @@
 language: java
 jdk:
-- oraclejdk8
+  - oraclejdk8
 os:
-- linux
+  - linux
 services:
-- mongodb
+  - mongodb
 env:
   global:
-  - SPRING_PROFILES_ACTIVE="unit-database"
+    - SPRING_PROFILES_ACTIVE="unit-database"
 before_install:
-- chmod +x gradlew
+  - mongo resumeCruncher --eval 'db.addUser("testing_user", "testing_user");'
+  - chmod +x gradlew
 install: "./gradlew :app:assemble"
 before_cache:
-- rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
   directories:
   - "$HOME/.gradle/caches/"

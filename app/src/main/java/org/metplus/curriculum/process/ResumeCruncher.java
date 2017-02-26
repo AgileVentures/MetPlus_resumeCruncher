@@ -38,6 +38,7 @@ public class ResumeCruncher extends ProcessCruncher<Resume>{
         try {
             docParser = new DocumentParserImpl(resume.getResume(springMongoConfig));
             docParser.parse();
+            logger.info("Document: " + docParser.getDocument().replaceAll("\n","\\\\n").replaceAll("\t", " "));
             Map<String, MetaData> allMetaData = new HashMap<>();
             for(Cruncher cruncher: allCrunchers.getCrunchers()) {
                 MetaData metaData = (MetaData) cruncher.crunch(docParser.getDocument());

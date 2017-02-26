@@ -28,6 +28,18 @@ public class Job extends DocumentWithMetaData {
     private double starRating;
 
     /**
+     * Check if the Job have data from a specific cruncher
+     * @param cruncherName Name of the cruncher
+     * @return True if have data, False otherwise
+     */
+    public boolean haveCruncherData(String cruncherName) {
+        return (( getTitleCruncherData(cruncherName) != null
+                && getTitleCruncherData(cruncherName).getFields().size() > 0)
+                || (getDescriptionCruncherData(cruncherName) != null
+                && getDescriptionCruncherData(cruncherName).getFields().size() > 0));
+    }
+
+    /**
      * Retrieve the Meta data from crunching the title
      * @param cruncherName Cruncher name
      * @return Meta data

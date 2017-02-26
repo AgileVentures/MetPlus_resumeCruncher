@@ -4,15 +4,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import org.metplus.curriculum.cruncher.CruncherMetaData;
-import org.metplus.curriculum.database.domain.*;
+import org.metplus.curriculum.database.domain.DocumentWithMetaData;
+import org.metplus.curriculum.database.domain.Job;
+import org.metplus.curriculum.database.domain.MetaData;
+import org.metplus.curriculum.database.domain.Resume;
 import org.metplus.curriculum.database.repository.JobRepository;
 import org.metplus.curriculum.database.repository.ResumeRepository;
 import org.metplus.curriculum.test.BeforeAfterInterface;
 import org.metplus.curriculum.test.BeforeAfterRule;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,186 +19,66 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
 
-/**
- * Created by joaopereira on 10/27/2016.
- */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({MatcherImplTest.MatchProbability_TwoLists.class,
-                     MatcherImplTest.MatchProbability_ListAndMetaData.class,
-                     MatcherImplTest.CompareJobResume.class,
-                     MatcherImplTest.MatchJobs.class})
+@Suite.SuiteClasses({MatcherImplTest.MatchAgainstResume.class,
+        MatcherImplTest.MatchAgainstJob.class,
+        MatcherImplTest.CheckStarRating.class,
+        MatcherImplTest.MatchSimilarity.class})
 public class MatcherImplTest {
     public static class Base implements BeforeAfterInterface {
+
+        protected JobRepository jobRespository = mock(JobRepository.class);
+        protected ResumeRepository resumeRespository = mock(ResumeRepository.class);
+
         @Rule
-        public BeforeAfterRule beforeAfter = new BeforeAfterRule(this);
+        public BeforeAfterRule rule = new BeforeAfterRule(this);
         protected MatcherImpl matcher;
-        @Mock
-        ResumeRepository resumeRepository;
-        @Mock
-        JobRepository jobRepository;
-        @Mock
         protected CruncherImpl cruncher;
+        protected Resume resumeCategoryOneAndTwo;
+        protected Resume resumeCategoryOne;
+        protected Job jobTitleCat1DescCat2;
+        protected Job jobTitleCat3DescCat4;
+
+        @Override
+        public void before() {
+            cruncher = new CruncherImpl();
+            matcher = new MatcherImpl(cruncher, jobRespository, resumeRespository);
+
+
+            List<String> categories = new ArrayList<>();
+            categories.add("cat_1_job");
+            resumeCategoryOne = createResume(categories);
+
+            categories.add("cat_2_job");
+            resumeCategoryOneAndTwo = createResume(categories);
+
+            jobTitleCat1DescCat2 = new Job();
+            NaiveBayesMetaData titleData = new NaiveBayesMetaData();
+            titleData.addCategory("cat_1_job", 1);
+            NaiveBayesMetaData descriptionData = new NaiveBayesMetaData();
+            descriptionData.addCategory("cat_2_job", 1);
+            setJobMetaData(jobTitleCat1DescCat2, titleData, descriptionData);
+
+            jobTitleCat3DescCat4 = new Job();
+            titleData = new NaiveBayesMetaData();
+            titleData.addCategory("cat_3_job", 1);
+            descriptionData = new NaiveBayesMetaData();
+            descriptionData.addCategory("cat_4_job", 1);
+            setJobMetaData(jobTitleCat3DescCat4, titleData, descriptionData);
+        }
 
         @Override
         public void after() {
-
+            reset(jobRespository, resumeRespository);
         }
 
-        @Override
-        public void before() {
-            Mockito.when(cruncher.getCruncherName()).thenReturn(CruncherImpl.CRUNCHER_NAME);
-            matcher = new MatcherImpl(cruncher,resumeRepository, jobRepository);
-        }
-    }
-
-    @RunWith(MockitoJUnitRunner.class)
-    public static class MatchProbability_TwoLists extends Base {
-        List<String> categories1;
-        @Override
-        public void before() {
-            super.before();
-            categories1 = new ArrayList<>();
-            categories1.add("cat 1");
-            categories1.add("cat 2");
-            categories1.add("cat 3");
-            categories1.add("cat 4");
-            categories1.add("cat 5");
-        }
-
-        @Test
-        public void allMatch() {
-            assertEquals(1, matcher.matchProbability(categories1, categories1), 0.01);
-        }
-
-        @Test
-        public void noMatch() {
-            List<String> categories2 = new ArrayList<>();
-            categories2.add("");
-            categories2.add("");
-            categories2.add("");
-            categories2.add("");
-            categories2.add("");
-            assertEquals(0, matcher.matchProbability(categories1, categories2), 0.01);
-        }
-
-        @Test
-        public void mostRelevantMatchOnly() {
-            List<String> categories2 = new ArrayList<>();
-            categories2.add("cat 1");
-            categories2.add("");
-            categories2.add("");
-            categories2.add("");
-            categories2.add("");
-            assertEquals(0.51, matcher.matchProbability(categories1, categories2), 0.01);
-        }
-
-        @Test
-        public void mostRelevantMatchOnlyMatchOnLastPlace() {
-            List<String> categories2 = new ArrayList<>();
-            categories2.add("");
-            categories2.add("");
-            categories2.add("");
-            categories2.add("");
-            categories2.add("cat 1");
-            assertEquals(0.24, matcher.matchProbability(categories1, categories2), 0.01);
-        }
-        @Test
-        public void inverse() {
-            List<String> categories2 = new ArrayList<>();
-            categories2.add("cat 5");
-            categories2.add("");
-            categories2.add("");
-            categories2.add("");
-            categories2.add("");
-            assertEquals(0.27, matcher.matchProbability(categories1, categories2), 0.01);
-        }
-    }
-    @RunWith(MockitoJUnitRunner.class)
-    public static class MatchProbability_ListAndMetaData extends Base {
-        List<String> categories1;
-        @Override
-        public void before() {
-            super.before();
-            categories1 = new ArrayList<>();
-            categories1.add("cat 1");
-            categories1.add("cat 2");
-            categories1.add("cat 3");
-            categories1.add("cat 4");
-            categories1.add("cat 5");
-        }
-
-        @Test
-        public void allMatch() {
-            NaiveBayesMetaData data = new NaiveBayesMetaData();
-            data.addField("cat 1", new MetaDataField(5.));
-            data.addField("cat 2", new MetaDataField(4.));
-            data.addField("cat 3", new MetaDataField(3.));
-            data.addField("cat 4", new MetaDataField(2.));
-            data.addField("cat 5", new MetaDataField(1.));
-            assertEquals(1, matcher.matchProbability(categories1, data), 0.01);
-        }
-
-        @Test
-        public void noMatch() {
-            NaiveBayesMetaData data = new NaiveBayesMetaData();
-            data.addField("other cat", new MetaDataField(3.));
-            assertEquals(-1, matcher.matchProbability(categories1, data), 0);
-        }
-
-        @Test
-        public void mostRelevantMatchOnly() {
-            NaiveBayesMetaData data = new NaiveBayesMetaData();
-            data.addField("cat 1", new MetaDataField(3.));
-            assertEquals(0.51, matcher.matchProbability(categories1, data), 0.01);
-        }
-
-        @Test
-        public void mostRelevantMatchOnlyMatchOnLastPlace() {
-            NaiveBayesMetaData data = new NaiveBayesMetaData();
-            data.addField("other cat 1", new MetaDataField(5.));
-            data.addField("other cat 2", new MetaDataField(4.));
-            data.addField("other cat 3", new MetaDataField(3.));
-            data.addField("other cat 4", new MetaDataField(2.));
-            data.addField("cat 1", new MetaDataField(1.));
-            assertEquals(0.24, matcher.matchProbability(categories1, data), 0.01);
-        }
-        @Test
-        public void inverse() {
-            NaiveBayesMetaData data = new NaiveBayesMetaData();
-            data.addField("cat 5", new MetaDataField(6.));
-            data.addField("other cat 1", new MetaDataField(5.));
-            data.addField("other cat 2", new MetaDataField(4.));
-            data.addField("other cat 3", new MetaDataField(3.));
-            data.addField("other cat 4", new MetaDataField(2.));
-            assertEquals(0.27, matcher.matchProbability(categories1, data), 0.01);
-        }
-    }
-
-
-    @RunWith(MockitoJUnitRunner.class)
-    public static class CompareJobResume extends Base {
-        protected Resume resume;
-        protected Job job;
-        @Override
-        public void before() {
-            super.before();
-            resume = new Resume();
-            NaiveBayesMetaData data = new NaiveBayesMetaData();
-            Map<String, MetaData> metaData = new HashMap<>();
-            data.addCategory("cat 1", 5.);
-            data.addCategory("cat 2", 4.);
-            data.addCategory("cat 3", 3.);
-            data.addCategory("cat 4", 2.);
-            data.addCategory("cat 5", 1.);
-            metaData.put(CruncherImpl.CRUNCHER_NAME, data);
-            resume.setMetaData(metaData);
-
-            job = new Job();
-        }
-
-        private void setJobMetaData(NaiveBayesMetaData titleMetaData, NaiveBayesMetaData descriptionMetaData) {
+        protected void setJobMetaData(Job job,
+                                      NaiveBayesMetaData titleMetaData,
+                                      NaiveBayesMetaData descriptionMetaData) {
             Map<String, MetaData> allDescriptionMetaData = new HashMap<>();
             Map<String, MetaData> allTitleMetaData = new HashMap<>();
             allTitleMetaData.put(CruncherImpl.CRUNCHER_NAME, titleMetaData);
@@ -212,200 +91,379 @@ public class MatcherImplTest {
             job.setDescriptionMetaData(descriptionData);
         }
 
-        @Test
-        public void allMatch() {
-
-            NaiveBayesMetaData titleData = new NaiveBayesMetaData();
-            Map<String, MetaData> titleMetaData = new HashMap<>();
-            titleData.addCategory("cat 1", 6.);
-            titleData.addCategory("cat 2", 5.);
-            titleMetaData.put(CruncherImpl.CRUNCHER_NAME, titleData);
-
-            NaiveBayesMetaData descriptionData = new NaiveBayesMetaData();
-            Map<String, MetaData> descriptionMetaData = new HashMap<>();
-            descriptionData.addCategory("cat 1", 6.);
-            descriptionData.addCategory("cat 3", 5.);
-            descriptionData.addCategory("cat 4", 4.);
-            descriptionData.addCategory("cat 5", 3.);
-            descriptionMetaData.put(CruncherImpl.CRUNCHER_NAME, descriptionData);
-            setJobMetaData(titleData, descriptionData);
-
-            assertEquals(5, matcher.matchSimilarity(resume, job), 0.01);
-        }
-
-        @Test
-        public void noMatch() {
-            NaiveBayesMetaData titleData = new NaiveBayesMetaData();
-            Map<String, MetaData> titleMetaData = new HashMap<>();
-            titleData.addCategory("cat 10", 6.);
-            titleMetaData.put(CruncherImpl.CRUNCHER_NAME, titleData);
-
-            NaiveBayesMetaData descriptionData = new NaiveBayesMetaData();
-            Map<String, MetaData> descriptionMetaData = new HashMap<>();
-            descriptionData.addCategory("cat 11", 6.);
-            descriptionData.addCategory("cat 31", 5.);
-            descriptionMetaData.put(CruncherImpl.CRUNCHER_NAME, descriptionData);
-            setJobMetaData(titleData, descriptionData);
-            assertEquals(0, matcher.matchSimilarity(resume, job), 0);
-        }
-
-        @Test
-        public void mostRelevantMatchOnly() {
-            NaiveBayesMetaData titleData = new NaiveBayesMetaData();
-            Map<String, MetaData> titleMetaData = new HashMap<>();
-            titleData.addCategory("cat 1", 6.);
-            titleMetaData.put(CruncherImpl.CRUNCHER_NAME, titleData);
-
-            NaiveBayesMetaData descriptionData = new NaiveBayesMetaData();
-            Map<String, MetaData> descriptionMetaData = new HashMap<>();
-            descriptionData.addCategory("cat 11", 6.);
-            descriptionData.addCategory("cat 31", 5.);
-            descriptionMetaData.put(CruncherImpl.CRUNCHER_NAME, descriptionData);
-            setJobMetaData(titleData, descriptionData);
-            assertEquals(2.58, matcher.matchSimilarity(resume, job), 0.01);
-        }
-
-        @Test
-        public void mostRelevantMatchOnlyMatchOnLastPlace() {
-            NaiveBayesMetaData titleData = new NaiveBayesMetaData();
-            Map<String, MetaData> titleMetaData = new HashMap<>();
-            titleData.addCategory("cat 12", 6.);
-            titleMetaData.put(CruncherImpl.CRUNCHER_NAME, titleData);
-
-            NaiveBayesMetaData descriptionData = new NaiveBayesMetaData();
-            Map<String, MetaData> descriptionMetaData = new HashMap<>();
-            descriptionData.addCategory("cat 11", 6.);
-            descriptionData.addCategory("cat 31", 5.);
-            descriptionData.addCategory("cat 32", 4.);
-            descriptionData.addCategory("cat 1", 3.);
-            descriptionMetaData.put(CruncherImpl.CRUNCHER_NAME, descriptionData);
-            setJobMetaData(titleData, descriptionData);
-
-            assertEquals(1.37, matcher.matchSimilarity(resume, job), 0.01);
-        }
-        @Test
-        public void inverse() {
-
-            NaiveBayesMetaData titleData = new NaiveBayesMetaData();
-            Map<String, MetaData> titleMetaData = new HashMap<>();
-            titleData.addCategory("cat 12", 6.);
-            titleMetaData.put(CruncherImpl.CRUNCHER_NAME, titleData);
-
-            NaiveBayesMetaData descriptionData = new NaiveBayesMetaData();
-            Map<String, MetaData> descriptionMetaData = new HashMap<>();
-            descriptionData.addCategory("cat 5", 6.);
-            descriptionData.addCategory("cat 31", 5.);
-            descriptionData.addCategory("cat 32", 4.);
-            descriptionData.addCategory("cat 11", 3.);
-            descriptionMetaData.put(CruncherImpl.CRUNCHER_NAME, descriptionData);
-            setJobMetaData(titleData, descriptionData);
-            assertEquals(0.56, matcher.matchSimilarity(resume, job), 0.01);
+        protected Resume createResume(List<String> categories) {
+            NaiveBayesMetaData resumeMetaData = new NaiveBayesMetaData();
+            double probability = 1;
+            for (String category : categories) {
+                resumeMetaData.addCategory(category, probability);
+                probability -= .1;
+            }
+            Map<String, MetaData> resumeCruncherMetaData = new HashMap<>();
+            resumeCruncherMetaData.put(cruncher.getCruncherName(), resumeMetaData);
+            Resume resume = new Resume();
+            resume.setMetaData(resumeCruncherMetaData);
+            return resume;
         }
     }
-    @RunWith(MockitoJUnitRunner.class)
-    public static class MatchJobs extends Base {
-        List<String> categories1;
-        NaiveBayesMetaData resumeData;
-        List<Job> allJobs;
-        Job job1;
-        Job job2;
-        Job job3;
-        Job job4;
 
-        private void setJobMetaData(Job job, NaiveBayesMetaData titleMetaData, NaiveBayesMetaData descriptionMetaData) {
-            Map<String, MetaData> allDescriptionMetaData = new HashMap<>();
-            Map<String, MetaData> allTitleMetaData = new HashMap<>();
-            allTitleMetaData.put(CruncherImpl.CRUNCHER_NAME, titleMetaData);
-            allDescriptionMetaData.put(CruncherImpl.CRUNCHER_NAME, descriptionMetaData);
-            DocumentWithMetaData titleData = new DocumentWithMetaData();
-            titleData.setMetaData(allTitleMetaData);
-            job.setTitleMetaData(titleData);
-            DocumentWithMetaData descriptionData = new DocumentWithMetaData();
-            descriptionData.setMetaData(allDescriptionMetaData);
-            job.setDescriptionMetaData(descriptionData);
+    public static class MatchAgainstResume extends Base {
+        @Test
+        public void nullResume_shouldReturnEmptyList() {
+            assertEquals(0, matcher.match(null).size());
         }
 
-        @Override
-        public void before() {
-            super.before();
-            resumeData = new NaiveBayesMetaData();
-            resumeData.addField("cat 1", new MetaDataField(5.));
-            resumeData.addField("cat 2", new MetaDataField(4.));
-            resumeData.addField("cat 3", new MetaDataField(3.));
-            resumeData.addField("cat 4", new MetaDataField(2.));
-            resumeData.addField("cat 5", new MetaDataField(1.));
-            resumeData.addField("cat 6", new MetaDataField(.1));
-            job1 = new Job();
-            job1.setJobId("1");
-            job1.setTitle("Job 1");
-            job1.setDescription("desc 1");
+        @Test
+        public void resumeWithoutCategories_shouldReturnEmptyList() {
+            Resume resume = new Resume();
+            assertEquals(0, matcher.match(resume).size());
+        }
+
+        @Test
+        public void resumeWithTwoCategory_shouldMatchOneJobWith387StarRating() {
+            List<Job> allJobs = new ArrayList<>();
+            allJobs.add(jobTitleCat1DescCat2);
+            when(jobRespository.findAll()).thenReturn(allJobs);
+
+
+            List<Job> expectedResults = new ArrayList<>();
+            expectedResults.add(jobTitleCat1DescCat2);
+
+            List<Job> results = matcher.match(resumeCategoryOneAndTwo);
+
+            assertEquals(expectedResults, results);
+            assertEquals(3.87, results.get(0).getStarRating(), 0.01);
+        }
+
+        @Test
+        public void resumeWithTwoCategory_shouldMatchNoJob() {
+
+            List<Job> allJobs = new ArrayList<>();
+            allJobs.add(jobTitleCat3DescCat4);
+            when(jobRespository.findAll()).thenReturn(allJobs);
+
+            List<Job> expectedResults = new ArrayList<>();
+
+            assertEquals(expectedResults, matcher.match(resumeCategoryOneAndTwo));
+        }
+
+        @Test
+        public void resumeWithSixCategoryAndOnlySixMatch_shouldMatchNoJob() {
+            List<String> resumeCategories = new ArrayList<>();
+            resumeCategories.add("cat_1_job");
+            resumeCategories.add("cat_2_job");
+            resumeCategories.add("cat_5_job");
+            resumeCategories.add("cat_6_job");
+            resumeCategories.add("cat_7_job");
+            resumeCategories.add("cat_3_job");
+            Resume resume = createResume(resumeCategories);
+
+            List<Job> allJobs = new ArrayList<>();
+            allJobs.add(jobTitleCat3DescCat4);
+            when(jobRespository.findAll()).thenReturn(allJobs);
+
+            List<Job> expectedResults = new ArrayList<>();
+
+            assertEquals(expectedResults, matcher.match(resume));
+        }
+
+        @Test
+        public void resumeWith1CategoryAndJobCategoryInDescriptionSixMatch_shouldMatchNoJob() {
+            Job job1 = new Job();
             NaiveBayesMetaData titleData = new NaiveBayesMetaData();
-            titleData.addCategory("cat 12", 6.);
-            setJobMetaData(job1, titleData, new NaiveBayesMetaData());
-            job2 = new Job();
-            job2.setJobId("2");
-            job2.setTitle("Job 2");
-            job2.setDescription("desc 2");
-
-            titleData = new NaiveBayesMetaData();
-            titleData.addCategory("cat 1", 6.);
-
+            titleData.addCategory("cat_2_job", 1);
+            titleData.addCategory("cat_3_job", .9);
             NaiveBayesMetaData descriptionData = new NaiveBayesMetaData();
-            descriptionData.addCategory("cat 12", 6.);
-            setJobMetaData(job2, titleData, descriptionData);
+            descriptionData.addCategory("cat_4_job", 1);
+            descriptionData.addCategory("cat_5_job", .9);
+            descriptionData.addCategory("cat_6_job", .8);
+            descriptionData.addCategory("cat_1_job", .7);
+            setJobMetaData(job1, titleData, descriptionData);
 
-            job3 = new Job();
-            job3.setJobId("3");
-            job3.setTitle("Job 3");
-            job3.setDescription("desc 3");
+            List<Job> allJobs = new ArrayList<>();
+            allJobs.add(job1);
+            when(jobRespository.findAll()).thenReturn(allJobs);
 
-            titleData = new NaiveBayesMetaData();
-            titleData.addCategory("cat 2", 6.);
-            titleData.addCategory("cat 3", 5.);
-            titleData.addCategory("cat 11", 4.);
+            List<Job> expectedResults = new ArrayList<>();
 
-            descriptionData = new NaiveBayesMetaData();
-            descriptionData.addCategory("cat 1", 6.);
-            setJobMetaData(job3, titleData, descriptionData);
-
-            job4 = new Job();
-            job4.setJobId("4");
-            job4.setTitle("Job 4");
-            job4.setDescription("desc 4");
-
-            allJobs = new ArrayList<>();
-            List<Job> repJobs = new ArrayList<>();
-            repJobs.add(job1);
-            repJobs.add(job2);
-            repJobs.add(job3);
-            repJobs.add(job4);
-            Mockito.when(jobRepository.findAll()).thenReturn(repJobs);
+            assertEquals(expectedResults, matcher.match(resumeCategoryOne));
         }
 
         @Test
-        public void nullMetadata() {
-            List<Job> result = matcher.match((CruncherMetaData) null);
-            assertNull(result);
+        public void resumeWith1CategoryAndJobCategoryInTitleThirdMatch_shouldMatchNoJob() {
+            Job job1 = new Job();
+            NaiveBayesMetaData titleData = new NaiveBayesMetaData();
+            titleData.addCategory("cat_2_job", 1);
+            titleData.addCategory("cat_3_job", .9);
+            titleData.addCategory("cat_1_job", .7);
+            NaiveBayesMetaData descriptionData = new NaiveBayesMetaData();
+            descriptionData.addCategory("cat_4_job", 1);
+            descriptionData.addCategory("cat_5_job", .9);
+            descriptionData.addCategory("cat_6_job", .8);
+            setJobMetaData(job1, titleData, descriptionData);
+
+            List<Job> allJobs = new ArrayList<>();
+            allJobs.add(job1);
+            when(jobRespository.findAll()).thenReturn(allJobs);
+
+            List<Job> expectedResults = new ArrayList<>();
+
+            assertEquals(expectedResults, matcher.match(resumeCategoryOne));
         }
 
         @Test
-        public void allMatch() {
-            allJobs.add(job2);
-            allJobs.add(job3);
+        public void resumeWith1CategoryTwiceWith2SuffixAndJobCategoryInTitleThirdMatch_shouldMatchJobWith258StarRating() {
+            Job job1 = new Job();
+            NaiveBayesMetaData titleData = new NaiveBayesMetaData();
+            titleData.addCategory("cat_1_job", .7);
+            NaiveBayesMetaData descriptionData = new NaiveBayesMetaData();
+            descriptionData.addCategory("cat_4_job", 1);
+            setJobMetaData(job1, titleData, descriptionData);
 
-            List<Job> result = matcher.match(resumeData);
-            assertEquals(allJobs, result);
-            assertEquals(2.58, result.get(0).getStarRating(), 0.01);
-            assertEquals(3.87, result.get(1).getStarRating(), 0.01);
+            List<Job> allJobs = new ArrayList<>();
+            allJobs.add(job1);
+            when(jobRespository.findAll()).thenReturn(allJobs);
+
+            List<Job> expectedResults = new ArrayList<>();
+            expectedResults.add(job1);
+
+
+            List<String> categories = new ArrayList<>();
+            categories.add("cat_1_resume");
+            categories.add("cat_1_job");
+            resumeCategoryOne = createResume(categories);
+
+            assertEquals(expectedResults, matcher.match(resumeCategoryOne));
+            assertEquals(2.58, expectedResults.get(0).getStarRating(), 0.01);
+        }
+
+    }
+
+    public static class MatchAgainstJob extends Base {
+        @Test
+        public void nullJob_shouldReturnEmptyList() {
+            assertEquals(0, matcher.matchInverse(null).size());
         }
 
         @Test
-        public void noMatchFound() {
-            resumeData = new NaiveBayesMetaData();
-            resumeData.addField("cat 1111", new MetaDataField(5.));
+        public void jobWithoutCategories_shouldReturnEmptyList() {
+            Job job = new Job();
+            assertEquals(0, matcher.matchInverse(job).size());
+        }
 
-            List<Job> result = matcher.match(resumeData);
-            assertEquals(0, result.size());
+        @Test
+        public void jobWithTwoCategory_shouldMatchOneResumeWithStarRating258() {
+
+            List<Resume> allResumes = new ArrayList<>();
+            allResumes.add(resumeCategoryOne);
+            when(resumeRespository.findAll()).thenReturn(allResumes);
+
+
+            List<Resume> expectedResults = new ArrayList<>();
+            expectedResults.add(resumeCategoryOne);
+
+            List<Resume> results = matcher.matchInverse(jobTitleCat1DescCat2);
+
+            assertEquals(expectedResults, results);
+            assertEquals(2.58, results.get(0).getStarRating(), 0.01);
+        }
+
+        @Test
+        public void jobWithTwoCategory_shouldMatchNoResume() {
+            List<Resume> allResumes = new ArrayList<>();
+            allResumes.add(resumeCategoryOneAndTwo);
+            when(resumeRespository.findAll()).thenReturn(allResumes);
+
+            List<Resume> expectedResults = new ArrayList<>();
+
+            assertEquals(expectedResults, matcher.matchInverse(jobTitleCat3DescCat4));
+        }
+
+        @Test
+        public void jobWithSixCategoriesAndOnlySixthMatch_shouldMatchNoResume() {
+            List<String> resumeCategories = new ArrayList<>();
+            resumeCategories.add("cat_1_job");
+            resumeCategories.add("cat_2_job");
+            resumeCategories.add("cat_5_job");
+            resumeCategories.add("cat_6_job");
+            resumeCategories.add("cat_7_job");
+            resumeCategories.add("cat_3_job");
+            Resume resume = createResume(resumeCategories);
+
+            List<Resume> allResumes = new ArrayList<>();
+            allResumes.add(resume);
+            when(resumeRespository.findAll()).thenReturn(allResumes);
+
+            List<Resume> expectedResults = new ArrayList<>();
+
+            assertEquals(expectedResults, matcher.matchInverse(jobTitleCat3DescCat4));
+        }
+
+        @Test
+        public void jobWithCategory1In4thPositionInDescriptionAndResumeWithCategory1_shouldMatchNoResume() {
+            Job job1 = new Job();
+            NaiveBayesMetaData titleData = new NaiveBayesMetaData();
+            titleData.addCategory("cat_2_job", 1);
+            titleData.addCategory("cat_3_job", .9);
+            NaiveBayesMetaData descriptionData = new NaiveBayesMetaData();
+            descriptionData.addCategory("cat_4_job", 1);
+            descriptionData.addCategory("cat_5_job", .9);
+            descriptionData.addCategory("cat_6_job", .8);
+            descriptionData.addCategory("cat_1_job", .7);
+            setJobMetaData(job1, titleData, descriptionData);
+
+            List<Resume> allResumes = new ArrayList<>();
+            allResumes.add(resumeCategoryOne);
+            when(resumeRespository.findAll()).thenReturn(allResumes);
+
+            List<Resume> expectedResults = new ArrayList<>();
+
+            assertEquals(expectedResults, matcher.matchInverse(job1));
+        }
+
+        @Test
+        public void jobWithCat1In3rdPositionInTitleAndResumeWithCategory1_shoudMatchNoResume() {
+            Job job1 = new Job();
+            NaiveBayesMetaData titleData = new NaiveBayesMetaData();
+            titleData.addCategory("cat_2_job", 1);
+            titleData.addCategory("cat_3_job", .9);
+            titleData.addCategory("cat_1_job", .7);
+            NaiveBayesMetaData descriptionData = new NaiveBayesMetaData();
+            descriptionData.addCategory("cat_4_job", 1);
+            descriptionData.addCategory("cat_5_job", .9);
+            descriptionData.addCategory("cat_6_job", .8);
+            setJobMetaData(job1, titleData, descriptionData);
+
+            List<Resume> allResumes = new ArrayList<>();
+            allResumes.add(resumeCategoryOne);
+            when(resumeRespository.findAll()).thenReturn(allResumes);
+
+            List<Resume> expectedResults = new ArrayList<>();
+
+            assertEquals(expectedResults, matcher.matchInverse(job1));
+        }
+
+        @Test
+        public void jobWithCat1In3rdPositionWithRepeatedCat2InTitleAndResumeWithCategory1_shoudMatchResume() {
+            Job job1 = new Job();
+            NaiveBayesMetaData titleData = new NaiveBayesMetaData();
+            titleData.addCategory("cat_2_job", 1);
+            titleData.addCategory("cat_2_resume", .9);
+            titleData.addCategory("cat_1_job", .7);
+            NaiveBayesMetaData descriptionData = new NaiveBayesMetaData();
+            descriptionData.addCategory("cat_4_job", 1);
+            descriptionData.addCategory("cat_5_job", .9);
+            descriptionData.addCategory("cat_6_job", .8);
+            setJobMetaData(job1, titleData, descriptionData);
+
+            List<Resume> allResumes = new ArrayList<>();
+            allResumes.add(resumeCategoryOne);
+            when(resumeRespository.findAll()).thenReturn(allResumes);
+
+            List<Resume> expectedResults = new ArrayList<>();
+            expectedResults.add(resumeCategoryOne);
+
+            List<Resume> results = matcher.matchInverse(job1);
+            assertEquals(expectedResults, results);
+            assertEquals(1.20, results.get(0).getStarRating(), 0.01);
+        }
+
+        @Test
+        public void jobCategory1DuplicatedAndResumeWithCategory1_shoudMatchResume() {
+            Job job1 = new Job();
+            NaiveBayesMetaData titleData = new NaiveBayesMetaData();
+            titleData.addCategory("cat_2_job", 1);
+            titleData.addCategory("cat_2_resume", .9);
+            titleData.addCategory("cat_1_job", .7);
+            NaiveBayesMetaData descriptionData = new NaiveBayesMetaData();
+            descriptionData.addCategory("cat_4_job", 1);
+            descriptionData.addCategory("cat_1_resume", .7);
+            descriptionData.addCategory("cat_5_job", .9);
+            descriptionData.addCategory("cat_6_job", .8);
+            setJobMetaData(job1, titleData, descriptionData);
+
+            List<Resume> allResumes = new ArrayList<>();
+            allResumes.add(resumeCategoryOne);
+            when(resumeRespository.findAll()).thenReturn(allResumes);
+
+            List<Resume> expectedResults = new ArrayList<>();
+            expectedResults.add(resumeCategoryOne);
+
+            List<Resume> results = matcher.matchInverse(job1);
+            assertEquals(expectedResults, results);
+            assertEquals(1.20, results.get(0).getStarRating(), 0.01);
+        }
+    }
+
+    public static class MatchSimilarity extends Base {
+        @Test
+        public void nullResume_shouldReturn0() {
+            assertEquals(0, matcher.matchSimilarity(null, jobTitleCat1DescCat2), 1);
+        }
+
+        @Test
+        public void nullJob_shouldReturn0() {
+            assertEquals(0, matcher.matchSimilarity(resumeCategoryOne, null), 1);
+        }
+
+        @Test
+        public void resumeWithoutCategories_shouldReturn0() {
+            assertEquals(0, matcher.matchSimilarity(new Resume(), jobTitleCat1DescCat2), 1);
+        }
+
+        @Test
+        public void jobWithoutCategories_shouldReturn0() {
+            assertEquals(0, matcher.matchSimilarity(resumeCategoryOne, new Job()), 1);
+        }
+
+        @Test
+        public void jobWithCat1InTitleAnd2InDescription_ResumeWithCat1And2_shouldReturn381() {
+            assertEquals(3.87, matcher.matchSimilarity(resumeCategoryOneAndTwo, jobTitleCat1DescCat2), 0.01);
+        }
+    }
+
+    public static class CheckStarRating extends Base {
+        @Test
+        public void twoListsWith1ElementEqual_shouldReturn5Stars() {
+            List<String> element = new ArrayList<>();
+            element.add("cat_1");
+            element.add("cat_2");
+            element.add("cat_3");
+            element.add("cat_4");
+            element.add("cat_5");
+            assertEquals(5, matcher.calculateStarRating(element, element), 0.01);
+        }
+
+
+        @Test
+        public void twoListsWith1ElementDifferent_shouldReturn0Stars() {
+            List<String> base = new ArrayList<>();
+            base.add("cat_1");
+            List<String> compare = new ArrayList<>();
+            compare.add("cat_2");
+            assertEquals(0, matcher.calculateStarRating(base, compare), 0.01);
+        }
+
+        @Test
+        public void twoListsWith1ElementDifferent_firstBaseCategoryInSecondCompare_shouldReturn0Stars() {
+            List<String> base = new ArrayList<>();
+            base.add("cat_1");
+            List<String> compare = new ArrayList<>();
+            compare.add("cat_2");
+            compare.add("cat_1");
+            assertEquals(1.94, matcher.calculateStarRating(base, compare), 0.01);
+        }
+
+        @Test
+        public void twoListsWith1ElementDifferent_firstAndSecondBaseCategoryInForthAndThirdCompare_shouldReturn0Stars() {
+            List<String> base = new ArrayList<>();
+            base.add("cat_1");
+            base.add("cat_2");
+            List<String> compare = new ArrayList<>();
+            compare.add("cat_3");
+            compare.add("cat_4");
+            compare.add("cat_2");
+            compare.add("cat_1");
+            assertEquals(2.42, matcher.calculateStarRating(base, compare), 0.01);
         }
     }
 }
