@@ -5,34 +5,13 @@ import java.util.List;
 /**
  * Created by joao on 3/21/16.
  * Interface for the matchers of resumes with title and description of jobs
- * @param <T> Resume type
- * @param <E> Job Type
+ * @param <Entry> Resume type
+ * @param <Result> Job Type
  */
-public interface Matcher<T, E> {
-    /**
-     * This function will receive a title and a description of a job
-     * and is responsible for retrieving a list of resumes that match
-     * @param title Title of the job
-     * @param description Descrption of the job
-     * @return Ordered list of resumes
-     */
-    List<T> match(String title, String description);
+public interface Matcher<Entry, Result> {
 
-    /**
-     * This function will receive a job
-     * and is responsible for retrieving a list of resumes that match
-     * @param job Job object
-     * @return Ordered list of resumes
-     */
-    List<T> match(E job);
-
-    /**
-     * This function will receive a meta data of a resume
-     * and is responsible for retrieving a list of Jobs that match
-     * @param metadata Meta data to match with
-     * @return Ordered list of resumes
-     */
-    List<E> match(CruncherMetaData metadata);
+    List<Result> match(Entry entry);
+    List<Entry> matchInverse(Result entry);
 
     /**
      * Retrieve the name of the cruncher associated with the
@@ -47,5 +26,5 @@ public interface Matcher<T, E> {
      * @param job
      * @return Range between 0 and 5 being 5 similar
      */
-    double matchSimilarity(T resume, E job);
+    double matchSimilarity(Entry resume, Result job);
 }

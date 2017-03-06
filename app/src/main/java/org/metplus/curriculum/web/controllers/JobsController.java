@@ -180,7 +180,7 @@ public class JobsController {
         else
             answer = new JobMatchAnswer<String>();
         for(Matcher matcher: matcherList.getMatchers()) {
-            matchedJobs = matcher.match(resume.getCruncherData(matcher.getCruncherName()));
+            matchedJobs = matcher.match(resume);
             if(matchedJobs == null) {
                 logger.error("Unable to find to jobs because the resume with id '{}' is in a invalid state", resumeId);
                 GenericAnswer errorAnswer = new GenericAnswer();

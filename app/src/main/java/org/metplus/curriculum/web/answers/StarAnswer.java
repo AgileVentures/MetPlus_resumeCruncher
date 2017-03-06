@@ -2,18 +2,13 @@ package org.metplus.curriculum.web.answers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.metplus.curriculum.database.domain.Resume;
+import org.metplus.curriculum.web.StarFormater;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-/**
- * Created by joaopereira on 10/28/2016.
- */
 public class StarAnswer extends GenericAnswer {
-    Map<String, Double> stars;
+    private Map<String, Double> stars;
 
     /**
      * Retrieve all Stars information
@@ -38,7 +33,7 @@ public class StarAnswer extends GenericAnswer {
      * @param starRating Start rating
      */
     public void addStarRating(String cruncherName, double starRating) {
-        getStars().put(cruncherName, starRating);
+        getStars().put(cruncherName, StarFormater.format(starRating));
     }
 
     @Override

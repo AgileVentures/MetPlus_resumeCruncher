@@ -211,7 +211,7 @@ public class MatcherImplTest {
             job.setTitle("pico");
             job.setDescription("pico de gallo");
             crunchJob(job);
-            assertEquals(0, resumeMatcher.match(job).size());
+            assertEquals(0, resumeMatcher.matchInverse(job).size());
         }
         @Test
         public void notCrunchedJob() {
@@ -222,7 +222,7 @@ public class MatcherImplTest {
             Job job = new Job();
             job.setTitle("pico");
             job.setDescription("pico de gallo");
-            assertNull(resumeMatcher.match(job));
+            assertNull(resumeMatcher.matchInverse(job));
         }
 
         @Test
@@ -235,7 +235,7 @@ public class MatcherImplTest {
             job.setDescription("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean quis odio ut neque venenatis iaculis nec eu diam. Sed a libero odio. Suspendisse iaculis velit nec sodales fermentum. Suspendisse potenti. Donec ultricies nulla vitae facilisis tempor. Cras et pretium augue. Maecenas viverra risus nibh, vitae faucibus massa fermentum vitae. Donec eget urna nec nisl pretium maximus. ");
 
             crunchJob(job);
-            List<Resume> result = resumeMatcher.match(job);
+            List<Resume> result = resumeMatcher.matchInverse(job);
             assertEquals(2, result.size());
             assertEquals("user2", result.get(0).getUserId());
             assertEquals("user3", result.get(1).getUserId());
@@ -252,7 +252,7 @@ public class MatcherImplTest {
 
             crunchJob(job);
 
-            List<Resume> result = resumeMatcher.match(job);
+            List<Resume> result = resumeMatcher.matchInverse(job);
             assertEquals(3, result.size());
             assertEquals("user2", result.get(0).getUserId());
             assertEquals("user3", result.get(1).getUserId());
@@ -371,8 +371,11 @@ public class MatcherImplTest {
             jobs.add(job2);
             jobs.add(job3);
         }
+
         @Test
         public void noJobDatabase() {
+
+            cruncher = new CruncherImpl();
             ExpressionCruncherMetaData metaData = new ExpressionCruncherMetaData();
             metaData.setMostReferedExpression("ipsum");
             metaData.setFields(new HashMap<>());
@@ -380,7 +383,11 @@ public class MatcherImplTest {
             Mockito.when(jobRepository.findAll()).thenReturn(new ArrayList<>());
             resumeMatcher = new MatcherImpl(cruncher, resumeRepository, jobRepository);
 
-            assertEquals(0, resumeMatcher.match(metaData).size());
+            Resume resume = new Resume();
+            Map<String, MetaData> metaDataResume = new HashMap<>();
+            metaDataResume.put(cruncher.getCruncherName(), metaData);
+            resume.setMetaData(metaDataResume);
+            assertEquals(0, resumeMatcher.match(resume).size());
         }
         @Test
         public void foundNone() {
@@ -392,7 +399,11 @@ public class MatcherImplTest {
             Mockito.when(jobRepository.findAll()).thenReturn(jobs);
             resumeMatcher = new MatcherImpl(cruncher, resumeRepository, jobRepository);
 
-            assertEquals(0, resumeMatcher.match(metaData).size());
+            Resume resume = new Resume();
+            Map<String, MetaData> metaDataResume = new HashMap<>();
+            metaDataResume.put(cruncher.getCruncherName(), metaData);
+            resume.setMetaData(metaDataResume);
+            assertEquals(0, resumeMatcher.match(resume).size());
         }
 
         @Test
@@ -404,7 +415,13 @@ public class MatcherImplTest {
             Mockito.when(resumeRepository.resumesOnCriteria(Mockito.any())).thenReturn(resumes);
             resumeMatcher = new MatcherImpl(cruncher, resumeRepository, jobRepository);
             Mockito.when(jobRepository.findAll()).thenReturn(jobs);
-            List<Job> result = resumeMatcher.match(metaData);
+
+            Resume resume = new Resume();
+            Map<String, MetaData> metaDataResume = new HashMap<>();
+            metaDataResume.put(cruncher.getCruncherName(), metaData);
+            resume.setMetaData(metaDataResume);
+
+            List<Job> result = resumeMatcher.match(resume);
             assertEquals(2, result.size());
             assertEquals("job3", result.get(0).getJobId());
             assertEquals("job1", result.get(1).getJobId());

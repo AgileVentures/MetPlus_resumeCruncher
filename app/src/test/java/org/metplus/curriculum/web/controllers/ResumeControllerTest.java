@@ -76,8 +76,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ResumeControllerTest.UploadEndpoint.class,
                      ResumeControllerTest.DownloadEndpoint.class,
-                     ResumeControllerTest.MatchEndpointv1.class,
-                     ResumeControllerTest.MatchEndpointv2.class,
                      ResumeControllerTest.MatchEndpointWithJobIdv1.class,
                      ResumeControllerTest.MatchEndpointWithJobIdv2.class,
                      ResumeControllerTest.CompareEndpointv2.class})
@@ -230,110 +228,6 @@ public class ResumeControllerTest {
     }
 
     @RunWith(MockitoJUnitRunner.class)
-    public static class MatchEndpointv1 extends DefaultResumeTest {
-
-        @Override
-        public void before(){
-            mockMvc = new MyStandaloneBuilder(new ResumeController(jobRepository, resumeRepository, matcherList, resumeCruncher), new WebMvcConfig())
-                    .setValidator(validator())
-                    .apply(documentationConfiguration(this.restDocumentation))
-                    .build();
-            token = "123-1234-1234";
-        }
-        @Test
-        public void noMatches() throws Exception {
-
-            Matcher matcher1 = Mockito.mock(Matcher.class);
-            Mockito.when(matcher1.getCruncherName()).thenReturn("matcher1");
-            Mockito.when(matcher1.match(Mockito.any(Job.class))).thenReturn(new ArrayList<>());
-            Matcher matcher2 = Mockito.mock(Matcher.class);
-            Mockito.when(matcher2.getCruncherName()).thenReturn("matcher2");
-            Mockito.when(matcher2.match(Mockito.any(Job.class))).thenReturn(new ArrayList<>());
-
-            List<Matcher> allMatchers = new ArrayList<>();
-            allMatchers.add(matcher1);
-            allMatchers.add(matcher2);
-            Mockito.when(matcherList.getMatchers()).thenReturn(allMatchers);
-
-            MockHttpServletResponse response = mockMvc.perform(post("/api/v1/resume/match")
-                    .header("X-Auth-Token", token)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .param("title", "Stone mason")
-                    .param("description", "Stone mason that is able to build some nice walls"))
-                    .andExpect(status().isOk())
-                    .andDo(document("resume/match-no-resumes/v1",
-                            requestHeaders(headerWithName("X-Auth-Token")
-                                    .description("Authentication token retrieved from the authentication")),
-                            requestParameters(parameterWithName("title")
-                                                      .description("Title of the Job"),
-                                              parameterWithName("description")
-                                                      .description("Description of the Job")),
-                            responseFields(
-                                    fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
-                                    fieldWithPath("message").description("Message associated with the result code"),
-                                    fieldWithPath("resumes").description("Hash with the identifiers of the resumes matched for each cruncher")
-                            )
-                    ))
-                    .andReturn().getResponse();
-            ResumeMatchAnswer answer = new ObjectMapper().readValue(response.getContentAsString(), ResumeMatchAnswer.class);
-            assertEquals("Result code is not correct", ResultCodes.SUCCESS, answer.getResultCode());
-            assertEquals("Number of resumes should be 0", 0, answer.getResumes().size());
-        }
-    }
-
-    @RunWith(MockitoJUnitRunner.class)
-    public static class MatchEndpointv2 extends DefaultResumeTest {
-
-        @Override
-        public void before(){
-            mockMvc = new MyStandaloneBuilder(new ResumeController(jobRepository, resumeRepository, matcherList, resumeCruncher), new WebMvcConfig())
-                    .setValidator(validator())
-                    .apply(documentationConfiguration(this.restDocumentation))
-                    .build();
-            token = "123-1234-1234";
-        }
-        @Test
-        public void noMatches() throws Exception {
-
-            Matcher matcher1 = Mockito.mock(Matcher.class);
-            Mockito.when(matcher1.getCruncherName()).thenReturn("matcher1");
-            Mockito.when(matcher1.match(Mockito.any(Job.class))).thenReturn(new ArrayList<>());
-            Matcher matcher2 = Mockito.mock(Matcher.class);
-            Mockito.when(matcher2.getCruncherName()).thenReturn("matcher2");
-            Mockito.when(matcher2.match(Mockito.any(Job.class))).thenReturn(new ArrayList<>());
-
-            List<Matcher> allMatchers = new ArrayList<>();
-            allMatchers.add(matcher1);
-            allMatchers.add(matcher2);
-            Mockito.when(matcherList.getMatchers()).thenReturn(allMatchers);
-
-            MockHttpServletResponse response = mockMvc.perform(post("/api/v2/resume/match")
-                    .header("X-Auth-Token", token)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .param("title", "Stone mason")
-                    .param("description", "Stone mason that is able to build some nice walls"))
-                    .andExpect(status().isOk())
-                    .andDo(document("resume/match-no-resumes/v2",
-                            requestHeaders(headerWithName("X-Auth-Token")
-                                    .description("Authentication token retrieved from the authentication")),
-                            requestParameters(parameterWithName("title")
-                                            .description("Title of the Job"),
-                                    parameterWithName("description")
-                                            .description("Description of the Job")),
-                            responseFields(
-                                    fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
-                                    fieldWithPath("message").description("Message associated with the result code"),
-                                    fieldWithPath("resumes").description("Hash with the identifiers of the resumes and start rating matched for each cruncher")
-                            )
-                    ))
-                    .andReturn().getResponse();
-            ResumeMatchAnswer answer = new ObjectMapper().readValue(response.getContentAsString(), ResumeMatchAnswer.class);
-            assertEquals("Result code is not correct", ResultCodes.SUCCESS, answer.getResultCode());
-            assertEquals("Number of resumes should be 0", 0, answer.getResumes().size());
-        }
-    }
-
-    @RunWith(MockitoJUnitRunner.class)
     public static class MatchEndpointWithJobIdv1 extends DefaultResumeTest {
         @Override
         public void before(){
@@ -436,10 +330,10 @@ public class ResumeControllerTest {
 
             Matcher matcher1 = Mockito.mock(Matcher.class);
             Mockito.when(matcher1.getCruncherName()).thenReturn("matcher1");
-            Mockito.when(matcher1.match(Mockito.any(Job.class))).thenReturn(matcher1Resumes);
+            Mockito.when(matcher1.matchInverse(Mockito.any(Job.class))).thenReturn(matcher1Resumes);
             Matcher matcher2 = Mockito.mock(Matcher.class);
             Mockito.when(matcher2.getCruncherName()).thenReturn("matcher2");
-            Mockito.when(matcher2.match(Mockito.any(Job.class))).thenReturn(matcher2Resumes);
+            Mockito.when(matcher2.matchInverse(Mockito.any(Job.class))).thenReturn(matcher2Resumes);
 
             List<Matcher> allMatchers = new ArrayList<>();
             allMatchers.add(matcher1);
@@ -471,8 +365,8 @@ public class ResumeControllerTest {
                     .andExpect(jsonPath("$.resumes.matcher2[1]", is("2")))
                     .andReturn().getResponse();
             Mockito.verify(jobRepository).findByJobId("1");
-            Mockito.verify(matcher1).match(Mockito.any(Job.class));
-            Mockito.verify(matcher2).match(Mockito.any(Job.class));
+            Mockito.verify(matcher1).matchInverse(Mockito.any(Job.class));
+            Mockito.verify(matcher2).matchInverse(Mockito.any(Job.class));
         }
     }
     @RunWith(MockitoJUnitRunner.class)
@@ -579,10 +473,10 @@ public class ResumeControllerTest {
 
             Matcher matcher1 = Mockito.mock(Matcher.class);
             Mockito.when(matcher1.getCruncherName()).thenReturn("matcher1");
-            Mockito.when(matcher1.match(Mockito.any(Job.class))).thenReturn(matcher1Resumes);
+            Mockito.when(matcher1.matchInverse(Mockito.any(Job.class))).thenReturn(matcher1Resumes);
             Matcher matcher2 = Mockito.mock(Matcher.class);
             Mockito.when(matcher2.getCruncherName()).thenReturn("matcher2");
-            Mockito.when(matcher2.match(Mockito.any(Job.class))).thenReturn(matcher2Resumes);
+            Mockito.when(matcher2.matchInverse(Mockito.any(Job.class))).thenReturn(matcher2Resumes);
 
             List<Matcher> allMatchers = new ArrayList<>();
             allMatchers.add(matcher1);
@@ -618,8 +512,8 @@ public class ResumeControllerTest {
                     .andExpect(jsonPath("$.resumes.matcher2[1].stars", is(1.2)))
                     .andReturn().getResponse();
             Mockito.verify(jobRepository).findByJobId("1");
-            Mockito.verify(matcher1).match(Mockito.any(Job.class));
-            Mockito.verify(matcher2).match(Mockito.any(Job.class));
+            Mockito.verify(matcher1).matchInverse(Mockito.any(Job.class));
+            Mockito.verify(matcher2).matchInverse(Mockito.any(Job.class));
         }
     }
     @RunWith(MockitoJUnitRunner.class)
@@ -688,6 +582,7 @@ public class ResumeControllerTest {
             assertEquals("Result code is not correct", ResultCodes.RESUME_NOT_FOUND, answer.getResultCode());
             assertEquals("Number of resumes should be 0", 0, answer.getStars().size());
         }
+
         @Test
         public void compareResult() throws Exception {
 
@@ -697,7 +592,7 @@ public class ResumeControllerTest {
 
             Matcher matcher1 = Mockito.mock(Matcher.class);
             Mockito.when(matcher1.getCruncherName()).thenReturn("matcher1");
-            Mockito.when(matcher1.matchSimilarity(resume, job)).thenReturn(3.2);
+            Mockito.when(matcher1.matchSimilarity(resume, job)).thenReturn(3.24);
             Matcher matcher2 = Mockito.mock(Matcher.class);
             Mockito.when(matcher2.getCruncherName()).thenReturn("matcher2");
             Mockito.when(matcher2.matchSimilarity(resume, job)).thenReturn(4.1);

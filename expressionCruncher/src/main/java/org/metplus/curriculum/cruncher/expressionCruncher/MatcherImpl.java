@@ -35,7 +35,6 @@ public class MatcherImpl implements Matcher<Resume, Job> {
         this.jobRepository = jobRepository;
     }
 
-    @Override
     public List<Resume> match(String title, String description) {
         logger.trace("match(" + title + ", " + description + ")");
         String titleExpression;
@@ -55,7 +54,7 @@ public class MatcherImpl implements Matcher<Resume, Job> {
     }
 
     @Override
-    public List<Resume> match(Job job) {
+    public List<Resume> matchInverse(Job job) {
         logger.trace("match(" + job + ")");
         String titleExpression;
         String descriptionExpression;
@@ -141,7 +140,8 @@ public class MatcherImpl implements Matcher<Resume, Job> {
     }
 
     @Override
-    public List<Job> match(CruncherMetaData metadata) {
+    public List<Job> match(Resume resume) {
+        CruncherMetaData metadata = resume.getCruncherData(cruncher.getCruncherName());
         logger.trace("match(" + metadata + ")");
         // Retrieve the meta data into a good object type
         ExpressionCruncherMetaData auxMetaData = (ExpressionCruncherMetaData)metadata;
