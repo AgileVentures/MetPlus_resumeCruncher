@@ -3,9 +3,8 @@ package org.metplus.curriculum.web.answers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.metplus.curriculum.database.domain.Resume;
+import org.metplus.curriculum.web.StarFormater;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,10 +38,7 @@ public class ResumeMatchAnswer<T> extends GenericAnswer {
         }
 
         public void setStars(double stars) {
-            DecimalFormat df = new DecimalFormat("#.#");
-            df.setRoundingMode(RoundingMode.FLOOR);
-
-            this.stars = Double.parseDouble(df.format(new Double(stars)));
+            this.stars = StarFormater.format(stars);
         }
     }
 

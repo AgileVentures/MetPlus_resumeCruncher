@@ -582,6 +582,7 @@ public class ResumeControllerTest {
             assertEquals("Result code is not correct", ResultCodes.RESUME_NOT_FOUND, answer.getResultCode());
             assertEquals("Number of resumes should be 0", 0, answer.getStars().size());
         }
+
         @Test
         public void compareResult() throws Exception {
 
@@ -591,7 +592,7 @@ public class ResumeControllerTest {
 
             Matcher matcher1 = Mockito.mock(Matcher.class);
             Mockito.when(matcher1.getCruncherName()).thenReturn("matcher1");
-            Mockito.when(matcher1.matchSimilarity(resume, job)).thenReturn(3.2);
+            Mockito.when(matcher1.matchSimilarity(resume, job)).thenReturn(3.24);
             Matcher matcher2 = Mockito.mock(Matcher.class);
             Mockito.when(matcher2.getCruncherName()).thenReturn("matcher2");
             Mockito.when(matcher2.matchSimilarity(resume, job)).thenReturn(4.1);
