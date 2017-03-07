@@ -63,5 +63,14 @@ public class LocalTokenServiceTest {
             String token = service.generateToken("2.2.2.2");
             assertNotEquals(token, service.generateToken("2.2.2.2"));
         }
+
+        @Test
+        public void tokenGeneratedTwiceForIPAddressAfterTimeout_shouldNotIncreaseTheNumberOfTokens() throws Exception {
+            service = new LocalTokenService(0);
+            String token = service.generateToken("2.2.2.2");
+            int numberOfToken = service.totalNumberTokens();
+            service.generateToken("2.2.2.2");
+            assertEquals(numberOfToken, service.totalNumberTokens());
+        }
     }
 }

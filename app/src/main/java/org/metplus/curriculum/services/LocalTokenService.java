@@ -8,24 +8,6 @@ import java.util.UUID;
 
 public class LocalTokenService implements TokenService {
 
-    class TokenInformation {
-        private String ipAddress;
-        private Date entryDate;
-
-        public TokenInformation(String ipAddress, Date entryDate) {
-            this.ipAddress = ipAddress;
-            this.entryDate = entryDate;
-        }
-
-        public Date getEntryDate() {
-            return entryDate;
-        }
-
-        public String getIpAddress() {
-            return ipAddress;
-        }
-    }
-
     private final int timeoutSeconds;
     private HashMap<UUID, TokenInformation> tokens = new HashMap<>();
     private ObjectIdGenerators.UUIDGenerator generator = new ObjectIdGenerators.UUIDGenerator();
@@ -39,21 +21,50 @@ public class LocalTokenService implements TokenService {
     }
 
     @Override
-    public boolean isValid(String token) {
-
-        if (tokens.containsKey(UUID.fromString(token)))
-            return true;
+    public synchronized boolean isValid(String token) {
+        UUID tokenUUID = UUID.fromString(token);
+        if (tokens.containsKey(tokenUUID))
+            if (new Date().getTime() <
+                    (tokens.get(tokenUUID).getEntryDate().getTime() + timeoutSeconds))
+                return true;
         return false;
     }
 
     @Override
-    public String generateToken(String ipAddress) {
-        if(tokens.containsValue(ipAddress))
-            for(UUID token : tokens.keySet())
-                if(tokens.get(token).equals(ipAddress))
+    public synchronized String generateToken(String ipAddress) {
+        for (UUID token : tokens.keySet())
+            if (tokens.get(token).getIpAddress().compareTo(ipAddress) == 0)
+                if (isValid(token.toString())) {
                     return token.toString();
+                } else {
+                    tokens.remove(token);
+                    break;
+                }
         UUID token = generator.generateId(ipAddress);
         tokens.put(token, new TokenInformation(ipAddress, new Date()));
         return token.toString();
+    }
+
+    @Override
+    public synchronized int totalNumberTokens() {
+        return tokens.size();
+    }
+
+    class TokenInformation {
+        private String ipAddress;
+        private Date entryDate;
+
+        TokenInformation(String ipAddress, Date entryDate) {
+            this.ipAddress = ipAddress;
+            this.entryDate = entryDate;
+        }
+
+        Date getEntryDate() {
+            return entryDate;
+        }
+
+        String getIpAddress() {
+            return ipAddress;
+        }
     }
 }
