@@ -20,11 +20,19 @@ public class UserTryToLogin {
 
     public boolean canUserLogin(String username, String password) {
         logger.trace("canUserLogin({}, {})", username, password);
-        if(username.equals(this.username) && password.equals(this.password)) {
+        if(isUsernameCorrect(username) && isPasswordCorrect(password)) {
             logger.info("User '{}' login was successfull", username);
             return true;
         }
         logger.info("Unable to login user '{}'", username);
         return false;
+    }
+
+    private boolean isPasswordCorrect(String password) {
+        return password != null && password.equals(this.password);
+    }
+
+    private boolean isUsernameCorrect(String username) {
+        return username != null && username.equals(this.username);
     }
 }

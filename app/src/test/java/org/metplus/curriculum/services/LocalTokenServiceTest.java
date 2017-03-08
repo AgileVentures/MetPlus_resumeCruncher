@@ -42,6 +42,11 @@ public class LocalTokenServiceTest {
         public void invalidToken_shouldReturnFalse() throws Exception {
             assertFalse(service.isValid("9367f48e-94d3-4b3b-8cbf-55cf61e58fe2"));
         }
+
+        @Test
+        public void nullToken_shouldReturnFalse() throws Exception {
+            assertFalse(service.isValid(null));
+        }
     }
 
     public static class GenerateToken extends DefaultLocalTokenServiceTest {

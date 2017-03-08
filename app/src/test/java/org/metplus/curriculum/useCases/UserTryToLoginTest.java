@@ -57,5 +57,15 @@ public class UserTryToLoginTest {
         public void incorrectPassword_shouldReturnFalse() throws Exception {
             assertFalse(useCase.canUserLogin("username", "invalid_password"));
         }
+
+        @Test
+        public void nullUsername_shouldReturnFalse() throws Exception {
+            assertFalse(useCase.canUserLogin(null, ""));
+        }
+
+        @Test
+        public void nullPassword_shouldReturnFalse() throws Exception {
+            assertFalse(useCase.canUserLogin("username", null));
+        }
     }
 }

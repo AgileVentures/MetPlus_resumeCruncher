@@ -26,6 +26,10 @@ public class LocalTokenService implements TokenService {
     @Override
     public synchronized boolean isValid(String token) {
         logger.trace("Checking is token: '{}' is valid", token);
+
+        if(token == null)
+            return false;
+
         UUID tokenUUID = UUID.fromString(token);
         if (tokens.containsKey(tokenUUID)) {
             if (new Date().getTime() <
