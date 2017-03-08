@@ -142,12 +142,12 @@ public class ResumeController {
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/match/{jobId}", method = RequestMethod.GET)
-    @APIVersion(1)
-    @ResponseBody
-    public ResponseEntity<GenericAnswer> matchv1(@PathVariable("jobId") final String jobId) {
-        return match(jobId, false);
-    }
+//    @RequestMapping(value = "/match/{jobId}", method = RequestMethod.GET)
+//    @APIVersion(1)
+//    @ResponseBody
+//    public ResponseEntity<GenericAnswer> matchv1(@PathVariable("jobId") final String jobId) {
+//        return match(jobId, false);
+//    }
 
     @RequestMapping(value = "/match/{jobId}", method = RequestMethod.GET)
     @APIVersion(2)
@@ -205,67 +205,67 @@ public class ResumeController {
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{resumeId}/compare/{jobId}", method = RequestMethod.GET)
-    @APIVersion(BaseController.VERSION_TESTING)
-    @ResponseBody
-    public ResponseEntity<GenericAnswer> compareResumeAgainstJobCanned(
-            @PathVariable("resumeId") final String resumeId,
-            @PathVariable("jobId") final String jobId) {
-        logger.debug("Match resumes with job id: '" + jobId + "'");
-        int jobIdentifier = Integer.valueOf(jobId);
-        int resumeIdentifier = Integer.valueOf(resumeId);
-        double stars[][] = {{1.1, 1.2, 3., 4.3, 5.},
-                             {1.2, 1.3, 3.1, 4.4, 4.9}};
-
-        int starsId = -1;
-        StarAnswer answer = new StarAnswer();
-        if(resumeIdentifier == 1)
-            starsId = jobIdentifier;
-        if(starsId < 0 || starsId >= stars[0].length)
-            return compareResumeAgainstJob(resumeId, jobId);
-
-        int cruncherId = 0;
-        for(Matcher matcher: matcherList.getMatchers()) {
-            answer.addStarRating(matcher.getCruncherName(), stars[cruncherId][starsId]);
-            cruncherId++;
-        }
-
-        answer.setMessage("Success");
-        answer.setResultCode(ResultCodes.SUCCESS);
-
-        logger.debug("Result is: " + answer);
-        return new ResponseEntity<>(answer, HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/match/{jobId}", method = RequestMethod.GET)
-    @APIVersion(BaseController.VERSION_TESTING)
-    @ResponseBody
-    public ResponseEntity<GenericAnswer> matchCannedReponse(@PathVariable("jobId") final String jobId) {
-        final double[] resumeStars = {1.8, 4.1, 2.6, 4.9, 3.2,
-                                      1.8, 4.1, 2.6, 4.9, 3.2};
-        ResumeMatchAnswer answer = new ResumeMatchAnswer();
-        double jobIdentifier = Double.valueOf(jobId);
-        if(jobIdentifier > 0 && jobIdentifier < 11) {
-            for(int i = 0 ; i  < resumeStars.length ; i++ ) {
-                Resume resume = resumeRepository.findByUserId(Integer.toString(i));
-                if(resume != null) {
-                    resume.setStarRating(resumeStars[i]);
-                    answer.addResume("NaiveBayes", resume, true);
-                }
-            }
-        } else if(jobIdentifier % 5 != 0) {
-            for(int i = 0 ; i < 4 ; i++) {
-                Resume resume = resumeRepository.findByUserId(Double.toString(jobIdentifier + i));
-                if(resume != null) {
-                    resume.setStarRating(resumeStars[i]);
-                    answer.addResume("NaiveBayes", resume, true);
-                }
-            }
-        }
-        answer.setMessage("Success");
-        answer.setResultCode(ResultCodes.SUCCESS);
-        return new ResponseEntity<>(answer, HttpStatus.OK);
-    }
+//    @RequestMapping(value = "/{resumeId}/compare/{jobId}", method = RequestMethod.GET)
+//    @APIVersion(BaseController.VERSION_TESTING)
+//    @ResponseBody
+//    public ResponseEntity<GenericAnswer> compareResumeAgainstJobCanned(
+//            @PathVariable("resumeId") final String resumeId,
+//            @PathVariable("jobId") final String jobId) {
+//        logger.debug("Match resumes with job id: '" + jobId + "'");
+//        int jobIdentifier = Integer.valueOf(jobId);
+//        int resumeIdentifier = Integer.valueOf(resumeId);
+//        double stars[][] = {{1.1, 1.2, 3., 4.3, 5.},
+//                             {1.2, 1.3, 3.1, 4.4, 4.9}};
+//
+//        int starsId = -1;
+//        StarAnswer answer = new StarAnswer();
+//        if(resumeIdentifier == 1)
+//            starsId = jobIdentifier;
+//        if(starsId < 0 || starsId >= stars[0].length)
+//            return compareResumeAgainstJob(resumeId, jobId);
+//
+//        int cruncherId = 0;
+//        for(Matcher matcher: matcherList.getMatchers()) {
+//            answer.addStarRating(matcher.getCruncherName(), stars[cruncherId][starsId]);
+//            cruncherId++;
+//        }
+//
+//        answer.setMessage("Success");
+//        answer.setResultCode(ResultCodes.SUCCESS);
+//
+//        logger.debug("Result is: " + answer);
+//        return new ResponseEntity<>(answer, HttpStatus.OK);
+//    }
+//
+//    @RequestMapping(value = "/match/{jobId}", method = RequestMethod.GET)
+//    @APIVersion(BaseController.VERSION_TESTING)
+//    @ResponseBody
+//    public ResponseEntity<GenericAnswer> matchCannedReponse(@PathVariable("jobId") final String jobId) {
+//        final double[] resumeStars = {1.8, 4.1, 2.6, 4.9, 3.2,
+//                                      1.8, 4.1, 2.6, 4.9, 3.2};
+//        ResumeMatchAnswer answer = new ResumeMatchAnswer();
+//        double jobIdentifier = Double.valueOf(jobId);
+//        if(jobIdentifier > 0 && jobIdentifier < 11) {
+//            for(int i = 0 ; i  < resumeStars.length ; i++ ) {
+//                Resume resume = resumeRepository.findByUserId(Integer.toString(i));
+//                if(resume != null) {
+//                    resume.setStarRating(resumeStars[i]);
+//                    answer.addResume("NaiveBayes", resume, true);
+//                }
+//            }
+//        } else if(jobIdentifier % 5 != 0) {
+//            for(int i = 0 ; i < 4 ; i++) {
+//                Resume resume = resumeRepository.findByUserId(Double.toString(jobIdentifier + i));
+//                if(resume != null) {
+//                    resume.setStarRating(resumeStars[i]);
+//                    answer.addResume("NaiveBayes", resume, true);
+//                }
+//            }
+//        }
+//        answer.setMessage("Success");
+//        answer.setResultCode(ResultCodes.SUCCESS);
+//        return new ResponseEntity<>(answer, HttpStatus.OK);
+//    }
 
     private ResponseEntity<GenericAnswer> match(final String jobId, boolean withProbability) {
         logger.debug("Match resumes with job id: '" + jobId + "'");
