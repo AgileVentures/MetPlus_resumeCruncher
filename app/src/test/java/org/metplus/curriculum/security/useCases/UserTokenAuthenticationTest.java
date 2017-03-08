@@ -1,11 +1,11 @@
-package org.metplus.curriculum.useCases;
+package org.metplus.curriculum.security.useCases;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import org.metplus.curriculum.services.LocalTokenService;
-import org.metplus.curriculum.services.TokenService;
+import org.metplus.curriculum.security.services.LocalTokenService;
+import org.metplus.curriculum.security.services.TokenService;
 import org.metplus.curriculum.test.BeforeAfterInterface;
 import org.metplus.curriculum.test.BeforeAfterRule;
 

@@ -1,4 +1,4 @@
-package org.metplus.curriculum.useCases;
+package org.metplus.curriculum.security.useCases;
 
 import org.junit.Rule;
 import org.junit.Test;

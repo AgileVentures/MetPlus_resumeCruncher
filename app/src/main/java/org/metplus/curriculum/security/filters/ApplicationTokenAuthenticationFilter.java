@@ -1,6 +1,6 @@
-package org.metplus.curriculum.web.security;
+package org.metplus.curriculum.security.filters;
 
-import org.metplus.curriculum.services.TokenService;
+import org.metplus.curriculum.security.services.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package org.metplus.curriculum.useCases;
+package org.metplus.curriculum.security.useCases;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

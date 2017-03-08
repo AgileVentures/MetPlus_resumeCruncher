@@ -1,4 +1,4 @@
-package org.metplus.curriculum.services;
+package org.metplus.curriculum.security.services;
 
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.slf4j.Logger;

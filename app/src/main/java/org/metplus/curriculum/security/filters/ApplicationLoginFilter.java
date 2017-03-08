@@ -1,16 +1,14 @@
-package org.metplus.curriculum.web.security;
+package org.metplus.curriculum.security.filters;
 
-import org.metplus.curriculum.services.TokenService;
-import org.metplus.curriculum.useCases.UserTryToLogin;
+import org.metplus.curriculum.security.services.TokenService;
+import org.metplus.curriculum.security.useCases.UserTryToLogin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Optional;
 
 public class ApplicationLoginFilter extends HandlerInterceptorAdapter {
     private static Logger logger = LoggerFactory.getLogger(ApplicationLoginFilter.class);

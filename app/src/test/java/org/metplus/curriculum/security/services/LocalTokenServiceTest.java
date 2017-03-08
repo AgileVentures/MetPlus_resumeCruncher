@@ -1,4 +1,4 @@
-package org.metplus.curriculum.services;
+package org.metplus.curriculum.security.services;
 
 import org.junit.Rule;
 import org.junit.Test;

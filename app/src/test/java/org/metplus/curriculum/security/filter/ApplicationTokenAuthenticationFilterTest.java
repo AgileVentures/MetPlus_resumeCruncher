@@ -1,14 +1,15 @@
-package org.metplus.curriculum.web.security;
+package org.metplus.curriculum.security.filter;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import org.metplus.curriculum.services.LocalTokenService;
-import org.metplus.curriculum.services.TokenService;
+import org.metplus.curriculum.security.filters.ApplicationTokenAuthenticationFilter;
+import org.metplus.curriculum.security.services.LocalTokenService;
+import org.metplus.curriculum.security.services.TokenService;
 import org.metplus.curriculum.test.BeforeAfterInterface;
 import org.metplus.curriculum.test.BeforeAfterRule;
-import org.metplus.curriculum.useCases.UserTokenAuthentication;
+import org.metplus.curriculum.security.useCases.UserTokenAuthentication;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 

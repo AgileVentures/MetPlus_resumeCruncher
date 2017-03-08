@@ -1,4 +1,4 @@
-package org.metplus.curriculum.services;
+package org.metplus.curriculum.security.services;
 
 public interface TokenService {
     boolean isValid(String token);
