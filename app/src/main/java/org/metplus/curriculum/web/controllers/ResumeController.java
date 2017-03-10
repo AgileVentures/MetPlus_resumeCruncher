@@ -31,8 +31,9 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping({"curriculum", "resume"})
-@APIVersion({1, 2, BaseController.VERSION_TESTING})
+//@RequestMapping({"curriculum", "resume"})
+@RequestMapping({BaseController.baseUrlApiv2 + "resume"})
+//@APIVersion({1, 2, BaseController.VERSION_TESTING})
 public class ResumeController {
     private static Logger logger = LoggerFactory.getLogger(ResumeController.class);
 
@@ -150,6 +151,7 @@ public class ResumeController {
 //    }
 
     @RequestMapping(value = "/match/{jobId}", method = RequestMethod.GET)
+//    @RequestMapping(value = "/match/{jobId}", method = RequestMethod.GET)
     @APIVersion(2)
     @ResponseBody
     public ResponseEntity<GenericAnswer> matchv2(@PathVariable("jobId") final String jobId) {

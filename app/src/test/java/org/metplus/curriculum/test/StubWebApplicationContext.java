@@ -31,6 +31,7 @@ package org.metplus.curriculum.test;
         import org.springframework.beans.factory.NoSuchBeanDefinitionException;
         import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
         import org.springframework.beans.factory.config.DependencyDescriptor;
+        import org.springframework.beans.factory.config.NamedBeanHolder;
         import org.springframework.beans.factory.support.StaticListableBeanFactory;
         import org.springframework.context.ApplicationContext;
         import org.springframework.context.ApplicationContextAware;
@@ -420,6 +421,11 @@ class StubWebApplicationContext implements WebApplicationContext {
 
         @Override
         public void destroyBean(Object existingBean) {
+        }
+
+        @Override
+        public <T> NamedBeanHolder<T> resolveNamedBean(Class<T> requiredType) throws BeansException {
+            return null;
         }
     }
 

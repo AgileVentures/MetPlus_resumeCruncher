@@ -22,7 +22,7 @@ public class RequestHandlerMapping extends RequestMappingHandlerMapping {
     @Override
     protected RequestMappingInfo getMappingForMethod(Method method, Class<?> handlerType) {
         RequestMappingInfo info = super.getMappingForMethod(method, handlerType);
-
+        System.out.println("Bammmmmm");
         APIVersion methodAnnotation = AnnotationUtils.findAnnotation(method, APIVersion.class);
         if(methodAnnotation != null) {
             RequestCondition<?> methodCondition = getCustomMethodCondition(method);

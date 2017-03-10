@@ -20,7 +20,7 @@ import java.util.*;
  * Created by Joao Pereira on 31/08/2015.
  */
 @Component
-@ConfigurationProperties(locations = "classpath:expressionCruncher.yml", prefix = "config")
+@ConfigurationProperties(prefix = "expression-cruncher")
 public class ExpressionCruncher extends CruncherInitializer {
     private static Logger logger = LoggerFactory.getLogger(ExpressionCruncher.class);
     private static final String IGNORE_LIST = "IgnoreList";

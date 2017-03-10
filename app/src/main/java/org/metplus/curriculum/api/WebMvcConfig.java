@@ -6,16 +6,16 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import static org.metplus.curriculum.web.controllers.BaseController.baseUrlApi;
 
-@Configuration
+//@Configuration
 public class WebMvcConfig extends DelegatingWebMvcConfiguration {
 //    @Autowired
 //    ApplicationLoginFilter loginFilter;
 
 
-    @Override
-    public RequestMappingHandlerMapping requestMappingHandlerMapping() {
-        return new RequestHandlerMapping(baseUrlApi);
-    }
+//    @Override
+//    public RequestMappingHandlerMapping requestMappingHandlerMapping() {
+//        return new RequestHandlerMapping(baseUrlApi);
+//    }
 
 //    @Override
 //    public void addInterceptors(InterceptorRegistry registry) {

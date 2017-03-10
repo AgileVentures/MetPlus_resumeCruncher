@@ -1,24 +1,18 @@
 package org.metplus.curriculum.web.controllers.auth;
 
-import org.metplus.curriculum.api.APIVersion;
 import org.metplus.curriculum.web.controllers.BaseController;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 
-
-/**
- * Created by joaopereira on 2/14/2016.
- */
 @RestController
-@APIVersion({1, 2, BaseController.VERSION_TESTING})
 public class AuthenticationController extends BaseController {
 
     // tag::authenticate[]
-    @RequestMapping(value = "authenticate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(path = "/api/v1/authenticate",
+            method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public void authenticate() {
         /*return "This is just for in-code-documentation purposes and Rest API reference documentation." +
                 "Servlet will never get to this point as Http requests are processed by AuthenticationFilter." +

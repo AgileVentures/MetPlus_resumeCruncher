@@ -5,21 +5,24 @@ import org.metplus.curriculum.security.filters.ApplicationTokenAuthenticationFil
 import org.metplus.curriculum.security.services.LocalTokenService;
 import org.metplus.curriculum.security.services.TokenService;
 import org.metplus.curriculum.security.useCases.UserTryToLogin;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.handler.MappedInterceptor;
 
 @Configuration
 public class SecurityConfig extends WebMvcConfigurerAdapter {
-
-    String username = "backend_admin";
-    String password = "backendpassword";
+    @Value("${backend.admin.username}")
+    String username;
+    @Value("${backend.admin.password}")
+    String password;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(applicationLoginFilter()).addPathPatterns("/**/authenticate");
-        registry.addInterceptor(applicationTokenAuthenticationFilter()).addPathPatterns("**");
+        registry.addInterceptor(applicationTokenAuthenticationFilter());
     }
 
     private ApplicationLoginFilter applicationLoginFilter() {

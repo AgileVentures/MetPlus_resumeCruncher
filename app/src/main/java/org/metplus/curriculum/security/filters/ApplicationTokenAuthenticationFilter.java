@@ -21,6 +21,7 @@ public class ApplicationTokenAuthenticationFilter  extends HandlerInterceptorAda
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String token = request.getHeader("X-Auth-Token");
+        logger.debug("Request from '{}'", request.getRemoteHost());
 
         if(tokenService.isValid(token))
             return true;

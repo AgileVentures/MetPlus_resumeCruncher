@@ -3,29 +3,30 @@ package org.metplus.curriculum.web.controllers;
 import org.metplus.curriculum.Application;
 import org.metplus.curriculum.api.WebMvcConfig;
 import org.metplus.curriculum.security.SecurityConfig;
+import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootContextLoader;
 import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-/**
- * Created by Joao Pereira on 03/11/2015.
- */
 
 @ActiveProfiles("development")
 @Profile("unit-test")
-@ContextConfiguration(loader=SpringApplicationContextLoader.class, classes = {Application.class, SecurityConfig.class, WebMvcConfig.class})
+//@ContextConfiguration(loader=SpringBootContextLoader.class, classes = {Application.class, SecurityConfig.class, WebMvcConfig.class})
+//@WebAppConfiguration
+//@SpringBootApplication
+//@SpringBootConfiguration(classes = {Application.class, WebMvcConfig.class}, locations = "resources/", initializers = ConfigFileApplicationContextInitializer.class)
+//@SpringBootTest(classes = {Application.class, SecurityConfig.class})
 @WebAppConfiguration
-@SpringBootApplication
-@SpringApplicationConfiguration(classes = {Application.class, WebMvcConfig.class}, locations = "resources/", initializers = ConfigFileApplicationContextInitializer.class)
 @EnableAutoConfiguration
-@EnableConfigurationProperties
+//@EnableConfigurationProperties
 public class BaseControllerTest {
 
 }

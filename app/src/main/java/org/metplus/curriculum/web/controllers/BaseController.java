@@ -10,6 +10,9 @@ public class BaseController {
     final static public String[] authenticationUrls = {"/api/v1/authenticate", "/api/v2/authenticate", "/api/v99999/authenticate"};
 
     final static public String baseUrlApi = "/api/v";
+    final static public String baseUrlApiv1 = baseUrlApi + "1";
+    final static public String baseUrlApiv2 = baseUrlApi + "2";
+    final static public String baseUrlApivTesting = baseUrlApi + "99999";
 
     public static final String AUTOCONFIG_ENDPOINT = "/autoconfig";
     public static final String BEANS_ENDPOINT = "/beans";
