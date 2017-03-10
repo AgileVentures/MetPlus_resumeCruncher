@@ -1,6 +1,5 @@
 package org.metplus.curriculum.web.controllers;
 
-import org.metplus.curriculum.api.APIVersion;
 import org.metplus.curriculum.database.domain.Settings;
 import org.metplus.curriculum.database.exceptions.MandatorySettingNotPresent;
 import org.metplus.curriculum.database.repository.SettingsRepository;
@@ -15,8 +14,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @RestController
-@APIVersion({1, 2, BaseController.VERSION_TESTING})
-@RequestMapping("admin")
+@RequestMapping({BaseController.baseUrlApiv1 + "/admin",
+        BaseController.baseUrlApiv2 + "/admin",
+        BaseController.baseUrlApivTesting + "/admin"})
 public class AdminController {
     private static final Logger LOG = LoggerFactory.getLogger(AdminController.class);
     @Autowired
@@ -24,14 +24,15 @@ public class AdminController {
 
     /**
      * Retrieve all the settings of the cruncher
-     * @summary Retrieve Cruncher settings
+     *
      * @return A list of settings
+     * @summary Retrieve Cruncher settings
      */
     @RequestMapping(value = "settings", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public ResponseEntity<Settings> mainPage() {
         LOG.debug("mainPage()");
-        if(0 == repository.count()){
+        if (0 == repository.count()) {
             repository.save(new Settings());
         }
         LOG.info("Output is: " + repository.findAll().iterator().next());
@@ -40,8 +41,9 @@ public class AdminController {
 
     /**
      * Save all the settings
-     * @summary Save settings
+     *
      * @return The answer stating if the settings were saved or not
+     * @summary Save settings
      */
     @RequestMapping(value = "settings", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     @ResponseBody
