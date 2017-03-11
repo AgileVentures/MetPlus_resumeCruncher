@@ -30,7 +30,14 @@ public class LocalTokenService implements TokenService {
         if(token == null)
             return false;
 
-        UUID tokenUUID = UUID.fromString(token);
+        UUID tokenUUID = null;
+        try {
+            tokenUUID = UUID.fromString(token);
+        } catch (IllegalArgumentException exp) {
+            logger.warn("Token '{}' is not a UUID", token);
+            return false;
+        }
+
         if (tokens.containsKey(tokenUUID)) {
             if (new Date().getTime() <
                     (tokens.get(tokenUUID).getEntryDate().getTime() + timeoutSeconds))

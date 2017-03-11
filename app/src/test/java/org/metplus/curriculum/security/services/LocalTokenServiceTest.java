@@ -47,6 +47,11 @@ public class LocalTokenServiceTest {
         public void nullToken_shouldReturnFalse() throws Exception {
             assertFalse(service.isValid(null));
         }
+
+        @Test
+        public void tokenNotUUID_shouldReturnFalse() throws Exception {
+            assertFalse(service.isValid("123"));
+        }
     }
 
     public static class GenerateToken extends DefaultLocalTokenServiceTest {
