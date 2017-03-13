@@ -11,5 +11,6 @@ dependencies {
     compile project(':core')
     compile project(':database')
     testCompile("junit:junit:4.12")
+    testCompile("de.flapdoodle.embed:de.flapdoodle.embed.mongo")
 }
 

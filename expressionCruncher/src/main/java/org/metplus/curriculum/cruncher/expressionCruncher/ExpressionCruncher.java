@@ -71,7 +71,7 @@ public class ExpressionCruncher extends CruncherInitializer {
     private CruncherImpl cruncherImpl;
     private MatcherImpl resumeMatcher;
     @Autowired
-    private SettingsRepository repository;
+    private SettingsRepository settingsRepository;
     @Autowired
     private ResumeRepository resumeRepository;
     @Autowired
@@ -83,11 +83,11 @@ public class ExpressionCruncher extends CruncherInitializer {
         try {
             CruncherSettings settings = null;
             try {
-                settings = repository.findAll().iterator().next().getCruncherSettings(CruncherImpl.CRUNCHER_NAME);
+                settings = settingsRepository.findAll().iterator().next().getCruncherSettings(CruncherImpl.CRUNCHER_NAME);
             } catch(NoSuchElementException e) {
                 logger.info("Settings not present creating basic settings before start");
-                repository.save(new Settings());
-                settings = repository.findAll().iterator().next().getCruncherSettings(CruncherImpl.CRUNCHER_NAME);
+                settingsRepository.save(new Settings());
+                settings = settingsRepository.findAll().iterator().next().getCruncherSettings(CruncherImpl.CRUNCHER_NAME);
             }
             logger.info("ignore list: " + ignoreList);
             ignoreList = (List)settings.getSetting(IGNORE_LIST).getData();
@@ -138,7 +138,7 @@ public class ExpressionCruncher extends CruncherInitializer {
     public void save() {
         CruncherSettings cSettings;
         try {
-            cSettings = repository.findAll().iterator().next().getCruncherSettings(CruncherImpl.CRUNCHER_NAME);
+            cSettings = settingsRepository.findAll().iterator().next().getCruncherSettings(CruncherImpl.CRUNCHER_NAME);
         } catch (CruncherSettingsNotFound cruncherSettingsNotFound) {
             cSettings = new CruncherSettings(CruncherImpl.CRUNCHER_NAME);
         }
@@ -146,9 +146,9 @@ public class ExpressionCruncher extends CruncherInitializer {
         cSettings.addSetting(new Setting<>(IGNORE_LIST, cruncherImpl.getIgnoreList()));
         cSettings.addSetting(new Setting<>(IGNORE_LIST_WORD, cruncherImpl.isIgnoreListSearchWord()));
         cSettings.addSetting(new Setting<>(MERGE_LIST, cruncherImpl.getMergeList()));
-        Settings globalSettings = repository.findAll().iterator().next();
+        Settings globalSettings = settingsRepository.findAll().iterator().next();
         globalSettings.addCruncherSettings(CruncherImpl.CRUNCHER_NAME, cSettings);
-        repository.save(globalSettings);
+        settingsRepository.save(globalSettings);
     }
 
     @Override
