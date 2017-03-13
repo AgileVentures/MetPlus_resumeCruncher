@@ -1,28 +1,13 @@
 package org.metplus.curriculum.database.domain;
 
-import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.metplus.curriculum.config.DatabaseConfig;
-import org.metplus.curriculum.database.config.SpringMongoConfig;
-import org.metplus.curriculum.database.domain.CruncherSettings;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.SpringApplicationContextLoader;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 
 import static org.junit.Assert.*;
 import java.util.Collection;
 
-/**
- * Created by Joao Pereira on 19/08/2015.
- */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {SpringMongoConfig.class, DatabaseConfig.class})
+@DataMongoTest
 public class CruncherSettingsTest {
     private Setting<Integer> int_set;
     private Setting<String>  str_set;

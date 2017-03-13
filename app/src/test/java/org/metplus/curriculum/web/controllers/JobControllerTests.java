@@ -56,7 +56,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         JobControllerTests.MatchEndpointV2.class})
 public class JobControllerTests {
 
-    @RunWith(SpringRunner.class)
     @WebMvcTest(controllers = JobsController.class)
     @AutoConfigureRestDocs("build/generated-snippets")
     public static class DefaultJobTest extends BaseControllerTest {
@@ -84,6 +83,7 @@ public class JobControllerTests {
         }
     }
 
+    @RunWith(SpringRunner.class)
     public static class CreateEndpoint extends DefaultJobTest {
         @Test
         public void alreadyExists() throws Exception {
@@ -161,6 +161,7 @@ public class JobControllerTests {
         }
     }
 
+    @RunWith(SpringRunner.class)
     public static class UpdateEndpoint extends DefaultJobTest {
         @Test
         public void doNotExist() throws Exception {
@@ -289,6 +290,7 @@ public class JobControllerTests {
         }
     }
 
+    @RunWith(SpringRunner.class)
     public static class MatchEndpointV1 extends DefaultJobTest {
         @Test
         public void doNotExist() throws Exception {
@@ -432,6 +434,7 @@ public class JobControllerTests {
     }
 
 
+    @RunWith(SpringRunner.class)
     public static class MatchEndpointV2 extends DefaultJobTest {
         @Test
         public void doNotExist() throws Exception {
