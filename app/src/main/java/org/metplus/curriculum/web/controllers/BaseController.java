@@ -23,4 +23,8 @@ public class BaseController {
     public static final String SHUTDOWN_ENDPOINT = "/shutdown";
 
     public static final int VERSION_TESTING = 99999;
+
+    public static String[] test() {
+        return new String[2];
+    }
 }
