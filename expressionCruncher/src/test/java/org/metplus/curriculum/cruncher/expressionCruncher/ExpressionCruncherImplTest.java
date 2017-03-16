@@ -13,11 +13,18 @@ import org.metplus.curriculum.database.domain.Settings;
 import org.metplus.curriculum.database.exceptions.CruncherSettingsNotFound;
 import org.metplus.curriculum.database.repository.SettingsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.properties.PropertyMapping;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.List;
@@ -25,12 +32,21 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 @ActiveProfiles("development")
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {ExpressionCruncher.class,SpringMongoConfig.class, DatabaseConfig.class, CrunchersList.class, MatcherList.class})
+//@ContextConfiguration(classes = {ExpressionCruncher.class,SpringMongoConfig.class, DatabaseConfig.class, CrunchersList.class, MatcherList.class})
+@ContextConfiguration(classes = {ExpressionCruncher.class, CrunchersList.class, MatcherList.class})
+@RunWith(SpringRunner.class)
+@DataMongoTest
+@EnableMongoRepositories(basePackages = "org.metplus.curriculum.database.repository")
+
+
+//@ComponentScan(basePackages={"org.metplus.curriculum.database"})
 public class ExpressionCruncherImplTest {
-    @Autowired private ExpressionCruncher cruncher;
+    @Autowired
+    private ExpressionCruncher cruncher;
+
     @Autowired
     private SettingsRepository repository;
+
     @Before
     public void setUp() {
         repository.deleteAll();

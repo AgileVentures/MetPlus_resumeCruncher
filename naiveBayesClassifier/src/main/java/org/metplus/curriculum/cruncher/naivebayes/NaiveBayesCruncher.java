@@ -23,7 +23,7 @@ import java.util.*;
  * Naive Bayes Classifier
  */
 @Component
-@ConfigurationProperties(locations = "classpath:naiveBayes.yml", prefix = "config")
+@ConfigurationProperties(prefix = "naive-bayes")
 public class NaiveBayesCruncher extends CruncherInitializer {
     private static final Logger LOG = LoggerFactory.getLogger(NaiveBayesCruncher.class);
 

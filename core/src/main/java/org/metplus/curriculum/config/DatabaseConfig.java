@@ -14,8 +14,9 @@ import java.util.List;
  * Created by Joao Pereira on 27/08/2015.
  */
 @Component
-@ConfigurationProperties(locations = {"classpath:database.yml"},prefix="pets-db")
+@ConfigurationProperties(prefix="database-pets")
 public class DatabaseConfig {
+
 
     private String name;
     private String username;
