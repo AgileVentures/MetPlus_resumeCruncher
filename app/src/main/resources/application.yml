@@ -263,7 +263,7 @@ logging.level.org.metplus: INFO
 database-pets:
   name:
   host:
-  port:
+  port: 0
   username:
   password:
 
