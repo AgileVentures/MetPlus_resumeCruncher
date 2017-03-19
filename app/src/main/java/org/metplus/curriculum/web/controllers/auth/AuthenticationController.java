@@ -11,7 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationController extends BaseController {
 
     // tag::authenticate[]
-    @RequestMapping(path = "/api/v1/authenticate",
+    @RequestMapping(path = {
+            BaseController.baseUrlApiv1 + "/authenticate",
+            BaseController.baseUrlApiv2 + "/authenticate",
+            BaseController.baseUrlApivTesting + "/authenticate"
+    },
             method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public void authenticate() {
         /*return "This is just for in-code-documentation purposes and Rest API reference documentation." +

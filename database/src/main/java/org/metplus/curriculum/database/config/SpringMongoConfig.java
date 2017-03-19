@@ -40,6 +40,7 @@ public class SpringMongoConfig extends AbstractMongoConfiguration {
     @Bean
     public MongoClient mongo() throws Exception {
         logger.info("mongo connection to database: " + dbConfig.getHost() + ":" + dbConfig.getPort() + "/" + dbConfig.getName());
+        logger.info("mongo connection uri to database: " + dbConfig.getUri());
         if(dbConfig.asAuthentication())
             return withAuthentication();
         else
