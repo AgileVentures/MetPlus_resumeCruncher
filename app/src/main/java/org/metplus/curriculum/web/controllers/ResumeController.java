@@ -1,9 +1,8 @@
 package org.metplus.curriculum.web.controllers;
 
 
-import org.metplus.curriculum.api.APIVersion;
-import org.metplus.curriculum.cruncher.MatcherList;
 import org.metplus.curriculum.cruncher.Matcher;
+import org.metplus.curriculum.cruncher.MatcherList;
 import org.metplus.curriculum.database.config.SpringMongoConfig;
 import org.metplus.curriculum.database.domain.Job;
 import org.metplus.curriculum.database.domain.Resume;
@@ -21,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,9 +30,6 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping({"curriculum", "resume"})
-@PreAuthorize("hasAuthority('ROLE_DOMAIN_USER')")
-@APIVersion({1, 2, BaseController.VERSION_TESTING})
 public class ResumeController {
     private static Logger logger = LoggerFactory.getLogger(ResumeController.class);
 
@@ -53,7 +48,9 @@ public class ResumeController {
     @Autowired
     private MatcherList matcherList;
 
-    public ResumeController(){}
+    public ResumeController() {
+    }
+
     public ResumeController(JobRepository jobRepository, ResumeRepository resumeRepository, MatcherList matcherList, ResumeCruncher resumeCruncher) {
         this.jobRepository = jobRepository;
         this.resumeRepository = resumeRepository;
@@ -61,17 +58,20 @@ public class ResumeController {
         this.resumeCruncher = resumeCruncher;
     }
 
-    @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    @RequestMapping(value = {BaseController.baseUrlApiv1 + "/resume/upload",
+            BaseController.baseUrlApiv2 + "/resume/upload",
+            BaseController.baseUrlApivTesting + "/resume/upload"
+    }, method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<GenericAnswer> uploadCurriculum(
-                @RequestParam("userId") String id,
-                @RequestParam("name") String name,
-                @RequestParam("file") MultipartFile file) {
+            @RequestParam("userId") String id,
+            @RequestParam("name") String name,
+            @RequestParam("file") MultipartFile file) {
         logger.debug("File '" + name + "' is being uploaded to user: '" + id + "'");
         GenericAnswer answer = new GenericAnswer();
 
         Resume resume = resumeRepository.findByUserId(id);
-        if(resume == null) {
+        if (resume == null) {
             logger.debug("No previous resume on the system");
             resume = new Resume(id);
         }
@@ -80,7 +80,7 @@ public class ResumeController {
                 resume.setFilename(name);
                 resume.setResume(file.getInputStream(), dbConfig);
                 String[] fullName = name.split("\\.");
-                resume.setFileType(fullName[fullName.length-1]);
+                resume.setFileType(fullName[fullName.length - 1]);
                 resumeRepository.save(resume);
                 answer.setMessage("File uploaded successfully");
                 answer.setResultCode(ResultCodes.SUCCESS);
@@ -102,7 +102,10 @@ public class ResumeController {
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
+    @RequestMapping(value = {BaseController.baseUrlApiv1 + "/resume/{userId}",
+            BaseController.baseUrlApiv2 + "/resume/{userId}",
+            BaseController.baseUrlApivTesting + "/resume/{userId}"
+    }, method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<?> getCurriculum(
             @PathVariable("userId") String id,
@@ -111,7 +114,7 @@ public class ResumeController {
         GenericAnswer answer = new GenericAnswer();
 
         Resume resume = resumeRepository.findByUserId(id);
-        if(resume == null) {
+        if (resume == null) {
             logger.warn("Unable to find user: '" + id + "'");
             answer.setMessage("Unable to find the user: '" + id + "'");
             answer.setResultCode(ResultCodes.RESUME_NOT_FOUND);
@@ -120,7 +123,7 @@ public class ResumeController {
         try {
             ByteArrayOutputStream file = resume.getResume(dbConfig);
             response.setContentType("application/octet-stream");
-            response.setHeader("Content-Disposition", "inline; filename=\"" + resume.getFilename() +"\"");
+            response.setHeader("Content-Disposition", "inline; filename=\"" + resume.getFilename() + "\"");
             FileCopyUtils.copy(file.toByteArray(), response.getOutputStream());
             response.setContentLength(file.size());
             response.flushBuffer();
@@ -144,33 +147,31 @@ public class ResumeController {
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/match/{jobId}", method = RequestMethod.GET)
-    @APIVersion(1)
+    @RequestMapping(value = {BaseController.baseUrlApiv1 + "/resume/match/{jobId}"}, method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<GenericAnswer> matchv1(@PathVariable("jobId") final String jobId) {
         return match(jobId, false);
     }
 
-    @RequestMapping(value = "/match/{jobId}", method = RequestMethod.GET)
-    @APIVersion(2)
+    @RequestMapping(value = BaseController.baseUrlApiv2 + "/resume/match/{jobId}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<GenericAnswer> matchv2(@PathVariable("jobId") final String jobId) {
         return match(jobId, true);
     }
 
-    @RequestMapping(value = "/{resumeId}/compare/{jobId}", method = RequestMethod.GET)
-    @APIVersion(2)
+    @RequestMapping(value = BaseController.baseUrlApiv2 + "/resume/{resumeId}/compare/{jobId}",
+            method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<GenericAnswer> compareResumeAgainstJob(@PathVariable("resumeId") final String resumeId, @PathVariable("jobId") final String jobId) {
         logger.debug("Match resumes with job id: '" + jobId + "'");
-        if(jobId == null || jobId.length() == 0) {
+        if (jobId == null || jobId.length() == 0) {
             logger.error("Comparing Resume with empty job identifier");
             GenericAnswer answer = new GenericAnswer();
             answer.setMessage("Empty job identifier");
             answer.setResultCode(ResultCodes.FATAL_ERROR);
             return new ResponseEntity<>(answer, HttpStatus.BAD_REQUEST);
         }
-        if(resumeId == null || resumeId.length() == 0) {
+        if (resumeId == null || resumeId.length() == 0) {
             logger.error("Comparing Resume with empty resume id");
             GenericAnswer answer = new GenericAnswer();
             answer.setMessage("Empty resume identifier");
@@ -179,7 +180,7 @@ public class ResumeController {
         }
         List<Resume> matchedResumes = null;
         Job job = jobRepository.findByJobId(jobId);
-        if(job == null) {
+        if (job == null) {
             logger.error("Unable to find job with id: " + jobId);
             GenericAnswer answer = new GenericAnswer();
             answer.setMessage("No job found with id: " + jobId);
@@ -187,7 +188,7 @@ public class ResumeController {
             return new ResponseEntity<>(answer, HttpStatus.NOT_FOUND);
         }
         Resume resume = resumeRepository.findByUserId(resumeId);
-        if(resume == null) {
+        if (resume == null) {
             logger.error("Unable to find resume with id: " + resumeId);
             GenericAnswer answer = new GenericAnswer();
             answer.setMessage("No resume found with id: " + resumeId);
@@ -196,7 +197,7 @@ public class ResumeController {
         }
 
         StarAnswer answer = new StarAnswer();
-        for(Matcher matcher: matcherList.getMatchers()) {
+        for (Matcher matcher : matcherList.getMatchers()) {
             answer.addStarRating(matcher.getCruncherName(), matcher.matchSimilarity(resume, job));
         }
 
@@ -207,8 +208,8 @@ public class ResumeController {
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{resumeId}/compare/{jobId}", method = RequestMethod.GET)
-    @APIVersion(BaseController.VERSION_TESTING)
+    @RequestMapping(value = BaseController.baseUrlApivTesting + "/{resumeId}/compare/{jobId}",
+            method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<GenericAnswer> compareResumeAgainstJobCanned(
             @PathVariable("resumeId") final String resumeId,
@@ -217,17 +218,17 @@ public class ResumeController {
         int jobIdentifier = Integer.valueOf(jobId);
         int resumeIdentifier = Integer.valueOf(resumeId);
         double stars[][] = {{1.1, 1.2, 3., 4.3, 5.},
-                             {1.2, 1.3, 3.1, 4.4, 4.9}};
+                {1.2, 1.3, 3.1, 4.4, 4.9}};
 
         int starsId = -1;
         StarAnswer answer = new StarAnswer();
-        if(resumeIdentifier == 1)
+        if (resumeIdentifier == 1)
             starsId = jobIdentifier;
-        if(starsId < 0 || starsId >= stars[0].length)
+        if (starsId < 0 || starsId >= stars[0].length)
             return compareResumeAgainstJob(resumeId, jobId);
 
         int cruncherId = 0;
-        for(Matcher matcher: matcherList.getMatchers()) {
+        for (Matcher matcher : matcherList.getMatchers()) {
             answer.addStarRating(matcher.getCruncherName(), stars[cruncherId][starsId]);
             cruncherId++;
         }
@@ -239,26 +240,26 @@ public class ResumeController {
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/match/{jobId}", method = RequestMethod.GET)
-    @APIVersion(BaseController.VERSION_TESTING)
+    @RequestMapping(value = BaseController.baseUrlApivTesting + "/resume/match/{jobId}",
+            method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<GenericAnswer> matchCannedReponse(@PathVariable("jobId") final String jobId) {
         final double[] resumeStars = {1.8, 4.1, 2.6, 4.9, 3.2,
-                                      1.8, 4.1, 2.6, 4.9, 3.2};
+                1.8, 4.1, 2.6, 4.9, 3.2};
         ResumeMatchAnswer answer = new ResumeMatchAnswer();
         double jobIdentifier = Double.valueOf(jobId);
-        if(jobIdentifier > 0 && jobIdentifier < 11) {
-            for(int i = 0 ; i  < resumeStars.length ; i++ ) {
+        if (jobIdentifier > 0 && jobIdentifier < 11) {
+            for (int i = 0; i < resumeStars.length; i++) {
                 Resume resume = resumeRepository.findByUserId(Integer.toString(i));
-                if(resume != null) {
+                if (resume != null) {
                     resume.setStarRating(resumeStars[i]);
                     answer.addResume("NaiveBayes", resume, true);
                 }
             }
-        } else if(jobIdentifier % 5 != 0) {
-            for(int i = 0 ; i < 4 ; i++) {
+        } else if (jobIdentifier % 5 != 0) {
+            for (int i = 0; i < 4; i++) {
                 Resume resume = resumeRepository.findByUserId(Double.toString(jobIdentifier + i));
-                if(resume != null) {
+                if (resume != null) {
                     resume.setStarRating(resumeStars[i]);
                     answer.addResume("NaiveBayes", resume, true);
                 }
@@ -271,7 +272,7 @@ public class ResumeController {
 
     private ResponseEntity<GenericAnswer> match(final String jobId, boolean withProbability) {
         logger.debug("Match resumes with job id: '" + jobId + "'");
-        if(jobId == null || jobId.length() == 0) {
+        if (jobId == null || jobId.length() == 0) {
             logger.error("Matching resumes with empty job identifier");
             GenericAnswer answer = new GenericAnswer();
             answer.setMessage("Empty job identifier");
@@ -280,7 +281,7 @@ public class ResumeController {
         }
         List<Resume> matchedResumes = null;
         Job job = jobRepository.findByJobId(jobId);
-        if(job == null) {
+        if (job == null) {
             logger.error("Unable to find job with id: " + jobId);
             GenericAnswer answer = new GenericAnswer();
             answer.setMessage("No job with id: " + jobId);
@@ -288,17 +289,17 @@ public class ResumeController {
             return new ResponseEntity<>(answer, HttpStatus.BAD_REQUEST);
         }
         ResumeMatchAnswer answer = new ResumeMatchAnswer();
-        for(Matcher matcher: matcherList.getMatchers()) {
+        for (Matcher matcher : matcherList.getMatchers()) {
             logger.debug("Checking for matcher: " + matcher.getCruncherName());
             matchedResumes = matcher.matchInverse(job);
-            if(matchedResumes == null) {
+            if (matchedResumes == null) {
                 logger.error("Matching resumes with empty job identifier");
                 GenericAnswer errorAnswer = new GenericAnswer();
                 errorAnswer.setMessage("Not all information is crunched");
                 errorAnswer.setResultCode(ResultCodes.FATAL_ERROR);
                 return new ResponseEntity<>(errorAnswer, HttpStatus.BAD_REQUEST);
             }
-            for(Resume resume: matchedResumes) {
+            for (Resume resume : matchedResumes) {
                 answer.addResume(matcher.getCruncherName(), resume, withProbability);
             }
         }
@@ -309,13 +310,17 @@ public class ResumeController {
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/reindex", method = RequestMethod.GET)
+    @RequestMapping(value = {
+            BaseController.baseUrlApiv1 + "/resume/reindex",
+            BaseController.baseUrlApiv2 + "/resume/reindex",
+            BaseController.baseUrlApivTesting + "/resume/reindex"},
+            method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<GenericAnswer> reindex() {
         logger.debug("reindex()");
         GenericAnswer answer = new GenericAnswer();
         int total = 0;
-        for(Resume resume: resumeRepository.findAll()) {
+        for (Resume resume : resumeRepository.findAll()) {
             resumeCruncher.addWork(resume);
             total++;
         }

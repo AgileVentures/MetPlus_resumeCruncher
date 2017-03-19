@@ -7,9 +7,6 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import java.lang.reflect.Method;
 
-/**
- * Created by joao on 9/12/16.
- */
 public class RequestHandlerMapping extends RequestMappingHandlerMapping {
 
     private final String prefix;
@@ -25,7 +22,7 @@ public class RequestHandlerMapping extends RequestMappingHandlerMapping {
     @Override
     protected RequestMappingInfo getMappingForMethod(Method method, Class<?> handlerType) {
         RequestMappingInfo info = super.getMappingForMethod(method, handlerType);
-
+        System.out.println("Bammmmmm");
         APIVersion methodAnnotation = AnnotationUtils.findAnnotation(method, APIVersion.class);
         if(methodAnnotation != null) {
             RequestCondition<?> methodCondition = getCustomMethodCondition(method);

@@ -1,16 +1,11 @@
 package org.metplus.curriculum.database.domain;
 
-import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.metplus.curriculum.config.DatabaseConfig;
 import org.metplus.curriculum.database.config.SpringMongoConfig;
-import org.metplus.curriculum.database.domain.CruncherSettings;
-import org.metplus.curriculum.database.domain.Settings;
 import org.metplus.curriculum.database.exceptions.CruncherSettingsNotFound;
 import org.metplus.curriculum.database.exceptions.SettingNotFound;
-import org.springframework.boot.test.SpringApplicationContextLoader;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -20,8 +15,6 @@ import static org.junit.Assert.*;
  * Created by Joao Pereira on 25/08/2015.
  */
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {SpringMongoConfig.class, DatabaseConfig.class})
 public class SettingsTest {
 
     @Test

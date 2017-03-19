@@ -12,6 +12,7 @@ buildscript {
 plugins {
     id "org.asciidoctor.convert" version "1.5.3"
 }
+import org.apache.tools.ant.filters.ReplaceTokens
 
 //repositories {
 //    mavenCentral()
@@ -21,7 +22,7 @@ plugins {
 //}
 
 apply plugin: 'application'
-apply plugin: 'spring-boot'
+apply plugin: 'org.springframework.boot'
 if(System.env.SPRING_PROFILES_ACTIVE.equals('production')) {
     apply plugin: 'war'
 }
@@ -34,7 +35,6 @@ dependencies {
     compile project(':expressionCruncher')
     compile project(':naiveBayesClassifier')
     compile("org.springframework.boot:spring-boot-actuator")
-    compile('org.springframework.boot:spring-boot-starter-security')
     compile("org.springframework.boot:spring-boot-starter-web")
     compile 'org.springframework.boot:spring-boot-starter-actuator'
     compile 'org.springframework.boot:spring-boot-starter-aop'
@@ -50,13 +50,11 @@ dependencies {
     testCompile 'org.hamcrest:hamcrest-core'
     testCompile 'org.hamcrest:hamcrest-library'
     testCompile 'org.mockito:mockito-all:1.10.19'
-    testCompile group: 'junit', name: 'junit', version: '4.11'
-    testCompile 'org.springframework.restdocs:spring-restdocs-mockmvc:1.0.1.RELEASE'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile 'org.springframework.restdocs:spring-restdocs-mockmvc'
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'com.jayway.jsonpath:json-path'
 }
-
-
 
 task copyLicense {
     outputs.file new File("$buildDir/LICENSE.md")
@@ -141,4 +139,12 @@ if(System.env.SPRING_PROFILES_ACTIVE.equals('production')) {
 
 clean << {
     project.file('cruncher.jar').delete()
+}
+
+processResources {
+    with copySpec {
+        from 'src/main/resources/template/logback.xml'
+        into ''
+        expand SENTRY_DSN: System.env.SENTRY_DSN
+    }
 }

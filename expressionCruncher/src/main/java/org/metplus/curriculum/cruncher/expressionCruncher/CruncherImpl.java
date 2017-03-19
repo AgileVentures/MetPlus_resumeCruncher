@@ -102,9 +102,10 @@ public class CruncherImpl implements Cruncher {
      */
     public void setMergeList(Map<String, List<String>> mergeList) {
         this.mergeList = new HashMap<String, List<String>>();
-        for (Map.Entry<String, List<String>> newVal: mergeList.entrySet()) {
-            this.mergeList.put(newVal.getKey().replaceAll(" ", SEP), newVal.getValue());
-        }
+        if(mergeList != null)
+            for (Map.Entry<String, List<String>> newVal: mergeList.entrySet())
+                this.mergeList.put(newVal.getKey().replaceAll(" ", SEP), newVal.getValue());
+
     }
 
     /**

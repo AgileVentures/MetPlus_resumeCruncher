@@ -10,7 +10,7 @@ import java.util.Map;
  * Created by joao on 8/20/16.
  */
 @Component
-@ConfigurationProperties(locations = {"classpath:naiveBayes.yml"}, prefix = "config")
+@ConfigurationProperties(prefix = "naive-bayes")
 public class NaiveBayesConfig {
     private Map<String, List<String>> learnDatabase;
     private List<String> cleanExpressions;
