@@ -3,7 +3,10 @@ package org.metplus.curriculum.security.services;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
@@ -15,12 +18,20 @@ public class LocalTokenService implements TokenService {
     private HashMap<UUID, TokenInformation> tokens = new HashMap<>();
     private ObjectIdGenerators.UUIDGenerator generator = new ObjectIdGenerators.UUIDGenerator();
 
+    @Autowired
+    private Clock clock;
+
     public LocalTokenService() {
         this.timeoutSeconds = 1800;
     }
 
     public LocalTokenService(int timeoutSeconds) {
         this.timeoutSeconds = timeoutSeconds;
+    }
+
+    public LocalTokenService(Clock clock, int timeoutSeconds) {
+        this.timeoutSeconds = timeoutSeconds;
+        this.clock = clock;
     }
 
     @Override
@@ -39,8 +50,7 @@ public class LocalTokenService implements TokenService {
         }
 
         if (tokens.containsKey(tokenUUID)) {
-            if (new Date().getTime() <
-                    (tokens.get(tokenUUID).getEntryDate().getTime() + timeoutSeconds))
+            if (clock.instant().compareTo(tokens.get(tokenUUID).getEntryDate().plusSeconds(timeoutSeconds)) < 0)
                 return true;
             else
                 logger.info("Token '{}' for ip '{}' expired", token, tokens.get(tokenUUID).getIpAddress());
@@ -65,7 +75,7 @@ public class LocalTokenService implements TokenService {
                 }
         UUID token = generator.generateId(ipAddress);
         logger.info("Generated token '{}' valid for '{}' seconds", token.toString(), timeoutSeconds);
-        tokens.put(token, new TokenInformation(ipAddress, new Date()));
+        tokens.put(token, new TokenInformation(ipAddress, clock.instant()));
         return token.toString();
     }
 
@@ -76,14 +86,14 @@ public class LocalTokenService implements TokenService {
 
     class TokenInformation {
         private String ipAddress;
-        private Date entryDate;
+        private Instant entryDate;
 
-        TokenInformation(String ipAddress, Date entryDate) {
+        TokenInformation(String ipAddress, Instant entryDate) {
             this.ipAddress = ipAddress;
             this.entryDate = entryDate;
         }
 
-        Date getEntryDate() {
+        Instant getEntryDate() {
             return entryDate;
         }
 
