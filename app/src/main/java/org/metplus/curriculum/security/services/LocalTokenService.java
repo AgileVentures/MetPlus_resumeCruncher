@@ -27,6 +27,7 @@ public class LocalTokenService implements TokenService {
 
     public LocalTokenService(int timeoutSeconds) {
         this.timeoutSeconds = timeoutSeconds;
+        clock = Clock.systemDefaultZone();
     }
 
     public LocalTokenService(Clock clock, int timeoutSeconds) {
