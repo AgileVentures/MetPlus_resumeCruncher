@@ -18,11 +18,11 @@ public class LocalTokenService implements TokenService {
     private HashMap<UUID, TokenInformation> tokens = new HashMap<>();
     private ObjectIdGenerators.UUIDGenerator generator = new ObjectIdGenerators.UUIDGenerator();
 
-    @Autowired
     private Clock clock;
 
     public LocalTokenService() {
         this.timeoutSeconds = 1800;
+        clock = Clock.systemDefaultZone();
     }
 
     public LocalTokenService(int timeoutSeconds) {
