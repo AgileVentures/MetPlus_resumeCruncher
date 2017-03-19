@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml" />
+    <logger name="org.springframework" level="WARN" />
+    <logger name="org.metplus" level="INFO" />
+    <logger name="org.apache" level="WARN" />
+
+    <appender name="Sentry" class="com.getsentry.raven.logback.SentryAppender">
+        <dsn>${SENTRY_DSN}</dsn>
+        <tags>tag1:value1,tag2:value2</tags>
+        <!-- Optional, allows to select the ravenFactory -->
+        <!--<ravenFactory>com.getsentry.raven.DefaultRavenFactory</ravenFactory>-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <root level="warn">
+        <appender-ref ref="Sentry"/>
+    </root>
+</configuration>
