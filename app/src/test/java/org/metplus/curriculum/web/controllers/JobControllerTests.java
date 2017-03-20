@@ -1,6 +1,6 @@
 package org.metplus.curriculum.web.controllers;
 
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -14,6 +14,8 @@ import org.metplus.curriculum.database.repository.JobRepository;
 import org.metplus.curriculum.database.repository.ResumeRepository;
 import org.metplus.curriculum.process.JobCruncher;
 import org.metplus.curriculum.security.services.TokenService;
+import org.metplus.curriculum.test.BeforeAfterInterface;
+import org.metplus.curriculum.test.BeforeAfterRule;
 import org.metplus.curriculum.web.answers.ResultCodes;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -50,15 +52,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Tests for the Job Controller
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({JobControllerTests.CreateEndpoint.class,
-        JobControllerTests.UpdateEndpoint.class,
+@Suite.SuiteClasses({
+        JobControllerTests.CreateEndpointVTest.class,
+        JobControllerTests.CreateEndpointV1.class,
+        JobControllerTests.CreateEndpointV2.class,
+        JobControllerTests.UpdateEndpointVTest.class,
+        JobControllerTests.UpdateEndpointV1.class,
+        JobControllerTests.UpdateEndpointV2.class,
         JobControllerTests.MatchEndpointV1.class,
         JobControllerTests.MatchEndpointV2.class})
 public class JobControllerTests {
 
     @WebMvcTest(controllers = JobsController.class)
     @AutoConfigureRestDocs("build/generated-snippets")
-    public static class DefaultJobTest extends BaseControllerTest {
+    public static class DefaultJobTest extends BaseControllerTest implements BeforeAfterInterface {
+        protected String versionUrl;
 
         @Autowired
         TokenService tokenService;
@@ -77,8 +85,16 @@ public class JobControllerTests {
 
         String token;
 
-        @Before
-        public void setUp() throws Exception {
+        @Rule
+        public BeforeAfterRule rule = new BeforeAfterRule(this);
+
+        @Override
+        public void after() {
+
+        }
+
+        @Override
+        public void before() {
             token = tokenService.generateToken("0.0.0.0");
         }
     }
@@ -150,7 +166,7 @@ public class JobControllerTests {
         }
 
         private ResultActions createNewJob() throws Exception {
-            return mockMvc.perform(post("/api/v1/job/create")
+            return mockMvc.perform(post("/api/" + versionUrl + "/job/create")
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .param("jobId", "1")
@@ -161,13 +177,37 @@ public class JobControllerTests {
         }
     }
 
+    public static class CreateEndpointV1 extends CreateEndpoint {
+        @Override
+        public void before() {
+            super.before();
+            this.versionUrl = "v1";
+        }
+    }
+
+    public static class CreateEndpointV2 extends CreateEndpoint {
+        @Override
+        public void before() {
+            super.before();
+            this.versionUrl = "v2";
+        }
+    }
+
+    public static class CreateEndpointVTest extends CreateEndpoint {
+        @Override
+        public void before() {
+            super.before();
+            this.versionUrl = "v99999";
+        }
+    }
+
     @RunWith(SpringRunner.class)
     public static class UpdateEndpoint extends DefaultJobTest {
         @Test
         public void doNotExist() throws Exception {
             Mockito.when(jobRepository.findByJobId("1")).thenReturn(null);
 
-            updateJob("/api/v1/job/{jobId}/update",
+            updateJob(
                     "Job title", "My awsome job description")
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
@@ -199,7 +239,7 @@ public class JobControllerTests {
             job.setDescription("My current description");
             Mockito.when(jobRepository.findByJobId("1")).thenReturn(job);
 
-            updateJob("/api/v1/job/{jobId}/update",
+            updateJob(
                     "Job title",
                     "My awsome job description")
                     .andExpect(status().isOk())
@@ -237,7 +277,7 @@ public class JobControllerTests {
             job.setDescription("My current description");
             Mockito.when(jobRepository.findByJobId("1")).thenReturn(job);
 
-            updateJob("/api/v1/job/{jobId}/update",
+            updateJob(
                     "Job title",
                     null)
                     .andExpect(status().isOk())
@@ -262,7 +302,7 @@ public class JobControllerTests {
             job.setDescription("My current description");
             Mockito.when(jobRepository.findByJobId("1")).thenReturn(job);
 
-            updateJob("/api/v1/job/1/update",
+            updateJob(
                     null,
                     "My awsome job description")
                     .andExpect(status().isOk())
@@ -279,14 +319,41 @@ public class JobControllerTests {
             Mockito.verify(jobCruncher).addWork(allJobs.getValue());
         }
 
-        private ResultActions updateJob(String url, String jobTitle, String jobDescription) throws Exception {
-            return mockMvc.perform(patch(url, "1")
+        private ResultActions updateJob(String jobTitle, String jobDescription) throws Exception {
+            return mockMvc.perform(patch("/api/" + versionUrl + "/job/{jobId}/update", "1")
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .param("title", jobTitle)
                     .param("description", jobDescription)
                     .header("X-Auth-Token", token)
             );
+        }
+    }
+
+
+    public static class UpdateEndpointV1 extends UpdateEndpoint {
+        @Override
+        public void before() {
+            super.before();
+            this.versionUrl = "v1";
+        }
+    }
+
+
+    public static class UpdateEndpointV2 extends UpdateEndpoint {
+        @Override
+        public void before() {
+            super.before();
+            this.versionUrl = "v2";
+        }
+    }
+
+
+    public static class UpdateEndpointVTest extends UpdateEndpoint {
+        @Override
+        public void before() {
+            super.before();
+            this.versionUrl = "v99999";
         }
     }
 

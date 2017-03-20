@@ -121,6 +121,26 @@ public class JobsController {
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
 
+    @RequestMapping(value = {BaseController.baseUrlApiv1 + "/job/reindex",
+            BaseController.baseUrlApiv2 + "/job/reindex",
+            BaseController.baseUrlApivTesting + "/job/reindex"},
+            method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<GenericAnswer> reindex() {
+        logger.debug("reindex()");
+        GenericAnswer answer = new GenericAnswer();
+        int total = 0;
+        for (Job job : jobRepository.findAll()) {
+            jobCruncher.addWork(job);
+            total++;
+        }
+        answer.setMessage("Going to reindex " + total + " jobs");
+        answer.setResultCode(ResultCodes.SUCCESS);
+
+        logger.debug("Result is: " + answer);
+        return new ResponseEntity<>(answer, HttpStatus.OK);
+    }
+
     @RequestMapping(value = BaseController.baseUrlApiv2 + "/job/match/{resumeId}",
             method = RequestMethod.GET)
     @ResponseBody
@@ -165,6 +185,7 @@ public class JobsController {
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
 
+
     private ResponseEntity<GenericAnswer> match(String resumeId, boolean withProbabilityAnswer) {
         logger.debug("match(" + resumeId + ", " + withProbabilityAnswer + ")");
         Resume resume = resumeRepository.findByUserId(resumeId);
@@ -198,27 +219,6 @@ public class JobsController {
         answer.setMessage("Success");
         answer.setResultCode(ResultCodes.SUCCESS);
         logger.debug("Done processing: " + answer);
-        return new ResponseEntity<>(answer, HttpStatus.OK);
-    }
-
-
-    @RequestMapping(value = {BaseController.baseUrlApiv1 + "/job/reindex",
-            BaseController.baseUrlApiv2 + "/job/reindex",
-            BaseController.baseUrlApivTesting + "/job/reindex"},
-            method = RequestMethod.GET)
-    @ResponseBody
-    public ResponseEntity<GenericAnswer> reindex() {
-        logger.debug("reindex()");
-        GenericAnswer answer = new GenericAnswer();
-        int total = 0;
-        for (Job job : jobRepository.findAll()) {
-            jobCruncher.addWork(job);
-            total++;
-        }
-        answer.setMessage("Going to reindex " + total + " jobs");
-        answer.setResultCode(ResultCodes.SUCCESS);
-
-        logger.debug("Result is: " + answer);
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
 }
