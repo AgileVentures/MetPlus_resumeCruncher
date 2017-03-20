@@ -208,7 +208,7 @@ public class ResumeController {
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
 
-    @RequestMapping(value = BaseController.baseUrlApivTesting + "/{resumeId}/compare/{jobId}",
+    @RequestMapping(value = BaseController.baseUrlApivTesting + "/resume/{resumeId}/compare/{jobId}",
             method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<GenericAnswer> compareResumeAgainstJobCanned(
