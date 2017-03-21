@@ -99,8 +99,7 @@ public class JobControllerTests {
         }
     }
 
-    @RunWith(SpringRunner.class)
-    public static class CreateEndpoint extends DefaultJobTest {
+    public static abstract class CreateEndpoint extends DefaultJobTest {
         @Test
         public void alreadyExists() throws Exception {
             Job job = new Job();
@@ -177,6 +176,7 @@ public class JobControllerTests {
         }
     }
 
+    @RunWith(SpringRunner.class)
     public static class CreateEndpointV1 extends CreateEndpoint {
         @Override
         public void before() {
@@ -185,6 +185,7 @@ public class JobControllerTests {
         }
     }
 
+    @RunWith(SpringRunner.class)
     public static class CreateEndpointV2 extends CreateEndpoint {
         @Override
         public void before() {
@@ -193,6 +194,7 @@ public class JobControllerTests {
         }
     }
 
+    @RunWith(SpringRunner.class)
     public static class CreateEndpointVTest extends CreateEndpoint {
         @Override
         public void before() {
@@ -201,8 +203,7 @@ public class JobControllerTests {
         }
     }
 
-    @RunWith(SpringRunner.class)
-    public static class UpdateEndpoint extends DefaultJobTest {
+    public static abstract class UpdateEndpoint extends DefaultJobTest {
         @Test
         public void doNotExist() throws Exception {
             Mockito.when(jobRepository.findByJobId("1")).thenReturn(null);
@@ -331,6 +332,7 @@ public class JobControllerTests {
     }
 
 
+    @RunWith(SpringRunner.class)
     public static class UpdateEndpointV1 extends UpdateEndpoint {
         @Override
         public void before() {
@@ -340,6 +342,7 @@ public class JobControllerTests {
     }
 
 
+    @RunWith(SpringRunner.class)
     public static class UpdateEndpointV2 extends UpdateEndpoint {
         @Override
         public void before() {
@@ -349,6 +352,7 @@ public class JobControllerTests {
     }
 
 
+    @RunWith(SpringRunner.class)
     public static class UpdateEndpointVTest extends UpdateEndpoint {
         @Override
         public void before() {
