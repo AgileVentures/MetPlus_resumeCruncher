@@ -7,7 +7,13 @@ import org.junit.runners.Suite;
 import org.metplus.curriculum.test.BeforeAfterInterface;
 import org.metplus.curriculum.test.BeforeAfterRule;
 
+import java.time.Clock;
+import java.time.Instant;
+
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
 
 
 @RunWith(Suite.class)
@@ -16,6 +22,9 @@ import static org.junit.Assert.*;
 public class LocalTokenServiceTest {
 
     public static class DefaultLocalTokenServiceTest implements BeforeAfterInterface {
+        Clock clock;
+        Instant now;
+        Instant afterTimeout;
         @Rule
         public BeforeAfterRule beforeAfter = new BeforeAfterRule(this);
         protected LocalTokenService service;
@@ -27,7 +36,12 @@ public class LocalTokenServiceTest {
 
         @Override
         public void before() {
-            service = new LocalTokenService();
+            clock = mock(Clock.class);
+            now = Instant.now();
+            afterTimeout = now.plusSeconds(1800);
+            when(clock.instant()).thenReturn(now);
+
+            service = new LocalTokenService(clock, 1800);
             generatedKey = service.generateToken("1.1.1.1");
         }
     }
@@ -51,6 +65,20 @@ public class LocalTokenServiceTest {
         @Test
         public void tokenNotUUID_shouldReturnFalse() throws Exception {
             assertFalse(service.isValid("123"));
+        }
+
+        @Test
+        public void timeoutReached_shouldReturnFalse() throws Exception {
+            reset(clock);
+            when(clock.instant()).thenReturn(afterTimeout);
+            assertFalse(service.isValid(generatedKey));
+        }
+
+        @Test
+        public void timeoutNotReached_shouldReturnTrue() throws Exception {
+            reset(clock);
+            when(clock.instant()).thenReturn(afterTimeout.minusSeconds(1));
+            assertTrue(service.isValid(generatedKey));
         }
     }
 
