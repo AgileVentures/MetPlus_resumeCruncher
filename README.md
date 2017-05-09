@@ -8,21 +8,53 @@ Resume Processor for the MetPlus project
 
 # Configuration files
 
-- core/src/main/resources/database.yml
-
-  In this file the configuration of connection to the database is stored
-
 - app/src/main/resources/application.yml
  
   In this file the application configuration is stored
 
     1. Tomcat configuration
     1. Log level
+    1. Database connection information
+    1. Default cruncher configuration
 
 # Installation
 1. Clone this repository by using the command
 
   ```git clone https://github.com/AgileVentures/MetPlus_resumeCruncher.git resumeCruncher```
+
+## Database
+
+### Local mongo database
+
+Follow the instruction to on [mongodb.com](https://www.mongodb.com/download-center?jmp=nav#community) to install in your operating system the database
+
+When this is done jump to the mongo database configuration section
+### Mongo in docker container
+
+Requirement for this options is to have Docker installed in your system.
+
+1 - Create docker image: 
+```bash
+docker run -it -p 27017:27017 --name pets-mongo -d mongo --noauth
+```
+This command creates a new image called `pets-mongo` and publishes the mongo port so
+we can access it from the host machine
+
+2 - Access the mongo instance to create the user and the database
+
+```bash
+docker exec -it pets-mongo mongo resumeCruncher
+```
+
+### Mongo configuration section
+
+Connect to the database resumeCruncher.
+
+1 - Create the user on the database
+
+```mongo
+ db.createUser({user: 'testing_user', pwd: 'testing_user', roles: [{role: 'readWrite', db: 'resumeCruncher'}]});
+```
 
 
 # Using the application
@@ -54,11 +86,12 @@ Host: localhost
 ```
 
 # Unit Testing
-Before running the tests make sure to have mongodb launched in your machine or if you want to use one external server edit the file ```core/src/main/resources/database.yml``` with the new definition
+Before running the tests make sure to have mongodb launched in your machine or if you want to use one external server edit the file ```app/src/main/resources/application.yml``` with the new definition
 
 After that just run the following command
 
 ```> SPRING_ACTIVE_PROFILE="unit-test" ./gradlew check ```
+
 
 # Credits
 Naive Bayes Classifier is based on the source developed by Philipp Nolte.
