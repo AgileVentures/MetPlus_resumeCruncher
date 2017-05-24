@@ -6,17 +6,6 @@ Resume Processor for the MetPlus project
 - Java SDK version 8
 - MongoDB
 
-# Configuration files
-
-- app/src/main/resources/application.yml
- 
-  In this file the application configuration is stored
-
-    1. Tomcat configuration
-    1. Log level
-    1. Database connection information
-    1. Default cruncher configuration
-
 # Installation
 1. Clone this repository by using the command
 
@@ -56,6 +45,133 @@ Connect to the database resumeCruncher.
  db.createUser({user: 'testing_user', pwd: 'testing_user', roles: [{role: 'readWrite', db: 'resumeCruncher'}]});
 ```
 
+# Configuration files
+
+- app/src/main/resources/application.yml
+ 
+  In this file the application configuration is stored
+
+    1. Tomcat configuration
+    1. Log level
+    1. Database connection information
+    1. Default cruncher configuration
+ 
+ ## Structure of the configuration
+ 
+ The configuration file is structures as per Spring using a multi profile following the [example](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html#boot-features-external-config-multi-profile-yaml)
+ 
+ We are using a default configuration plus specific configuration for `production`, `development` and `unit-database` profiles.
+ 
+ To launch with a specific profile the application should be launch with the following command:
+ 
+ ```bash
+ $ SPRING_PROFILES_ACTIVE="production" ./gradlew startCruncher
+ ```
+ 
+ The default profile is `development`
+ 
+ ## Tomcat configuration
+ 
+ The only change to tomcat configuration is the server port and it looks like this:
+ 
+ ```
+ server:
+  port: 8443
+ ```
+
+Other options are available, please refer to the documentation of spring boot
+
+## Log level
+
+The application is using the default logger of spring boot.
+To change the log level of the framework and libraries:
+```
+logging.level: INFO
+logging.level.org.hibernate: ERROR
+logging.level.com.mongodb: ERROR
+logging.level.org.springframework: WARN
+```
+
+To change the Cruncher specific logs:
+```
+logging.level.org.metplus: DEBUG
+```
+
+## Database connection information
+The database configuration can be found in blocks like the following and there is one for each profile.
+
+```
+database-pets:
+    username: username      # Username to connect to the mongo database
+    password: password      # Password of the User in mongo database
+    name: resumeCruncher    # Name of the database in mongo
+    host: localhost         # Hostname where the mongo database is running
+    port: 27017             # Port the mongo databse is listening
+```
+
+Make sure to update the correct section of this file depending on the profile that is going to be used.
+
+### Optional configuration
+All the previous configuration can also be archived by using the URI to the database. In order to use this URI replace the previous section with the next one
+
+```
+database-pets:
+    uri: mongodb://username:password@hostname:port/database_name
+```
+
+## Default cruncher configuration
+
+### Web application configuration
+In this section it is possible to change the username and password used to connect to the cruncher server
+
+```
+backend:
+  admin:
+    username: backend_admin     # Username that should be provided in the HTTP parameter X-Auth-Username
+    password: backendpassword   # Password that should be provided in the HTTP parameter X-Auth-Password 
+```
+
+### Cunchers default configuration
+
+This section of configuration is the section that uses more space, because it contains the initial configuration for all the crunchers.
+
+At this point there are 2 crunchers and they have the following configuration:
+
+#### Expression based cruncher
+This cruncher is a very basic implementation of a word/expression counting algorithm, that adds up all the occurencies of a word/expression and based on the words/expression more common matches documents.
+
+The options for this cruncher looks like this
+
+```
+expression-cruncher:
+    case-sensitive: false                      # Should the matching be case sensitive or not
+    ignoreListWordSearch: true                 # Ignore the words in the ignore list
+    merge-list:                                # List of tokens to be merged, this is a hash that contains
+      "software development":                  # the final name and a list of expressions that will be replace by that final name
+        - "software development"
+        - "software development lifecycle"
+      "cook":
+        - "cook"
+        - "line cook"
+    ignore-list:                               # List of words or expressions that will be ignored when matching
+      - "a"                                    # this is used to archive more accuracy on the matching
+```
+
+#### Naive Bayes based cruncher
+This cruncher uses a different approach, based in the Naive Bayes algorithm to match categories. 
+This algorithm need a set of trainning documments for each possible category. The bigger the set the more accurate is the algorithm.
+
+```
+naive-bayes:
+  learn-database:              # Trainning set, this is a hash that contains the category name
+    "category one":            # and a list with different documents that belong to each category
+      - "blah blah blah"
+    "category two":
+      - "bamm bamm bamm"
+  clean-expressions:           # To ensure that common words do not polute the results, we can
+    - "a"                      # can provide a list of words or expressions that will be removed
+    - "or"                     # from the document before the algorithm run
+```
 
 # Using the application
 
