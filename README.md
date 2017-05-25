@@ -12,13 +12,17 @@ Resume Processor for the MetPlus project
   ```git clone https://github.com/AgileVentures/MetPlus_resumeCruncher.git resumeCruncher```
 
 ## Database
+In order to install and run the application you need to have access to one mongo instance to save the cruncher information.
+You can use a Local Mongo instance, a Docker container, a Virtual Machine or a database as a Service like [mlab](http://www.mlab.com)
 
-### Local mongo database
+### Examples of installation of mongo
+In the following points you there is more information on how to create a mongo database
+#### (Example) Local mongo database
 
 Follow the instruction to on [mongodb.com](https://www.mongodb.com/download-center?jmp=nav#community) to install in your operating system the database
 
 When this is done jump to the mongo database configuration section
-### Mongo in docker container
+#### (Example) Mongo in docker container
 
 Requirement for this options is to have Docker installed in your system.
 
@@ -35,11 +39,10 @@ we can access it from the host machine
 docker exec -it pets-mongo mongo resumeCruncher
 ```
 
-### Mongo configuration section
+### Mongo configuration
 
-Connect to the database resumeCruncher.
-
-1 - Create the user on the database
+Before we can start the Cruncher we need to create a user and a database to connect to. 
+To accomplish that connect to the Mongo instance using mongo CLI or a a visual app like robomongo and execute the following:
 
 ```mongo
  db.createUser({user: 'testing_user', pwd: 'testing_user', roles: [{role: 'readWrite', db: 'resumeCruncher'}]});
