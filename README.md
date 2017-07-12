@@ -10,6 +10,8 @@ Resume Processor for the MetPlus project
 1. Clone this repository by using the command
 
   ```git clone https://github.com/AgileVentures/MetPlus_resumeCruncher.git resumeCruncher```
+  
+2. Enter the source folder (All commands in this document assume you are currently inside the source folder directory)
 
 ## Database
 In order to install and run the application you need to have access to one mongo instance to save the cruncher information.
@@ -177,6 +179,8 @@ naive-bayes:
 ```
 
 # Using the application
+
+Enter the sources folder before doing the next step
 
 To start the application:
 
