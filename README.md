@@ -13,6 +13,8 @@ Resume Processor for the MetPlus project
   
 2. Enter the source folder (All commands in this document assume you are currently inside the source folder directory)
 
+  ```cd resumeCruncher```
+
 ## Database
 In order to install and run the application you need to have access to one mongo instance to save the cruncher information.
 You can use a Local Mongo instance, a Docker container, a Virtual Machine or a database as a Service like [mlab](http://www.mlab.com)
