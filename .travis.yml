@@ -9,7 +9,7 @@ env:
   global:
     - SPRING_PROFILES_ACTIVE="unit-database"
 before_install:
-  - mongo resumeCruncher --eval 'db.createUser("testing_user", "testing_user");'
+  - mongo resumeCruncher --eval 'db.createUser({user: "testing_user", pwd: "testing_user", roles:["readWrite"]});'
   - chmod +x gradlew
 install: "./gradlew :app:assemble"
 before_cache:
