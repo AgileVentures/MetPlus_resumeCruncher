@@ -79,7 +79,7 @@ applicationDistribution.from(copyLicense) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.0'
+    gradleVersion = '4.3'
 }
 
 task stage {
