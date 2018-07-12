@@ -217,6 +217,17 @@ After that just run the following command
 
 ```> SPRING_ACTIVE_PROFILE="unit-test" ./gradlew check ```
 
+# Contributing
+
+1. Fork it ( https://github.com/AgileVentures/MetPlus_resumeCruncher/fork )
+1. Talk with us in [Slack](https://agileventures.slack.com) channel #metplus
+1. Find a story to work in [Waffle](https://waffle.io/AgileVentures/MetPlus_tracker?search=resumecruncher)
+1. Create your feature branch (git checkout -b my-new-feature)
+1. Test changes don't break anything (```./gradlew check```)
+1. Add test for your new feature
+1. Commit your changes (`git commit -am 'Add some feature'`)
+1. Push to the branch (`git push origin my-new-feature`)
+1. Create a new Pull Request
 
 # Credits
 Naive Bayes Classifier is based on the source developed by Philipp Nolte.
