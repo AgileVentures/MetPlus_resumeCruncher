@@ -12,18 +12,10 @@ buildscript {
 plugins {
     id "org.asciidoctor.convert" version "1.5.3"
 }
-import org.apache.tools.ant.filters.ReplaceTokens
-
-//repositories {
-//    mavenCentral()
-//    maven {
-//        url 'https://repo.spring.io/release'
-//    }
-//}
 
 apply plugin: 'application'
 apply plugin: 'org.springframework.boot'
-if(System.env.SPRING_PROFILES_ACTIVE.equals('production')) {
+if (System.env.SPRING_PROFILES_ACTIVE.equals('production')) {
     apply plugin: 'war'
 }
 apply plugin: 'org.asciidoctor.convert'
@@ -39,7 +31,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-actuator'
     compile 'org.springframework.boot:spring-boot-starter-aop'
 
-    if(System.env.SPRING_PROFILES_ACTIVE.equals('production')) {
+    if (System.env.SPRING_PROFILES_ACTIVE.equals('production')) {
         providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
     }
 
@@ -69,12 +61,15 @@ task copyLicense {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-task startCruncher <<{
-    bootRun { 
-        systemProperties = System.properties
-	systemProperty "spring.profiles.active", System.env.SPRING_PROFILES_ACTIVE != null ? System.env.SPRING_PROFILES_ACTIVE : "development" 
+task startCruncher {
+    doLast {
+        bootRun {
+            systemProperties = System.properties
+            systemProperty "spring.profiles.active", System.env.SPRING_PROFILES_ACTIVE != null ? System.env.SPRING_PROFILES_ACTIVE : "development"
+        }
     }
 }
+
 startCruncher.finalizedBy bootRun
 
 applicationDistribution.from(copyLicense) {
@@ -111,28 +106,27 @@ asciidoctor {
 
 
 task stage(type: Copy, dependsOn: [clean, build]) {
-    //from jar.archivePath
-    //into project.rootDir 
-    //rename {
-    //       'cruncher.jar'
-    //}
 }
+
 stage.mustRunAfter(clean)
-gradle.taskGraph.whenReady {taskGraph ->
+
+gradle.taskGraph.whenReady { taskGraph ->
     if (taskGraph.hasTask(stage)) {
-       test.enabled = false
-       asciidoctor.enabled = false
+        test.enabled = false
+        asciidoctor.enabled = false
     }
 }
 
 
-if(System.env.SPRING_PROFILES_ACTIVE.equals('production')) {
+if (System.env.SPRING_PROFILES_ACTIVE.equals('production')) {
     tasks.test.enabled = false
     tasks.asciidoctor.enabled = false
 }
 
-clean << {
-    project.file('cruncher.jar').delete()
+clean {
+    doLast {
+        project.file('cruncher.jar').delete()
+    }
 }
 
 processResources {
