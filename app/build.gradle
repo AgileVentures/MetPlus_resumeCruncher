@@ -4,7 +4,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath "org.asciidoctor:asciidoctor-gradle-plugin:1.5.2"
+        classpath "org.asciidoctor:asciidoctor-gradle-plugin:1.5.3"
         classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.6'
     }
 }
@@ -89,30 +89,24 @@ test {
     outputs.dir snippetsDir
 }
 asciidoctorj {
-    version = '1.5.2'
+    version = '1.5.3'
 }
 asciidoctor {
     attributes 'snippets': snippetsDir
     inputs.dir snippetsDir
     dependsOn test
-    backends    'html5'
-    attributes	'build-gradle': file('build.gradle'),
+    backends 'html5'
+    attributes 'build-gradle': file('build.gradle'),
             'sourcedir': project.sourceSets.main.java.srcDirs[0],
             'endpoint-url': 'http://example.org',
-            'source-highlighter' : 'coderay',
+            'source-highlighter': 'coderay',
             'imagesdir': './images',
-            'toc':'left',
+            'toc': 'left',
             'icons': 'font',
-            'setanchors':'true',
-            'idprefix':'',
-            'idseparator':'-',
-            'docinfo1':'true'
-}
-jar {
-    dependsOn asciidoctor
-    from ("${asciidoctor.outputDir}/html5") {
-        into 'static/docs'
-    }
+            'setanchors': 'true',
+            'idprefix': '',
+            'idseparator': '-',
+            'docinfo1': 'true'
 }
 
 
