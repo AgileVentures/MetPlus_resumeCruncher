@@ -13,7 +13,7 @@ import org.metplus.curriculum.database.repository.ResumeRepository;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -87,7 +87,6 @@ public class ResumeCruncherTest {
             Mockito.when(resume.getResume(springMongoConfig)).thenThrow(new ResumeNotFound(""));
             List<Cruncher> listCrunchers = new ArrayList<>();
             listCrunchers.add(cruncherImpl);
-            Mockito.when(allCrunchers.getCrunchers()).thenReturn(listCrunchers);
             cruncher.postConstructor();
             cruncher.addWork(resume);
             cruncher.stop();
@@ -102,7 +101,6 @@ public class ResumeCruncherTest {
             Mockito.when(resume.getResume(springMongoConfig)).thenThrow(new ResumeReadException(""));
             List<Cruncher> listCrunchers = new ArrayList<>();
             listCrunchers.add(cruncherImpl);
-            Mockito.when(allCrunchers.getCrunchers()).thenReturn(listCrunchers);
             cruncher.postConstructor();
             cruncher.addWork(resume);
             cruncher.stop();

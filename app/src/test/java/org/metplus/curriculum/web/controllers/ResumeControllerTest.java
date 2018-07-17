@@ -50,6 +50,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -308,7 +309,7 @@ public class ResumeControllerTest {
                             responseFields(
                                     fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
                                     fieldWithPath("message").description("Message associated with the result code"),
-                                    fieldWithPath("resumes").description("List with the identifiers of the resumes matched for each cruncher")
+                                    subsectionWithPath("resumes").description("List with the identifiers of the resumes matched for each cruncher")
                             )
                     ))
                     .andExpect(jsonPath("$.resultCode", is(ResultCodes.SUCCESS.toString())))
@@ -445,7 +446,7 @@ public class ResumeControllerTest {
                             responseFields(
                                     fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
                                     fieldWithPath("message").description("Message associated with the result code"),
-                                    fieldWithPath("resumes").description("Hash with the identifiers of the resumes and the star rating matched for each cruncher")
+                                    subsectionWithPath("resumes").description("Hash with the identifiers of the resumes and the star rating matched for each cruncher")
                             )
                     ))
                     .andExpect(jsonPath("$.resultCode", is(ResultCodes.SUCCESS.toString())))
@@ -559,7 +560,7 @@ public class ResumeControllerTest {
                             responseFields(
                                     fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
                                     fieldWithPath("message").description("Message associated with the result code"),
-                                    fieldWithPath("stars").description("Hash with the star rating per cruncher")
+                                    subsectionWithPath("stars").description("Hash with the star rating per cruncher")
                             )
                     ))
                     .andReturn().getResponse();

@@ -1,6 +1,11 @@
 package org.metplus.curriculum.database.domain;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.GridFSBuckets;
+import com.mongodb.client.gridfs.GridFSFindIterable;
+import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
@@ -12,7 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsOperations;
+import org.springframework.data.mongodb.gridfs.GridFsResource;
+import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -52,21 +61,20 @@ public class Resume extends DocumentWithMetaData {
 
     /**
      * Retrieve the resume file
+     *
      * @return Stream of the file
-     * @throws ResumeNotFound When the resume is not found
+     * @throws ResumeNotFound      When the resume is not found
      * @throws ResumeReadException When a error occur while reading file from disk
      */
     public ByteArrayOutputStream getResume(SpringMongoConfig dbConfig) throws ResumeNotFound, ResumeReadException {
         try {
-            BasicDBObject query = new BasicDBObject();
-            query.put("_id", userId);
+            Query query = generateQueryToFindFile();
+            GridFsTemplate fileStore = new GridFsTemplate(
+                    dbConfig.mongoDbFactory(), dbConfig.mappingMongoConverter(), "filestore");
+            GridFSFile gridFile = fileStore.findOne(query);
 
-            GridFS fileStore = new GridFS(
-                    dbConfig.mongoTemplate().getDb(), "filestore");
-            GridFSDBFile gridFile = fileStore.findOne(query);
-
-            InputStream in = gridFile.getInputStream();
-
+            GridFSBucket bucket = GridFSBuckets.create(dbConfig.mongoDbFactory().getDb(), "files");
+            InputStream in = new GridFsResource(gridFile, bucket.openDownloadStream(gridFile.getObjectId())).getInputStream();
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             int data = in.read();
             while (data >= 0) {
@@ -85,30 +93,41 @@ public class Resume extends DocumentWithMetaData {
 
     /**
      * Save the file to disk
-     * @apiNote First removes all files for the user only after will try to save a new one, this might cause problem
+     *
      * @param fileInputStream File content
      * @throws CurriculumException When an error is raised while saving
+     * @apiNote First removes all files for the user only after will try to save a new one, this might cause problem
      */
     public void setResume(InputStream fileInputStream, SpringMongoConfig dbConfig) throws CurriculumException {
         try {
-            GridFS fileStore = new GridFS(dbConfig.mongoTemplate().getDb(), "filestore");
-            BasicDBObject query = new BasicDBObject();
-            query.put("_id", userId);
 
-            fileStore.remove(query);
+            GridFsTemplate fileStore = new GridFsTemplate(
+                    dbConfig.mongoDbFactory(), dbConfig.mappingMongoConverter(), "filestore");
 
-            GridFSInputFile inputFile = fileStore.createFile(fileInputStream);
-            inputFile.setId(userId);
-            inputFile.setFilename(filename);
-            inputFile.save();
+            Query query = generateQueryToFindFile();
+            fileStore.delete(query);
+
+            DBObject metaData = new BasicDBObject();
+            metaData.put("userid", userId);
+            fileStore.store(fileInputStream, metaData);
+
+//            GridFSInputFile inputFile = fileStore.createFile(fileInputStream);
+//            inputFile.setId(userId);
+//            inputFile.setFilename(filename);
+//            inputFile.save();
         } catch (Exception e) {
             e.printStackTrace();
             throw new CurriculumException("Error while saving the resume to the database: " + e.getMessage());
         }
     }
 
+    private Query generateQueryToFindFile() {
+        return new Query(Criteria.where("_id").is(userId).orOperator(Criteria.where("metadata.userid").is(userId)));
+    }
+
     /**
      * Retrieve the filename
+     *
      * @return Filename
      */
     public String getFilename() {
@@ -117,6 +136,7 @@ public class Resume extends DocumentWithMetaData {
 
     /**
      * Save the filename
+     *
      * @param filename New File name
      */
     public void setFilename(String filename) {
@@ -125,6 +145,7 @@ public class Resume extends DocumentWithMetaData {
 
     /**
      * Retrieve the file type
+     *
      * @return File type
      */
     public String getFileType() {
@@ -133,6 +154,7 @@ public class Resume extends DocumentWithMetaData {
 
     /**
      * Change the file type
+     *
      * @param fileType String with the file type
      */
     public void setFileType(String fileType) {
@@ -141,6 +163,7 @@ public class Resume extends DocumentWithMetaData {
 
     /**
      * Retrieve the User Identifier
+     *
      * @return User Identifier
      */
     public String getUserId() {
@@ -149,6 +172,7 @@ public class Resume extends DocumentWithMetaData {
 
     /**
      * Retrieve the starRating of the resume
+     *
      * @return Start ratting of the resume
      */
     public double getStarRating() {
@@ -157,6 +181,7 @@ public class Resume extends DocumentWithMetaData {
 
     /**
      * Set the start ratting of the resume
+     *
      * @param starRating
      */
     public void setStarRating(double starRating) {

@@ -25,6 +25,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -44,6 +45,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -414,10 +416,10 @@ public class JobControllerTests {
 
             Matcher matcher1 = Mockito.mock(Matcher.class);
             Mockito.when(matcher1.getCruncherName()).thenReturn("matcher1");
-            Mockito.when(matcher1.match(Mockito.any(CruncherMetaData.class))).thenReturn(matcher1Resumes);
+            Mockito.when(matcher1.match(Mockito.any(Resume.class))).thenReturn(matcher1Resumes);
             Matcher matcher2 = Mockito.mock(Matcher.class);
             Mockito.when(matcher2.getCruncherName()).thenReturn("matcher2");
-            Mockito.when(matcher2.match(Mockito.any(CruncherMetaData.class))).thenReturn(matcher2Resumes);
+            Mockito.when(matcher2.match(Mockito.any(Resume.class))).thenReturn(matcher2Resumes);
 
             List<Matcher> allMatchers = new ArrayList<>();
             allMatchers.add(matcher1);
@@ -425,8 +427,7 @@ public class JobControllerTests {
             Mockito.when(matcherList.getMatchers()).thenReturn(allMatchers);
 
 
-            matchWithResume(
-            )
+            matchWithResume()
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                     .andExpect(jsonPath("$.resultCode", is(ResultCodes.SUCCESS.toString())))
@@ -443,12 +444,12 @@ public class JobControllerTests {
                             responseFields(
                                     fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
                                     fieldWithPath("message").description("Message associated with the result code"),
-                                    fieldWithPath("jobs").description("Hash with a list of job IDs matched by each cruncher")
+                                    subsectionWithPath("jobs").description("Hash with a list of job IDs matched by each cruncher")
                             )
                     ));
             Mockito.verify(resumeRepository).findByUserId("1");
-            Mockito.verify(matcher1).match(Mockito.any(CruncherMetaData.class));
-            Mockito.verify(matcher2).match(Mockito.any(CruncherMetaData.class));
+            Mockito.verify(matcher1).match(Mockito.any(Resume.class));
+            Mockito.verify(matcher2).match(Mockito.any(Resume.class));
         }
 
         @Test
@@ -462,10 +463,10 @@ public class JobControllerTests {
 
             Matcher matcher1 = Mockito.mock(Matcher.class);
             Mockito.when(matcher1.getCruncherName()).thenReturn("matcher1");
-            Mockito.when(matcher1.match(Mockito.any(CruncherMetaData.class))).thenReturn(new ArrayList<>());
+            Mockito.when(matcher1.match(Mockito.any(Resume.class))).thenReturn(new ArrayList<>());
             Matcher matcher2 = Mockito.mock(Matcher.class);
             Mockito.when(matcher2.getCruncherName()).thenReturn("matcher2");
-            Mockito.when(matcher2.match(Mockito.any(CruncherMetaData.class))).thenReturn(new ArrayList<>());
+            Mockito.when(matcher2.match(Mockito.any(Resume.class))).thenReturn(new ArrayList<>());
 
             List<Matcher> allMatchers = new ArrayList<>();
             allMatchers.add(matcher1);
@@ -486,12 +487,12 @@ public class JobControllerTests {
                             responseFields(
                                     fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
                                     fieldWithPath("message").description("Message associated with the result code"),
-                                    fieldWithPath("jobs").description("Hash with a list of job ids matched by each cruncher")
+                                    subsectionWithPath("jobs").description("Hash with a list of job ids matched by each cruncher")
                             )
                     ));
             Mockito.verify(resumeRepository).findByUserId("1");
-            Mockito.verify(matcher1).match(Mockito.any(CruncherMetaData.class));
-            Mockito.verify(matcher2).match(Mockito.any(CruncherMetaData.class));
+            Mockito.verify(matcher1).match(Mockito.any(Resume.class));
+            Mockito.verify(matcher2).match(Mockito.any(Resume.class));
         }
 
         private ResultActions matchWithResume() throws Exception {
@@ -557,16 +558,15 @@ public class JobControllerTests {
 
             Matcher matcher1 = Mockito.mock(Matcher.class);
             Mockito.when(matcher1.getCruncherName()).thenReturn("matcher1");
-            Mockito.when(matcher1.match(Mockito.any(CruncherMetaData.class))).thenReturn(matcher1Resumes);
+            Mockito.when(matcher1.match(Mockito.any(Resume.class))).thenReturn(matcher1Resumes);
             Matcher matcher2 = Mockito.mock(Matcher.class);
             Mockito.when(matcher2.getCruncherName()).thenReturn("matcher2");
-            Mockito.when(matcher2.match(Mockito.any(CruncherMetaData.class))).thenReturn(matcher2Resumes);
+            Mockito.when(matcher2.match(Mockito.any(Resume.class))).thenReturn(matcher2Resumes);
 
             List<Matcher> allMatchers = new ArrayList<>();
             allMatchers.add(matcher1);
             allMatchers.add(matcher2);
             Mockito.when(matcherList.getMatchers()).thenReturn(allMatchers);
-
 
             matchResume()
                     .andExpect(status().isOk())
@@ -589,12 +589,12 @@ public class JobControllerTests {
                             responseFields(
                                     fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
                                     fieldWithPath("message").description("Message associated with the result code"),
-                                    fieldWithPath("jobs").description("Hash with a list of job IDs and the star rating matched by each cruncher")
+                                    subsectionWithPath("jobs").description("Hash with a list of job IDs and the star rating matched by each cruncher")
                             )
                     ));
             Mockito.verify(resumeRepository).findByUserId("1");
-            Mockito.verify(matcher1).match(Mockito.any(CruncherMetaData.class));
-            Mockito.verify(matcher2).match(Mockito.any(CruncherMetaData.class));
+            Mockito.verify(matcher1).match(Mockito.any(Resume.class));
+            Mockito.verify(matcher2).match(Mockito.any(Resume.class));
         }
 
         @Test
@@ -608,10 +608,10 @@ public class JobControllerTests {
 
             Matcher matcher1 = Mockito.mock(Matcher.class);
             Mockito.when(matcher1.getCruncherName()).thenReturn("matcher1");
-            Mockito.when(matcher1.match(Mockito.any(CruncherMetaData.class))).thenReturn(new ArrayList<>());
+            Mockito.when(matcher1.match(Mockito.any(Resume.class))).thenReturn(new ArrayList<>());
             Matcher matcher2 = Mockito.mock(Matcher.class);
             Mockito.when(matcher2.getCruncherName()).thenReturn("matcher2");
-            Mockito.when(matcher2.match(Mockito.any(CruncherMetaData.class))).thenReturn(new ArrayList<>());
+            Mockito.when(matcher2.match(Mockito.any(Resume.class))).thenReturn(new ArrayList<>());
 
             List<Matcher> allMatchers = new ArrayList<>();
             allMatchers.add(matcher1);
@@ -631,12 +631,12 @@ public class JobControllerTests {
                             responseFields(
                                     fieldWithPath("resultCode").type(ResultCodes.class).description("Result code"),
                                     fieldWithPath("message").description("Message associated with the result code"),
-                                    fieldWithPath("jobs").description("Hash with a list of job names matched by each cruncher")
+                                    subsectionWithPath("jobs").description("Hash with a list of job names matched by each cruncher")
                             )
                     ));
             Mockito.verify(resumeRepository).findByUserId("1");
-            Mockito.verify(matcher1).match(Mockito.any(CruncherMetaData.class));
-            Mockito.verify(matcher2).match(Mockito.any(CruncherMetaData.class));
+            Mockito.verify(matcher1).match(Mockito.any(Resume.class));
+            Mockito.verify(matcher2).match(Mockito.any(Resume.class));
         }
 
         private ResultActions matchResume() throws Exception {

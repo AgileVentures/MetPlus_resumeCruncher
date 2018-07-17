@@ -1,8 +1,7 @@
 package org.metplus.curriculum.database.config;
 
 
-import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
+import com.mongodb.*;
 import org.metplus.curriculum.config.DatabaseConfig;
 import org.metplus.curriculum.database.repository.RepositoryPackage;
 import org.slf4j.Logger;
@@ -15,15 +14,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-import com.mongodb.MongoClient;
-import com.mongodb.WriteConcern;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 @Configuration
 @EnableMongoRepositories(basePackageClasses = RepositoryPackage.class)
 @EnableAutoConfiguration
-@ComponentScan(basePackages={"org.metplus.curriculum.database"})
+@ComponentScan(basePackages = {"org.metplus.curriculum.database"})
 public class SpringMongoConfig extends AbstractMongoConfiguration {
 
     private static Logger logger = LoggerFactory.getLogger(SpringMongoConfig.class);
@@ -36,16 +35,6 @@ public class SpringMongoConfig extends AbstractMongoConfiguration {
     }
 
 
-    @Override
-    @Bean
-    public MongoClient mongo() throws Exception {
-        logger.info("mongo connection to database: " + dbConfig.getHost() + ":" + dbConfig.getPort() + "/" + dbConfig.getName());
-        logger.info("mongo connection uri to database: " + dbConfig.getUri());
-        if(dbConfig.asAuthentication())
-            return withAuthentication();
-        else
-            return withoutAuthentication();
-    }
     private MongoClient withAuthentication()  throws Exception {
         MongoCredential a = MongoCredential.createCredential(dbConfig.getUsername(),
                 getDatabaseName(),
@@ -55,27 +44,43 @@ public class SpringMongoConfig extends AbstractMongoConfiguration {
         ServerAddress addr = new ServerAddress(dbConfig.getHost(),
                 dbConfig.getPort());
 
-        MongoClient client = new MongoClient(addr, arr);
-        client.setWriteConcern(WriteConcern.SAFE);
+        MongoClient client = new MongoClient(addr,
+                a,
+                new MongoClientOptions.Builder().writeConcern(WriteConcern.ACKNOWLEDGED).build());
         return client;
     }
-    private MongoClient withoutAuthentication()  throws Exception {
+
+    private MongoClient withoutAuthentication() throws Exception {
         ServerAddress addr = new ServerAddress(dbConfig.getHost(),
                 dbConfig.getPort());
-        MongoClient client = new MongoClient(addr);
-        client.setWriteConcern(WriteConcern.SAFE);
+        MongoClient client = new MongoClient(addr,
+                new MongoClientOptions.Builder().writeConcern(WriteConcern.ACKNOWLEDGED).build());
         return client;
     }
 
     @Override
-    protected String getMappingBasePackage() {
-        return "org.metplus.curriculum.database.domain";
+    protected Collection<String> getMappingBasePackages() {
+        return Collections.singleton("org.metplus.curriculum.database.domain");
     }
 
     // ---------------------------------------------------- MongoTemplate
 
+    @Override
+    public MongoClient mongoClient() {
+        try {
+            logger.info("mongo connection to database: " + dbConfig.getHost() + ":" + dbConfig.getPort() + "/" + dbConfig.getName());
+            logger.info("mongo connection uri to database: " + dbConfig.getUri());
+            if (dbConfig.asAuthentication())
+                return withAuthentication();
+            else
+                return withoutAuthentication();
+        } catch (Exception exp) {
+            return null;
+        }
+    }
+
     @Bean
     public MongoTemplate mongoTemplate() throws Exception {
-        return new MongoTemplate(mongo(), getDatabaseName());
+        return new MongoTemplate(mongoClient(), getDatabaseName());
     }
 }

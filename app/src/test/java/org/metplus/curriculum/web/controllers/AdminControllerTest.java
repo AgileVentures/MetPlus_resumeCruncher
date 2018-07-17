@@ -32,6 +32,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -74,9 +75,9 @@ public class AdminControllerTest extends BaseControllerTest {
                 .header("X-Auth-Token", token))
                 .andDo(document("admin-settings/simple-retrieval-of-settings",
                         responseFields(
-                                fieldWithPath("cruncherSettings").description("All settings from all crunchers"),
-                                fieldWithPath("appSettings").description("Settings of the application"),
-                                fieldWithPath("id").description("Identifier"))))
+                                subsectionWithPath("cruncherSettings").description("All settings from all crunchers"),
+                                subsectionWithPath("appSettings").description("Settings of the application"),
+                                fieldWithPath("id").description("Identifier").optional())))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         Settings set = mapper.readValue(response.getContentAsByteArray(), Settings.class);

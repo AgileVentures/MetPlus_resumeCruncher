@@ -4,14 +4,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.metplus.curriculum.cruncher.Cruncher;
 import org.metplus.curriculum.database.domain.*;
 import org.metplus.curriculum.database.repository.JobRepository;
 import org.metplus.curriculum.database.repository.ResumeRepository;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -216,7 +214,6 @@ public class MatcherImplTest {
         @Test
         public void notCrunchedJob() {
 
-            Mockito.when(resumeRepository.resumesOnCriteria(Mockito.any())).thenReturn(initialize());
             resumeMatcher = new MatcherImpl(cruncher, resumeRepository, jobRepository);
 
             Job job = new Job();
@@ -379,7 +376,6 @@ public class MatcherImplTest {
             ExpressionCruncherMetaData metaData = new ExpressionCruncherMetaData();
             metaData.setMostReferedExpression("ipsum");
             metaData.setFields(new HashMap<>());
-            Mockito.when(resumeRepository.resumesOnCriteria(Mockito.any())).thenReturn(resumes);
             Mockito.when(jobRepository.findAll()).thenReturn(new ArrayList<>());
             resumeMatcher = new MatcherImpl(cruncher, resumeRepository, jobRepository);
 
@@ -395,7 +391,6 @@ public class MatcherImplTest {
             ExpressionCruncherMetaData metaData = new ExpressionCruncherMetaData();
             metaData.setMostReferedExpression("bamm");
             metaData.setFields(new HashMap<>());
-            Mockito.when(resumeRepository.resumesOnCriteria(Mockito.any())).thenReturn(resumes);
             Mockito.when(jobRepository.findAll()).thenReturn(jobs);
             resumeMatcher = new MatcherImpl(cruncher, resumeRepository, jobRepository);
 
@@ -412,7 +407,6 @@ public class MatcherImplTest {
             ExpressionCruncherMetaData metaData = new ExpressionCruncherMetaData();
             metaData.setMostReferedExpression("ipsum");
             metaData.setFields(new HashMap<>());
-            Mockito.when(resumeRepository.resumesOnCriteria(Mockito.any())).thenReturn(resumes);
             resumeMatcher = new MatcherImpl(cruncher, resumeRepository, jobRepository);
             Mockito.when(jobRepository.findAll()).thenReturn(jobs);
 
