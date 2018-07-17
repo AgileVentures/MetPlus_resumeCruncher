@@ -24,8 +24,8 @@ import static org.junit.Assert.assertNull;
  */
 @RunWith(Suite.class)
 @SuiteClasses({MatcherImplTest.MatchResumes.class,
-MatcherImplTest.MatchJobs.class,
-MatcherImplTest.MatchResumesWithJobObject.class})
+        MatcherImplTest.MatchJobs.class,
+        MatcherImplTest.MatchResumesWithJobObject.class})
 public class MatcherImplTest {
     @RunWith(MockitoJUnitRunner.class)
     public static class MatchResumes {
@@ -211,6 +211,7 @@ public class MatcherImplTest {
             crunchJob(job);
             assertEquals(0, resumeMatcher.matchInverse(job).size());
         }
+
         @Test
         public void notCrunchedJob() {
 
@@ -256,6 +257,7 @@ public class MatcherImplTest {
             assertEquals("user1", result.get(2).getUserId());
         }
     }
+
     @RunWith(MockitoJUnitRunner.class)
     public static class MatchJobs {
         @Mock
@@ -385,6 +387,7 @@ public class MatcherImplTest {
             resume.setMetaData(metaDataResume);
             assertEquals(0, resumeMatcher.match(resume).size());
         }
+
         @Test
         public void foundNone() {
             initialize();

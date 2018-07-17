@@ -35,7 +35,7 @@ public class SpringMongoConfig extends AbstractMongoConfiguration {
     }
 
 
-    private MongoClient withAuthentication()  throws Exception {
+    private MongoClient withAuthentication() throws Exception {
         MongoCredential a = MongoCredential.createCredential(dbConfig.getUsername(),
                 getDatabaseName(),
                 dbConfig.getPassword().toCharArray());
