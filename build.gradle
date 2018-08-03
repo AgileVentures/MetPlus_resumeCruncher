@@ -18,10 +18,12 @@ repositories {
     mavenCentral()
 }
 
-group = 'org.metplus'
+group = 'org.metplus.cruncher'
 version = '0.1.0'
 
 subprojects{
+
+
     apply plugin: 'kotlin'
     apply plugin: 'idea'
     apply plugin: 'eclipse'

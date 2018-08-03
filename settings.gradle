@@ -1,3 +1,5 @@
 rootProject.name = 'org.metplus.cruncher'
 
-
+include 'core'
+include 'persistence'
+include 'web'

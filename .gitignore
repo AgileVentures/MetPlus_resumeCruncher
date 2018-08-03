@@ -14,3 +14,4 @@ app/src/main/resources/logback.xml
 *.jar
 *.swp
 out/
+*.log
