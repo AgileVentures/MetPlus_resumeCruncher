@@ -1,0 +1,25 @@
+repositories {
+    mavenCentral()
+}
+
+//apply plugin: 'kotlin-spring'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+dependencies {
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-mustache')
+    compile('com.fasterxml.jackson.module:jackson-module-kotlin')
+    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    compile("org.jetbrains.kotlin:kotlin-reflect")
+    compile(project(':core'))
+    compile(project(':persistence'))
+
+
+    testCompile project (path: ":core", configuration: 'testArtifacts')
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
