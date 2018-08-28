@@ -2,7 +2,7 @@ package org.metplus.cruncher.settings
 
 data class Settings(
         val id: Int,
-        val applicationSettings: HashMap<String, ApplicationSettings>
+        val applicationSettings: ApplicationSettings
 )
 
 data class ApplicationSettings(
