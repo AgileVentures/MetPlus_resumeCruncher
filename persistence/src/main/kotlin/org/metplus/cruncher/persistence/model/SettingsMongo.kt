@@ -7,18 +7,18 @@ import java.math.BigInteger
 
 @Document
 @TypeAlias("settings")
-class Settings(
+class SettingsMongo(
         @Id val id: BigInteger,
-        val appSettings: SettingsList
+        val appSettingsMongo: SettingsListMongo
 )
 
-class SettingsList(
+class SettingsListMongo(
         @Id val id: BigInteger,
-        val settings: HashMap<String, Setting<*>>,
+        val settings: HashMap<String, SettingMongo<*>>,
         val mandatory: List<String>
 )
 
-class Setting<DataType>(
+class SettingMongo<DataType>(
         val name: String,
         val data: DataType
 )
