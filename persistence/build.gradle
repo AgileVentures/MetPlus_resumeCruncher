@@ -23,6 +23,7 @@ dependencies {
     compile("org.springframework.data:spring-data-mongodb:2.0.9.RELEASE")
     compile('org.springframework.boot:spring-boot-starter-data-mongodb')
     compile(project(":core"))
+    compile("org.jetbrains.kotlin:kotlin-reflect")
 
     testCompile project (path: ":core", configuration: 'testArtifacts')
     testCompile("de.flapdoodle.embed:de.flapdoodle.embed.mongo")
