@@ -1,0 +1,18 @@
+spring:
+  profiles.active: development
+
+logging.level: INFO
+logging.level.org.hibernate: ERROR
+logging.level.com.mongodb: ERROR
+logging.level.org.springframework: WARN
+
+---
+
+spring:
+  profiles: development
+
+logging.level.org.metplus: DEBUG
+
+server:
+  port: 8443
+
