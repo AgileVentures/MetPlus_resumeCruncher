@@ -4,7 +4,7 @@ spring:
 logging.level: INFO
 logging.level.org.hibernate: ERROR
 logging.level.com.mongodb: ERROR
-logging.level.org.springframework: WARN
+logging.level.org.springframework: INFO
 
 ---
 

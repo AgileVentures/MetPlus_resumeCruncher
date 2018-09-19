@@ -35,3 +35,8 @@ dependencies {
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
+
+jar {
+    baseName = 'org.metplus.cruncher.persistence'
+    enabled = true
+}
