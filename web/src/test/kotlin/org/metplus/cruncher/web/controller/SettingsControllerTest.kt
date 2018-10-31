@@ -2,14 +2,13 @@ package org.metplus.cruncher.web.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.metplus.cruncher.settings.GetSettings
-import org.metplus.cruncher.settings.Settings
-import org.metplus.cruncher.settings.SettingsRepository
+import org.metplus.cruncher.settings.*
 import org.metplus.cruncher.web.TestConfiguration
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
@@ -21,13 +20,10 @@ import org.springframework.restdocs.payload.PayloadDocumentation.*
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.MockMvcBuilder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup
-import org.springframework.web.context.WebApplicationContext
 
 
 @ExtendWith(SpringExtension::class)
@@ -43,7 +39,8 @@ class SettingsControllerTest(@Autowired private val mvc: MockMvc) {
 
     @Test
     @Throws(Exception::class)
-    fun shouldReturnDefaultMessage() {
+    fun `When no settings are present it returns a default settings object`() {
+        (settingsRepository as SettingsRepositoryFake).removeAll()
         mvc.perform(get("/api/v1/admin/settings/")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk)
@@ -57,62 +54,64 @@ class SettingsControllerTest(@Autowired private val mvc: MockMvc) {
     }
 
 
-//    @Test
-//    @Throws(Exception::class)
-//    fun simpleUpdateSettingsWithNoChanges() {
-//
-//        val mapper = ObjectMapper()
-//        mapper.registerModule(KotlinModule())
-//
-//        val response = mvc.perform(get("/api/v1/admin/settings/")
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk)
-//                .andReturn().response
-//        val set = mapper.readValue<SettingsController.SettingsResponse>(response.contentAsByteArray)
-//        val strSet = mapper.writeValueAsString(set)
-//        mvc.perform(post("/api/v1/admin/settings")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(strSet))
-//                .andExpect(status().isOk)
-//    }
+    @Test
+    @Throws(Exception::class)
+    fun `when get and save the same object without changes it returns the correct settings object`() {
+        (settingsRepository as SettingsRepositoryFake).removeAll()
 
-//    @Test
-//    @Throws(Exception::class)
-//    fun updateSettingsWithWithChanges() {
-//
-//        val mapper = ObjectMapper()
-//        val settingsBefore = settingsRepository.save(Settings(1, ApplicationSettings()))
-//
-//
-//        val strSet = mapper.writeValueAsString(settingsBefore)
-//
-//        mvc.perform(post("/api/v1/admin/settings")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(strSet))
-//                .andExpect(status().isOk)
-//
-//        val settingsCaptor = ArgumentCaptor.forClass(Settings::class.java)
-//        verify<Any>(repository).save(settingsCaptor.capture())
-//        val after = settingsCaptor.getValue()
-//        assertEquals(1, after.getApplicationSetting("shall update").getData())
-//    }
-//
-//
-//    @Test
-//    @Throws(Exception::class)
-//    fun updateSettingsWithWithChangesError() {
-//        val mapper = ObjectMapper()
-//
-//        before.addCruncherSettings("error not found", CruncherSettings())
-//        val strSet = mapper.writeValueAsString(before)
-//
-//        mvc.perform(post("/api/v1/admin/settings")
-//                .header("X-Auth-Token", token)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(strSet))
-//                .andExpect(status().is4xxClientError)
-//
-//        verify<Any>(repository, times(0)).save(ArgumentMatchers.any(Settings::class.java))
-//
-//    }
+        val mapper = ObjectMapper()
+        mapper.registerModule(KotlinModule())
+
+        val response = mvc.perform(get("/api/v1/admin/settings/")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk)
+                .andReturn().response
+        val settingSaved = mapper.readValue<SettingsController.SettingsResponse>(response.contentAsByteArray)
+        val strSet = jacksonObjectMapper().writeValueAsString(settingSaved)
+
+        mvc.perform(post("/api/v1/admin/settings/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(strSet.toString()))
+                .andExpect(status().isOk)
+
+        Assertions.assertThat(settingsRepository.getAll().first())
+                .isNotNull
+                .isEqualToComparingFieldByField(settingSaved.toSettings())
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun `when update an existing settings it saves to the database the new setting`() {
+        (settingsRepository as SettingsRepositoryFake).removeAll()
+
+        val settingsBefore = settingsRepository.save(
+                Settings(1, ApplicationSettings(
+                        hashMapOf("some content" to Setting("some content", "some value"))
+                ))
+        )
+        val jsonResponseRepresentation = jacksonObjectMapper().writeValueAsString(settingsBefore.toSettingsResponse())
+
+        mvc.perform(post("/api/v1/admin/settings/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonResponseRepresentation))
+                .andExpect(status().isOk)
+
+        Assertions.assertThat(settingsRepository.getAll().first())
+                .isNotNull
+                .isEqualToComparingFieldByField(settingsBefore)
+    }
+
+
+    @Test
+    @Throws(Exception::class)
+    fun `when passing a incorrectly structured json object it returns 400`() {
+        (settingsRepository as SettingsRepositoryFake).removeAll()
+
+        val strSet = jacksonObjectMapper().writeValueAsString("")
+
+        mvc.perform(post("/api/v1/admin/settings/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(strSet))
+                .andExpect(status().is4xxClientError)
+    }
 }
