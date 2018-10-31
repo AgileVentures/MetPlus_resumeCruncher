@@ -17,4 +17,7 @@ class SettingsRepositoryFake(
         return settingsList
     }
 
+    fun removeAll() {
+        settingsList.clear()
+    }
 }
