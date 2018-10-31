@@ -34,8 +34,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 class SettingsControllerTest(@Autowired private val mvc: MockMvc) {
     @Autowired
     lateinit var settingsRepository: SettingsRepository
-    @Autowired
-    lateinit var getSettings: GetSettings
 
     @Test
     @Throws(Exception::class)

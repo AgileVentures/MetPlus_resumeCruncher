@@ -1,8 +1,17 @@
 package org.metplus.cruncher.web.controller
 
-import org.metplus.cruncher.settings.*
+import org.metplus.cruncher.settings.ApplicationSettings
+import org.metplus.cruncher.settings.GetSettings
+import org.metplus.cruncher.settings.SaveSettings
+import org.metplus.cruncher.settings.Setting
+import org.metplus.cruncher.settings.Settings
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/v1/admin/settings")
