@@ -97,6 +97,20 @@ class SettingsControllerTest(@Autowired private val mvc: MockMvc) {
         Assertions.assertThat(settingsRepository.getAll().first())
                 .isNotNull
                 .isEqualToComparingFieldByField(settingsBefore)
+
+        mvc.perform(get("/api/v1/admin/settings/")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk)
+                .andDo(document("admin-settings/simple-retrieval-of-settings",
+                        responseFields(
+                                subsectionWithPath("cruncherSettings").description("All settings from all crunchers"),
+                                subsectionWithPath("appSettings").description("SettingsController of the application"),
+                                fieldWithPath("id").description("Identifier"))))
+                .andExpect(jsonPath("$.id", equalTo(1)))
+                .andExpect(jsonPath("$.appSettings.settings", hasKey("some content")))
+                .andExpect(jsonPath("$.appSettings.settings['some content']", hasEntry("name", "some content")))
+                .andExpect(jsonPath("$.appSettings.settings['some content']", hasEntry("data", "some value")))
+                .andReturn().response
     }
 
 
