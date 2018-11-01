@@ -1,5 +1,8 @@
 package org.metplus.cruncher.persistence
 
+import org.metplus.cruncher.job.JobsRepository
+import org.metplus.cruncher.persistence.model.JobRepositoryImpl
+import org.metplus.cruncher.persistence.model.JobRepositoryMongo
 import org.metplus.cruncher.persistence.model.SettingsRepositoryImpl
 import org.metplus.cruncher.persistence.model.SettingsRepositoryMongo
 import org.metplus.cruncher.settings.SettingsRepository
@@ -14,4 +17,8 @@ open class TestConfig {
     @Bean
     open fun getSettingsRepository(@Autowired repo: SettingsRepositoryMongo)
             : SettingsRepository = SettingsRepositoryImpl(repo)
+
+    @Bean
+    open fun getJobRepository(@Autowired repo: JobRepositoryMongo)
+            : JobsRepository = JobRepositoryImpl(repo)
 }
