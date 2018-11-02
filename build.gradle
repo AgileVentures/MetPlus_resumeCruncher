@@ -47,6 +47,7 @@ subprojects{
     dependencies {
         compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
         testCompile "org.assertj:assertj-core:3.10.0"
+        testCompile "org.junit.jupiter:junit-jupiter-params:$junitVersion"
         testCompile "org.junit.jupiter:junit-jupiter-api:$junitVersion"
         testRuntime "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
         testRuntime "org.junit.platform:junit-platform-console:$junitPlatformVersion"

@@ -25,7 +25,7 @@ dependencies {
     compile(project(":core"))
     compile("org.jetbrains.kotlin:kotlin-reflect")
 
-    testCompile project (path: ":core", configuration: 'testArtifacts')
+    testCompile project(path: ":core", configuration: 'testArtifacts')
     testCompile("de.flapdoodle.embed:de.flapdoodle.embed.mongo")
     testCompile("org.springframework.boot:spring-boot-test-autoconfigure")
     testCompile('org.springframework:spring-test')
