@@ -28,6 +28,7 @@ abstract class SettingsRepositoryTest {
                 .isEqualToComparingFieldByField(resultAfterSave)
 
     }
+
     @Test
     fun `when settings are available it save updates a setting if the setting with a specific id already exists`() {
         val initialSetting = getRepository().save(Settings(
@@ -40,12 +41,12 @@ abstract class SettingsRepositoryTest {
                 )
         ))
 
-        val updatedSetting = initialSetting.copy( applicationSettings =
-                ApplicationSettings(
-                        hashMapOf(
-                                "some_setting" to Setting("some name", "some data")
-                        )
+        val updatedSetting = initialSetting.copy(applicationSettings =
+        ApplicationSettings(
+                hashMapOf(
+                        "some_setting" to Setting("some name", "some data")
                 )
+        )
         )
 
         val resultAfterSave = getRepository().save(updatedSetting)

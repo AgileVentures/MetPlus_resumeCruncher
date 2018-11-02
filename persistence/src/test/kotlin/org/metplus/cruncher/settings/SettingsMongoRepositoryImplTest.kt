@@ -9,9 +9,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @DataMongoTest
 @ExtendWith(SpringExtension::class)
-@ContextConfiguration(classes=[TestConfig::class])
-class SettingsMongoRepositoryImplTest: SettingsRepositoryTest() {
-    @Autowired lateinit var mongoRepository: SettingsRepository
+@ContextConfiguration(classes = [TestConfig::class])
+class SettingsMongoRepositoryImplTest : SettingsRepositoryTest() {
+    @Autowired
+    lateinit var mongoRepository: SettingsRepository
 
     override fun getRepository(): SettingsRepository {
         return mongoRepository

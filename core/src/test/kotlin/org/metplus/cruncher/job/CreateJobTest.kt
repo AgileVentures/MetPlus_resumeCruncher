@@ -24,8 +24,8 @@ internal class CreateJobTest {
 
         createJob.process(newJob, object : CreateJobObserver {
             override fun onSuccess(job: Job) {
-                    assertThat(job).isEqualToComparingFieldByField(newJob)
-                    wasObserverCalled = true
+                assertThat(job).isEqualToComparingFieldByField(newJob)
+                wasObserverCalled = true
             }
 
             override fun onAlreadyExists() {
