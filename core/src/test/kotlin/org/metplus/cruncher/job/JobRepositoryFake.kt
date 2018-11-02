@@ -1,6 +1,6 @@
 package org.metplus.cruncher.job
 
-class JobRepositoryFake: JobsRepository {
+class JobRepositoryFake : JobsRepository {
 
     private val jobs = mutableMapOf<String, Job>()
 
