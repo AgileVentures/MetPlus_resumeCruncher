@@ -15,7 +15,7 @@ dependencies {
     compile(project(':persistence'))
 
 
-    testCompile(project (path: ":core", configuration: 'testArtifacts'))
+    testCompile(project(path: ":core", configuration: 'testArtifacts'))
     testCompile("org.springframework.restdocs:spring-restdocs-mockmvc")
     testCompile('org.springframework.boot:spring-boot-starter-test') {
         exclude module: 'junit'

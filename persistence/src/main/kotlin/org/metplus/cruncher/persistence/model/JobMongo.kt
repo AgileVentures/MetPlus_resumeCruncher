@@ -6,9 +6,10 @@ import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 
 @Document
-@TypeAlias("settings")
+@TypeAlias("job")
 class JobMongo(
         @Field("jobId")
         @Id val id: String,
-        val title: String
+        val title: String,
+        val description: String
 )

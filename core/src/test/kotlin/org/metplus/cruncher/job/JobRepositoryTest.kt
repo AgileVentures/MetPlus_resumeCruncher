@@ -8,17 +8,17 @@ abstract class JobRepositoryTest {
 
     @Test
     fun `when saving a job that did not exist, it return the saved job with id set`() {
-        val beforeSave = Job("newjobid", "some title")
+        val beforeSave = Job("newjobid", "some title", "some description")
         val afterSave = getJobRepository().save(beforeSave)
         assertThat(afterSave).isEqualToComparingFieldByField(beforeSave)
     }
 
     @Test
     fun `when saving a job that exist, it return the saved job`() {
-        val beforeSave = Job("newjobid", "some title")
+        val beforeSave = Job("newjobid", "some title", "some description")
         getJobRepository().save(beforeSave)
 
-        val jobWithNewTitle = beforeSave.copy(title = "some other title")
+        val jobWithNewTitle = beforeSave.copy(title = "some other title", description = "some other description")
         val afterSave = getJobRepository().save(jobWithNewTitle)
 
         assertThat(afterSave).isEqualToComparingFieldByField(jobWithNewTitle)
@@ -26,7 +26,7 @@ abstract class JobRepositoryTest {
 
     @Test
     fun `when retrieving a job that exist, it return the saved job`() {
-        val beforeSave = Job("newjobid", "some title")
+        val beforeSave = Job("newjobid", "some title", "some description")
         getJobRepository().save(beforeSave)
 
         val afterSave = getJobRepository().getById("newjobid")
