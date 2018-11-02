@@ -18,13 +18,15 @@ class JobRepositoryImpl(
 private fun JobMongo.toJob(): Job {
     return Job(
             id = id,
-            title = title
+            title = title,
+            description = description
     )
 }
 
 private fun Job.toJobMongo(): JobMongo {
     return JobMongo(
             id = id,
-            title = title
+            title = title,
+            description = description
     )
 }
