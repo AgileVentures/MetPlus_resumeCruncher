@@ -1,8 +1,8 @@
 package org.metplus.cruncher.job
 
-class JobRepoistoryFake: JobsRepository {
+class JobRepositoryFake: JobsRepository {
 
-    val jobs = mutableMapOf<String, Job>()
+    private val jobs = mutableMapOf<String, Job>()
 
     override fun save(job: Job): Job {
         jobs[job.id] = job.copy()
@@ -11,5 +11,9 @@ class JobRepoistoryFake: JobsRepository {
 
     override fun getById(id: String): Job? {
         return jobs[id]
+    }
+
+    fun removeAll() {
+        jobs.clear()
     }
 }
