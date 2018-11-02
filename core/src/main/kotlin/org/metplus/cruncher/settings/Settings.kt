@@ -4,7 +4,7 @@ data class Settings(
         val id: Int,
         val applicationSettings: ApplicationSettings
 ) {
-    fun getApplicationSetting(setting: String) : Setting<*> {
+    fun getApplicationSetting(setting: String): Setting<*> {
         return Setting("bamm", "badam")
     }
 }

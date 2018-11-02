@@ -57,8 +57,6 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                 .andExpect(jsonPath("$.resultCode", equalTo(ResultCodes.JOB_ID_EXISTS.toString())))
                 .andDo(document("job/create-already-exists",
-//                        requestHeaders(headerWithName("X-Auth-Token")
-//                                .description("Authentication token retrieved from the authentication")),
                         requestParameters(
                                 parameterWithName("jobId").description("Job Identifier to create"),
                                 parameterWithName("title").description("Title of the job"),
@@ -75,13 +73,11 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
     @ParameterizedTest(name = "{index} => API Version: {0}")
     @ValueSource(strings = ["v1", "v2"])
     fun success(versionId: String) {
-        createNewJob(versionId, Job("Job Identifier to create","Title of the job", "Description of the job"))
+        createNewJob(versionId, Job("Job Identifier to create", "Title of the job", "Description of the job"))
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                 .andExpect(jsonPath("$.resultCode", equalTo(ResultCodes.SUCCESS.toString())))
                 .andDo(document("job/create-success",
-//                        requestHeaders(headerWithName("X-Auth-Token")
-//                                .description("Authentication token retrieved from the authentication")),
                         requestParameters(
                                 parameterWithName("jobId").description("Job Identifier to create"),
                                 parameterWithName("title").description("Title of the job"),
@@ -105,7 +101,6 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
                 .param("jobId", job.id)
                 .param("title", job.title)
                 .param("description", job.description)
-//                .header("X-Auth-Token", token)
         )
     }
 }
