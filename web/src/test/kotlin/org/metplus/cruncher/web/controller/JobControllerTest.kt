@@ -16,10 +16,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.MediaType
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.payload.PayloadDocumentation.responseFields
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
+import org.springframework.restdocs.request.RequestDocumentation.pathParameters
 import org.springframework.restdocs.request.RequestDocumentation.requestParameters
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -72,7 +74,7 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
 
     @ParameterizedTest(name = "{index} => API Version: {0}")
     @ValueSource(strings = ["v1", "v2"])
-    fun success(versionId: String) {
+    fun `when creating a job that does not exist, it returns success`(versionId: String) {
         createNewJob(versionId, Job("Job Identifier to create", "Title of the job", "Description of the job"))
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
@@ -101,6 +103,61 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
                 .param("jobId", job.id)
                 .param("title", job.title)
                 .param("description", job.description)
+        )
+    }
+
+    @ParameterizedTest(name = "{index} => API Version: {0}")
+    @ValueSource(strings = ["v1", "v2"])
+    fun `when updating a job that does not exist, it returns an error`(versionId: String) {
+        updateJob(versionId,
+                "Job title", "My awsome job description")
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
+                .andExpect(jsonPath("$.resultCode", equalTo(ResultCodes.JOB_NOT_FOUND.toString())))
+                .andDo(document("job/update-not-exists",
+                        pathParameters(parameterWithName("jobId").description("Job Identifier to create")),
+                        requestParameters(
+                                parameterWithName("title").description("Title of the job"),
+                                parameterWithName("description").description("Description of the job")
+                        ),
+                        responseFields(
+                                fieldWithPath("resultCode").type(ResultCodes::class.java).description("Result code"),
+                                fieldWithPath("message").description("Message associated with the result code")
+                        )
+                ))
+    }
+
+    @ParameterizedTest(name = "{index} => API Version: {0}")
+    @ValueSource(strings = ["v1", "v2"])
+    fun `when update a job that exists, it returns success`(versionId: String) {
+        val job = Job("1", "My current title", "My current description")
+        jobsRepository.save(job)
+
+        updateJob(versionId,
+                "Job title",
+                "My awsome job description")
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
+                .andExpect(jsonPath("$.resultCode", equalTo(ResultCodes.SUCCESS.toString())))
+                .andDo(document("job/update-success",
+                        pathParameters(parameterWithName("jobId").description("Job Identifier to create")),
+                        requestParameters(
+                                parameterWithName("title").description("Title of the job(Optional)").optional(),
+                                parameterWithName("description").description("Description of the job(Optional)").optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("resultCode").type(ResultCodes::class.java).description("Result code"),
+                                fieldWithPath("message").description("Message associated with the result code")
+                        )
+                ))
+    }
+
+    private fun updateJob(versionId: String, jobTitle: String, jobDescription: String): ResultActions {
+        return mvc.perform(patch("/api/$versionId/job/{jobId}/update", "1")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .param("title", jobTitle)
+                .param("description", jobDescription)
         )
     }
 }

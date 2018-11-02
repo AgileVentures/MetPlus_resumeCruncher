@@ -2,6 +2,7 @@ package org.metplus.cruncher.web
 
 import org.metplus.cruncher.job.CreateJob
 import org.metplus.cruncher.job.JobsRepository
+import org.metplus.cruncher.job.UpdateJob
 import org.metplus.cruncher.persistence.model.JobRepositoryImpl
 import org.metplus.cruncher.persistence.model.JobRepositoryMongo
 import org.metplus.cruncher.persistence.model.SettingsRepositoryImpl
@@ -40,4 +41,9 @@ open class ApplicationConfiguration {
     open fun createJob(
             @Autowired jobsRepository: JobsRepository
     ): CreateJob = CreateJob(jobsRepository)
+
+    @Bean
+    open fun updateJob(
+            @Autowired jobsRepository: JobsRepository
+    ): UpdateJob = UpdateJob(jobsRepository)
 }
