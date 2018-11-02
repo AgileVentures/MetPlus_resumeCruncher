@@ -3,6 +3,7 @@ package org.metplus.cruncher.web
 import org.metplus.cruncher.job.CreateJob
 import org.metplus.cruncher.job.JobRepositoryFake
 import org.metplus.cruncher.job.JobsRepository
+import org.metplus.cruncher.job.UpdateJob
 import org.metplus.cruncher.settings.GetSettings
 import org.metplus.cruncher.settings.SaveSettings
 import org.metplus.cruncher.settings.SettingsRepository
@@ -29,4 +30,7 @@ open class TestConfiguration {
 
     @Bean
     open fun createJob(@Autowired jobsRepository: JobsRepository): CreateJob = CreateJob(jobsRepository)
+
+    @Bean
+    open fun updateJob(@Autowired jobsRepository: JobsRepository): UpdateJob = UpdateJob(jobsRepository)
 }
