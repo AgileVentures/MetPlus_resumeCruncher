@@ -16,10 +16,10 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc
 @EnableWebMvc
 open class TestConfiguration {
     @Bean
-    open fun getSettingsRepository(): SettingsRepository =  SettingsRepositoryFake()
+    open fun getSettingsRepository(): SettingsRepository = SettingsRepositoryFake()
 
     @Bean
-    open fun getJobRepository(): JobsRepository =  JobRepositoryFake()
+    open fun getJobRepository(): JobsRepository = JobRepositoryFake()
 
     @Bean
     open fun getSettings(): GetSettings = GetSettings(getSettingsRepository())

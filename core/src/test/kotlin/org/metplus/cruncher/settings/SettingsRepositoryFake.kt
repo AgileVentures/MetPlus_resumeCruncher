@@ -2,11 +2,11 @@ package org.metplus.cruncher.settings
 
 class SettingsRepositoryFake(
         private val settingsList: MutableList<Settings> = mutableListOf()
-): SettingsRepository {
+) : SettingsRepository {
     override fun save(settings: Settings): Settings {
         val settingsToSave = settings.copy()
         val existingVersion = settingsList.find { it.id == settings.id }
-        if (existingVersion != null){
+        if (existingVersion != null) {
             settingsList.remove(existingVersion)
         }
         settingsList.add(settingsToSave)
