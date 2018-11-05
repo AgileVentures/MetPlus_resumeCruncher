@@ -16,3 +16,33 @@ logging.level.org.metplus: DEBUG
 server:
   port: 8443
 
+backend:
+  admin:
+    username: backend_admin
+    password: backendpassword
+
+
+---
+spring:
+  profiles: production
+
+server:
+  port: 8443
+
+backend:
+  admin:
+    username: ${username}
+    password: ${password}
+
+
+logging.level.org.metplus: INFO
+
+---
+
+spring:
+  profiles: test
+
+backend:
+  admin:
+    username: backend_admin
+    password: backendpassword
