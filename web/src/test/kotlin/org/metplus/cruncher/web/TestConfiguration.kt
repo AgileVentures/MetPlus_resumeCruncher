@@ -8,6 +8,8 @@ import org.metplus.cruncher.settings.GetSettings
 import org.metplus.cruncher.settings.SaveSettings
 import org.metplus.cruncher.settings.SettingsRepository
 import org.metplus.cruncher.settings.SettingsRepositoryFake
+import org.metplus.cruncher.web.security.services.LocalTokenService
+import org.metplus.cruncher.web.security.services.TokenService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.SpringBootConfiguration
 import org.springframework.context.annotation.Bean
@@ -33,4 +35,7 @@ open class TestConfiguration {
 
     @Bean
     open fun updateJob(@Autowired jobsRepository: JobsRepository): UpdateJob = UpdateJob(jobsRepository)
+
+    @Bean
+    open fun tokenService(): TokenService = LocalTokenService()
 }

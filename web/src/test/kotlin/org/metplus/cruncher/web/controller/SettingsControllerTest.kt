@@ -8,6 +8,7 @@ import org.assertj.core.api.Assertions
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasEntry
 import org.hamcrest.Matchers.hasKey
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.metplus.cruncher.settings.ApplicationSettings
@@ -16,6 +17,7 @@ import org.metplus.cruncher.settings.Settings
 import org.metplus.cruncher.settings.SettingsRepository
 import org.metplus.cruncher.settings.SettingsRepositoryFake
 import org.metplus.cruncher.web.TestConfiguration
+import org.metplus.cruncher.web.security.services.TokenService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -43,12 +45,23 @@ class SettingsControllerTest(@Autowired private val mvc: MockMvc) {
     @Autowired
     lateinit var settingsRepository: SettingsRepository
 
+    @Autowired
+    lateinit var tokenService: TokenService
+
+    lateinit var token: String
+
+    @BeforeEach
+    fun setup() {
+        token = tokenService.generateToken("0.0.0.0")
+    }
+
     @Test
     @Throws(Exception::class)
     fun `When no settings are present it returns a default settings object`() {
         (settingsRepository as SettingsRepositoryFake).removeAll()
         mvc.perform(get("/api/v1/admin/settings/")
-                .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_JSON)
+                .header("X-Auth-Token", token))
                 .andExpect(status().isOk)
                 .andDo(document("admin-settings/simple-retrieval-of-settings",
                         responseFields(
@@ -69,13 +82,15 @@ class SettingsControllerTest(@Autowired private val mvc: MockMvc) {
         mapper.registerModule(KotlinModule())
 
         val response = mvc.perform(get("/api/v1/admin/settings/")
-                .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_JSON)
+                .header("X-Auth-Token", token))
                 .andExpect(status().isOk)
                 .andReturn().response
         val settingSaved = mapper.readValue<SettingsController.SettingsResponse>(response.contentAsByteArray)
         val strSet = jacksonObjectMapper().writeValueAsString(settingSaved)
 
         mvc.perform(post("/api/v1/admin/settings/")
+                .header("X-Auth-Token", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(strSet.toString()))
                 .andExpect(status().isOk)
@@ -99,7 +114,8 @@ class SettingsControllerTest(@Autowired private val mvc: MockMvc) {
 
         mvc.perform(post("/api/v1/admin/settings/")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonResponseRepresentation))
+                .content(jsonResponseRepresentation)
+                .header("X-Auth-Token", token))
                 .andExpect(status().isOk)
 
         Assertions.assertThat(settingsRepository.getAll().first())
@@ -131,7 +147,8 @@ class SettingsControllerTest(@Autowired private val mvc: MockMvc) {
 
         mvc.perform(post("/api/v1/admin/settings/")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(strSet))
+                .content(strSet)
+                .header("X-Auth-Token", token))
                 .andExpect(status().is4xxClientError)
     }
 }
