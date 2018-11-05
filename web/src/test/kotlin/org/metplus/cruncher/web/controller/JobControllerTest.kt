@@ -10,11 +10,14 @@ import org.metplus.cruncher.job.Job
 import org.metplus.cruncher.job.JobRepositoryFake
 import org.metplus.cruncher.job.JobsRepository
 import org.metplus.cruncher.web.TestConfiguration
+import org.metplus.cruncher.web.security.services.TokenService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.MediaType
+import org.springframework.restdocs.headers.HeaderDocumentation.headerWithName
+import org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post
@@ -40,9 +43,16 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
     @Autowired
     lateinit var jobsRepository: JobsRepository
 
+    @Autowired
+    lateinit var tokenService: TokenService
+
+    lateinit var token: String
+
     @BeforeEach
     fun setup() {
         (jobsRepository as JobRepositoryFake).removeAll()
+
+        token = tokenService.generateToken("0.0.0.0")
     }
 
     @ParameterizedTest(name = "{index} => API Version: {0}")
@@ -59,6 +69,8 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                 .andExpect(jsonPath("$.resultCode", equalTo(ResultCodes.JOB_ID_EXISTS.toString())))
                 .andDo(document("job/create-already-exists",
+                        requestHeaders(headerWithName("X-Auth-Token")
+                                .description("Authentication token retrieved from the authentication")),
                         requestParameters(
                                 parameterWithName("jobId").description("Job Identifier to create"),
                                 parameterWithName("title").description("Title of the job"),
@@ -80,6 +92,8 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                 .andExpect(jsonPath("$.resultCode", equalTo(ResultCodes.SUCCESS.toString())))
                 .andDo(document("job/create-success",
+                        requestHeaders(headerWithName("X-Auth-Token")
+                                .description("Authentication token retrieved from the authentication")),
                         requestParameters(
                                 parameterWithName("jobId").description("Job Identifier to create"),
                                 parameterWithName("title").description("Title of the job"),
@@ -98,6 +112,7 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
 
     private fun createNewJob(versionId: String, job: Job): ResultActions {
         return mvc.perform(post("/api/$versionId/job/create")
+                .header("X-Auth-Token", token)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .param("jobId", job.id)
@@ -115,6 +130,8 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                 .andExpect(jsonPath("$.resultCode", equalTo(ResultCodes.JOB_NOT_FOUND.toString())))
                 .andDo(document("job/update-not-exists",
+                        requestHeaders(headerWithName("X-Auth-Token")
+                                .description("Authentication token retrieved from the authentication")),
                         pathParameters(parameterWithName("jobId").description("Job Identifier to create")),
                         requestParameters(
                                 parameterWithName("title").description("Title of the job"),
@@ -140,6 +157,8 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                 .andExpect(jsonPath("$.resultCode", equalTo(ResultCodes.SUCCESS.toString())))
                 .andDo(document("job/update-success",
+                        requestHeaders(headerWithName("X-Auth-Token")
+                                .description("Authentication token retrieved from the authentication")),
                         pathParameters(parameterWithName("jobId").description("Job Identifier to create")),
                         requestParameters(
                                 parameterWithName("title").description("Title of the job(Optional)").optional(),
@@ -154,6 +173,7 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
 
     private fun updateJob(versionId: String, jobTitle: String, jobDescription: String): ResultActions {
         return mvc.perform(patch("/api/$versionId/job/{jobId}/update", "1")
+                .header("X-Auth-Token", token)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .param("title", jobTitle)
