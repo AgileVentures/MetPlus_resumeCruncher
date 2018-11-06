@@ -1,6 +1,5 @@
 package org.metplus.cruncher.web.controller
 
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -11,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.context.annotation.Profile
 import org.springframework.http.MediaType
 import org.springframework.restdocs.headers.HeaderDocumentation.headerWithName
 import org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders
@@ -29,7 +27,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @AutoConfigureRestDocs(outputDir = "build/generated-snippets")
 @AutoConfigureMockMvc
 @WebMvcTest(AuthenticationController::class)
-class AuthenticationControllerTests(@Autowired private val mvc: MockMvc) {
+class AuthenticationControllerTest(@Autowired private val mvc: MockMvc) {
 
     @Value("\${backend.admin.username}")
     private var backendAdminUsername: String? = null
