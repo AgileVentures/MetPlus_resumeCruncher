@@ -70,13 +70,3 @@ class JobController(
         return cruncherResponse!!
     }
 }
-
-data class CruncherResponse(
-        val resultCode: ResultCodes,
-        val message: String)
-
-enum class ResultCodes {
-    JOB_ID_EXISTS,
-    SUCCESS,
-    JOB_NOT_FOUND
-}

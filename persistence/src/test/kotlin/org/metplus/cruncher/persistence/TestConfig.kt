@@ -3,8 +3,11 @@ package org.metplus.cruncher.persistence
 import org.metplus.cruncher.job.JobsRepository
 import org.metplus.cruncher.persistence.model.JobRepositoryImpl
 import org.metplus.cruncher.persistence.model.JobRepositoryMongo
+import org.metplus.cruncher.persistence.model.ResumeRepositoryImpl
+import org.metplus.cruncher.persistence.model.ResumeRepositoryMongo
 import org.metplus.cruncher.persistence.model.SettingsRepositoryImpl
 import org.metplus.cruncher.persistence.model.SettingsRepositoryMongo
+import org.metplus.cruncher.resume.ResumeRepository
 import org.metplus.cruncher.settings.SettingsRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.SpringBootConfiguration
@@ -21,4 +24,8 @@ open class TestConfig {
     @Bean
     open fun getJobRepository(@Autowired repo: JobRepositoryMongo)
             : JobsRepository = JobRepositoryImpl(repo)
+
+    @Bean
+    open fun getResumeRepository(@Autowired repo: ResumeRepositoryMongo)
+            : ResumeRepository = ResumeRepositoryImpl(repo)
 }
