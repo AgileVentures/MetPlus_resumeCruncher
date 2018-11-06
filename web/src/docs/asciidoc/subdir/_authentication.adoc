@@ -1,0 +1,19 @@
+= Authentication Success
+
+Request
+include::{snippets}/authentication/userPassword/http-request.adoc[]
+include::{snippets}/authentication/userPassword/request-headers.adoc[]
+
+Response
+include::{snippets}/authentication/userPassword/http-response.adoc[]
+Parameters on response
+include::{snippets}/authentication/userPassword/response-fields.adoc[]
+
+= Authentication error
+
+Request
+include::{snippets}/authentication/userPassword-error/http-request.adoc[]
+include::{snippets}/authentication/userPassword-error/request-headers.adoc[]
+
+Response
+include::{snippets}/authentication/userPassword-error/http-response.adoc[]
