@@ -5,8 +5,12 @@ import org.metplus.cruncher.job.JobsRepository
 import org.metplus.cruncher.job.UpdateJob
 import org.metplus.cruncher.persistence.model.JobRepositoryImpl
 import org.metplus.cruncher.persistence.model.JobRepositoryMongo
+import org.metplus.cruncher.persistence.model.ResumeRepositoryImpl
+import org.metplus.cruncher.persistence.model.ResumeRepositoryMongo
 import org.metplus.cruncher.persistence.model.SettingsRepositoryImpl
 import org.metplus.cruncher.persistence.model.SettingsRepositoryMongo
+import org.metplus.cruncher.resume.ResumeRepository
+import org.metplus.cruncher.resume.UploadResume
 import org.metplus.cruncher.settings.GetSettings
 import org.metplus.cruncher.settings.SaveSettings
 import org.springframework.beans.factory.annotation.Autowired
@@ -38,6 +42,11 @@ open class ApplicationConfiguration {
     ): JobsRepository = JobRepositoryImpl(jobRepository = jobRepositoryMongo)
 
     @Bean
+    open fun getResumeRepository(
+            @Autowired resumeRepositoryMongo: ResumeRepositoryMongo
+    ): ResumeRepository = ResumeRepositoryImpl(resumeRepositoryMongo)
+
+    @Bean
     open fun createJob(
             @Autowired jobsRepository: JobsRepository
     ): CreateJob = CreateJob(jobsRepository)
@@ -46,4 +55,9 @@ open class ApplicationConfiguration {
     open fun updateJob(
             @Autowired jobsRepository: JobsRepository
     ): UpdateJob = UpdateJob(jobsRepository)
+
+    @Bean
+    open fun uploadResume(
+            @Autowired resumeRepository: ResumeRepository
+    ): UploadResume = UploadResume(resumeRepository)
 }
