@@ -25,7 +25,6 @@ class ResumeController(
     fun uploadResumeEndpoint(@RequestParam("userId") id: String,
                      @RequestParam("name") name: String,
                      @RequestParam("file") file: MultipartFile): CruncherResponse {
-        System.out.println("Size is: " + file.size)
         return uploadResume.process(id, name,file.inputStream, file.size, observer =  object: UploadResumeObserver<CruncherResponse> {
             override fun onException(exception: Exception, resume: Resume): CruncherResponse {
                 return CruncherResponse(

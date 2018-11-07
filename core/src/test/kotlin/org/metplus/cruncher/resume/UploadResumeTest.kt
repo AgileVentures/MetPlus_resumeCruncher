@@ -4,16 +4,17 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.io.InputStream
 
 internal class UploadResumeTest {
     private lateinit var resumeRepository: ResumeRepository
     private lateinit var uploadResume: UploadResume
+    private lateinit var resumeFileRepository: ResumeFileRepository
 
     @BeforeEach
     fun setup() {
         resumeRepository = ResumeRepositoryFake()
-        uploadResume = UploadResume(resumeRepository)
+        resumeFileRepository = ResumeFileRepositoryFake()
+        uploadResume = UploadResume(resumeRepository, resumeFileRepository)
     }
 
     @Test
@@ -47,10 +48,12 @@ internal class UploadResumeTest {
 
         assertThat(resumeRepository.getByUserId("someUserId"))
                 .isEqualToComparingFieldByField(newResume)
+        assertThat(resumeFileRepository.getByUserId("someUserId"))
+                .isNotNull
     }
 
     @Test
-    fun `when resume exists, it overrides with new resume`() {
+    fun `when resume exists, it overrides with new resume and saves the file`() {
         resumeRepository.save(Resume(
                 filename = "some_file_name.pdf",
                 fileType = "pdf",
@@ -120,7 +123,7 @@ internal class UploadResumeTest {
     fun `when resume throw exception while saving, it does not save the file and call the onException observer`() {
         resumeRepository = ResumeRepositoryStub()
         (resumeRepository as ResumeRepositoryStub).throwOnSave = Exception("Some exception")
-        uploadResume = UploadResume(resumeRepository)
+        uploadResume = UploadResume(resumeRepository, resumeFileRepository)
 
         val fileInputStream = FileInputStreamFake("some content")
         assertThat(uploadResume.process(userId = "someUserId",
@@ -144,18 +147,9 @@ internal class UploadResumeTest {
                     }
 
                 }) as Boolean).isTrue()
-    }
-
-    class FileInputStreamFake(
-            private val fileContent: String
-    ) : InputStream() {
-
-        private var readUntil: Int = 0
-
-        override fun read(): Int {
-            if (readUntil == fileContent.length)
-                return -1
-            return fileContent[readUntil++].toInt()
-        }
+        try{
+            resumeFileRepository.getByUserId("someUserId")
+            fail("Exception should have been thrown")
+        } catch (exception: ResumeNotFound) {}
     }
 }
