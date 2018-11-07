@@ -21,6 +21,13 @@ backend:
     username: backend_admin
     password: backendpassword
 
+database-pets:
+  username: testing_user
+  password: testing_user
+  name: resumeCruncher
+  host: localhost
+  port: 27017
+
 
 ---
 spring:
@@ -37,12 +44,9 @@ backend:
 
 logging.level.org.metplus: INFO
 
----
-
-spring:
-  profiles: test
-
-backend:
-  admin:
-    username: backend_admin
-    password: backendpassword
+database-pets:
+  name:
+  host:
+  port: 0
+  username:
+  password:

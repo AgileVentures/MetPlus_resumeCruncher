@@ -4,6 +4,8 @@ import org.metplus.cruncher.job.CreateJob
 import org.metplus.cruncher.job.JobRepositoryFake
 import org.metplus.cruncher.job.JobsRepository
 import org.metplus.cruncher.job.UpdateJob
+import org.metplus.cruncher.resume.ResumeFileRepository
+import org.metplus.cruncher.resume.ResumeFileRepositoryFake
 import org.metplus.cruncher.resume.ResumeRepository
 import org.metplus.cruncher.resume.ResumeRepositoryFake
 import org.metplus.cruncher.resume.UploadResume
@@ -31,6 +33,9 @@ open class TestConfiguration {
     open fun getResumeRepository(): ResumeRepository = ResumeRepositoryFake()
 
     @Bean
+    open fun getResumeFileRepository(): ResumeFileRepository = ResumeFileRepositoryFake()
+
+    @Bean
     open fun getSettings(): GetSettings = GetSettings(getSettingsRepository())
 
     @Bean
@@ -46,5 +51,8 @@ open class TestConfiguration {
     open fun tokenService(): TokenService = LocalTokenService()
 
     @Bean
-    open fun uploadResume(@Autowired resumeRepository: ResumeRepository): UploadResume = UploadResume(resumeRepository)
+    open fun uploadResume(
+            @Autowired resumeRepository: ResumeRepository,
+            @Autowired resumeFileRepository: ResumeFileRepository
+    ): UploadResume = UploadResume(resumeRepository, resumeFileRepository)
 }
