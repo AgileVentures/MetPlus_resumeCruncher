@@ -1,9 +1,9 @@
-package org.metplus.cruncher.persistence.model
+package org.metplus.cruncher.persistence.model.settings
 
 import org.junit.jupiter.api.extension.ExtendWith
 import org.metplus.cruncher.persistence.TestConfig
-import org.metplus.cruncher.resume.ResumeRepository
-import org.metplus.cruncher.resume.ResumeRepositoryTest
+import org.metplus.cruncher.settings.SettingsRepository
+import org.metplus.cruncher.settings.SettingsRepositoryTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
 import org.springframework.test.context.ContextConfiguration
@@ -12,11 +12,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @DataMongoTest
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [TestConfig::class])
-internal class ResumeRepositoryImplTest : ResumeRepositoryTest() {
+class SettingsMongoRepositoryImplTest : SettingsRepositoryTest() {
     @Autowired
-    lateinit var mongoRepository: ResumeRepository
+    lateinit var mongoRepository: SettingsRepository
 
-    override fun getRepository(): ResumeRepository {
+    override fun getRepository(): SettingsRepository {
         return mongoRepository
     }
 }
