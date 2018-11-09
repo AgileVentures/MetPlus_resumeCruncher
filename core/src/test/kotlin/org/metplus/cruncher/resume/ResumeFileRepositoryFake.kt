@@ -13,7 +13,7 @@ class ResumeFileRepositoryFake : ResumeFileRepository {
         return allResumeFiles[resumeFile.userId]!!
     }
 
-    override fun getByUserId(userId: String): ResumeFile? {
+    override fun getByUserId(userId: String): ResumeFile {
         return allResumeFiles[userId] ?: throw ResumeNotFound("Resume for user '$userId' not found")
     }
 }
