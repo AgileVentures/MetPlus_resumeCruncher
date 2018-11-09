@@ -4,6 +4,7 @@ import org.metplus.cruncher.job.CreateJob
 import org.metplus.cruncher.job.JobRepositoryFake
 import org.metplus.cruncher.job.JobsRepository
 import org.metplus.cruncher.job.UpdateJob
+import org.metplus.cruncher.resume.DownloadResume
 import org.metplus.cruncher.resume.ResumeFileRepository
 import org.metplus.cruncher.resume.ResumeFileRepositoryFake
 import org.metplus.cruncher.resume.ResumeRepository
@@ -55,4 +56,10 @@ open class TestConfiguration {
             @Autowired resumeRepository: ResumeRepository,
             @Autowired resumeFileRepository: ResumeFileRepository
     ): UploadResume = UploadResume(resumeRepository, resumeFileRepository)
+
+    @Bean
+    open fun downloadResume(
+            @Autowired resumeRepository: ResumeRepository,
+            @Autowired resumeFileRepository: ResumeFileRepository
+    ): DownloadResume = DownloadResume(resumeRepository, resumeFileRepository)
 }
