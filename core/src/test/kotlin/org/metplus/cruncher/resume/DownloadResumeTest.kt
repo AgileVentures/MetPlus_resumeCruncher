@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
+import org.metplus.cruncher.rating.CruncherMetaData
 
 internal class DownloadResumeTest {
     private lateinit var resumeRepository: ResumeRepository
@@ -39,7 +40,8 @@ internal class DownloadResumeTest {
         val resumeSaved = Resume(
                 filename = "some_file_name.pdf",
                 userId = "someUserId",
-                fileType = "pdf"
+                fileType = "pdf",
+                cruncherData = CruncherMetaData(metaData = hashMapOf())
         )
         val resumeFileSaved = ResumeFile(
                 filename = "some_file_name.pdf",
@@ -70,7 +72,8 @@ internal class DownloadResumeTest {
         val resumeSaved = Resume(
                 filename = "some_file_name.pdf",
                 userId = "someUserId",
-                fileType = "pdf"
+                fileType = "pdf",
+                cruncherData = CruncherMetaData(metaData = hashMapOf())
         )
         resumeRepository.save(resumeSaved)
 

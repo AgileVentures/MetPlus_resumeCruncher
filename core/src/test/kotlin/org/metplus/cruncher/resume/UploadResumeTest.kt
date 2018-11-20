@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.metplus.cruncher.rating.CruncherMetaData
 
 internal class UploadResumeTest {
     private lateinit var resumeRepository: ResumeRepository
@@ -22,7 +23,8 @@ internal class UploadResumeTest {
         val newResume = Resume(
                 userId = "someUserId",
                 fileType = "pdf",
-                filename = "some_file_name.pdf"
+                filename = "some_file_name.pdf",
+                cruncherData = CruncherMetaData(metaData = hashMapOf())
         )
         val fileInputStream = FileInputStreamFake("some content")
         assertThat(uploadResume.process(userId = "someUserId",
@@ -57,13 +59,15 @@ internal class UploadResumeTest {
         resumeRepository.save(Resume(
                 filename = "some_file_name.pdf",
                 fileType = "pdf",
-                userId = "someUserId"
+                userId = "someUserId",
+                cruncherData = CruncherMetaData(metaData = hashMapOf())
         ))
 
         val newResume = Resume(
                 userId = "someUserId",
                 fileType = "doc",
-                filename = "some_other_file.doc"
+                filename = "some_other_file.doc",
+                cruncherData = CruncherMetaData(metaData = hashMapOf())
         )
 
         val fileInputStream = FileInputStreamFake("some content")

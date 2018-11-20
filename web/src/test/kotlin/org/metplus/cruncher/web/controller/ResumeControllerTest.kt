@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import org.metplus.cruncher.rating.CruncherMetaData
 import org.metplus.cruncher.resume.Resume
 import org.metplus.cruncher.resume.ResumeFile
 import org.metplus.cruncher.resume.ResumeFileRepository
@@ -100,7 +101,8 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
         resumeRepository.save(Resume(
                 userId = "asdasdasd",
                 filename = "line_with_bold.pdf",
-                fileType = "pdf"
+                fileType = "pdf",
+                cruncherData = CruncherMetaData(mutableMapOf<String, Long>() as HashMap<String, Long>)
         ))
         resumeFileRepository.save(ResumeFile(
                 userId = "asdasdasd",
