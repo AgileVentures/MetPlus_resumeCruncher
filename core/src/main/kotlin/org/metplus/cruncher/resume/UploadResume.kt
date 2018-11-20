@@ -1,5 +1,6 @@
 package org.metplus.cruncher.resume
 
+import org.metplus.cruncher.rating.CruncherMetaData
 import java.io.InputStream
 
 class UploadResume(
@@ -11,7 +12,8 @@ class UploadResume(
         val resume = Resume(
                 userId = userId,
                 filename = resumeName,
-                fileType = fileType
+                fileType = fileType,
+                cruncherData = CruncherMetaData(hashMapOf())
         )
 
         if (size == 0.toLong())
