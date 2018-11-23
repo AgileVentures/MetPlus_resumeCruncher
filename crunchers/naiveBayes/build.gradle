@@ -1,2 +1,6 @@
 group 'org.metplus.cruncher.crunchers'
 version '0.1.0'
+
+dependencies {
+    compile(project(":core"))
+}
