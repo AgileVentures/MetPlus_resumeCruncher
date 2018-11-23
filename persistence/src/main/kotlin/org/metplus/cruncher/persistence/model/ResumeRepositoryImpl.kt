@@ -17,16 +17,16 @@ class ResumeRepositoryImpl(
 }
 
 private fun ResumeMongo.toResume(): Resume {
-    val data = mutableMapOf<String, Long>()
+    val data = mutableMapOf<String, Double>()
     cruncherData.dataFields.forEach {
-        data[it.key] = it.value.data as Long
+        data[it.key] = it.value.data as Double
     }
 
     return Resume(
             userId = id,
             fileType = fileType,
             filename = filename,
-            cruncherData = CruncherMetaData(data as HashMap<String, Long>)
+            cruncherData = CruncherMetaData(data as HashMap<String, Double>)
     )
 }
 
