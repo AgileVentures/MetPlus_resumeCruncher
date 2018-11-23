@@ -45,10 +45,11 @@ docker exec -it pets-mongo mongo resumeCruncher
 
 ### Mongo configuration
 
-Before we can start the Cruncher we need to create a user and a database to connect to. 
+Before we can start the Cruncher we need to create a database to connect to, and a user for authentication. 
 To accomplish that connect to the Mongo instance using mongo CLI or a a visual app like robomongo and execute the following:
 
 ```mongo
+ use resumeCruncher
  db.createUser({user: 'testing_user', pwd: 'testing_user', roles: [{role: 'readWrite', db: 'resumeCruncher'}]});
 ```
 
@@ -194,8 +195,9 @@ To send requests to the application a browser can be user pointing to the addres
 The API documentation can be found in: http://joaopapereira.github.io/MetPlus_resumeCruncher/
 
 To start you need to authenticate doing 
+
 ```
-POST /api/v1/authenticate HTTP/1.1
+Before we can start the Cruncher we need to create a user and a database to connect to.POST /api/v1/authenticate HTTP/1.1
 Accept: application/json
 X-Auth-Username: backend_admin
 X-Auth-Password: backendpassword
