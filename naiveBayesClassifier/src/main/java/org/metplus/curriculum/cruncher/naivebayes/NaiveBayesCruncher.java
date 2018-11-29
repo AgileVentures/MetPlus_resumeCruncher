@@ -60,6 +60,8 @@ public class NaiveBayesCruncher extends CruncherInitializer {
     private ResumeRepository resumeRepository;
     @Autowired
     private JobRepository jobRepository;
+    @Autowired
+    private NaiveBayesConfig naiveBayesConfig;
 
     public NaiveBayesCruncher() {
 
@@ -77,7 +79,13 @@ public class NaiveBayesCruncher extends CruncherInitializer {
             //cleanExpressions = config.getCleanExpressions();
             load();
         } catch (CruncherSettingsNotFound cruncherSettingsNotFound) {
+            LOG.info("Could not find the settings, going to load them from yml");
             save();
+            try {
+                load();
+            } catch (CruncherSettingsNotFound cruncherSettingsNotFound1) {
+                LOG.error("Unable to reload after saving.....%s", cruncherSettingsNotFound1.getMessage());
+            }
         }
     }
 
@@ -144,10 +152,12 @@ public class NaiveBayesCruncher extends CruncherInitializer {
         } catch (CruncherSettingsNotFound cruncherSettingsNotFound) {
             cSettings = new CruncherSettings(CruncherImpl.CRUNCHER_NAME);
         }
-        cSettings.addSetting(new Setting<>(LEARN_DATABASE, learnDatabase));
+        cSettings.addSetting(new Setting<>(LEARN_DATABASE, naiveBayesConfig.getLearnDatabase()));
         Settings globalSettings = repository.findAll().iterator().next();
         globalSettings.addCruncherSettings(CruncherImpl.CRUNCHER_NAME, cSettings);
         repository.save(globalSettings);
+        learnDatabase = naiveBayesConfig.getLearnDatabase();
+        cleanExpressions = naiveBayesConfig.getCleanExpressions();
     }
 
     @Override
