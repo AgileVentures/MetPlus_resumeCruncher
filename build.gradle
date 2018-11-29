@@ -78,10 +78,6 @@ applicationDistribution.from(copyLicense) {
     into ""
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.3'
-}
-
 task stage {
 }
 stage.dependsOn(":app:stage")
