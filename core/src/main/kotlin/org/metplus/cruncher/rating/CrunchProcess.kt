@@ -64,7 +64,7 @@ abstract class ProcessCruncher<Work>(
 
     @Synchronized
     fun addWork(work: Work) {
-        workDeque!!.add(work)
+        workDeque.add(work)
         semaphore.release()
     }
 
