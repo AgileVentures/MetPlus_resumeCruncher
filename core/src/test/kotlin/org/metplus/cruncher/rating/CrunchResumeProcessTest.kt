@@ -9,10 +9,9 @@ import org.metplus.cruncher.resume.Resume
 import org.metplus.cruncher.resume.ResumeFile
 import org.metplus.cruncher.resume.ResumeFileRepository
 import org.metplus.cruncher.resume.ResumeFileRepositoryFake
-import org.metplus.cruncher.resume.ResumeNotFound
 import org.metplus.cruncher.resume.ResumeRepository
 import org.metplus.cruncher.resume.ResumeRepositoryFake
-import java.io.ByteArrayOutputStream
+
 
 class CrunchResumeProcessTest {
     private lateinit var cruncher: CrunchResumeProcess
@@ -55,71 +54,84 @@ class CrunchResumeProcessTest {
                 userId = "some-user-id",
                 fileStream = FileInputStreamFake("Some text in the file")
         ))
-        cruncherImpl.crunchReturn = CruncherMetaData(
+        cruncherImpl.crunchReturn = mutableListOf(CruncherMetaData(
                 metaData = mutableMapOf("some-key" to 10.0)
-        )
+        ))
+
         cruncher.start()
         cruncher.addWork(resume)
         cruncher.stop()
         cruncher.join()
-        assertThat(cruncherImpl.crunchWasCalledWith).contains("Some text in the file")
+
+        assertThat(cruncherImpl.crunchWasCalledWith.size).isEqualTo(1)
+        assertThat(cruncherImpl.crunchWasCalledWith.first()).contains("Some text in the file")
         val cruncherResume = resumeRepository.getByUserId("some-user-id")!!
         assertThat(cruncherResume.cruncherData.metaData["some-key"]).isEqualTo(10.0)
     }
-//
-//    @Test
-//    @Throws(ResumeNotFound::class, ResumeReadException::class, InterruptedException::class)
-//    fun twoResume() {
-//        val resume = Mockito.mock(Resume::class.java)
-//        Mockito.`when`(resume.getResume(springMongoConfig)).thenReturn(ByteArrayOutputStream())
-//        val resume1 = Mockito.mock(Resume::class.java)
-//        Mockito.`when`(resume1.getResume(springMongoConfig)).thenReturn(ByteArrayOutputStream())
-//        val listCrunchers = ArrayList<Cruncher>()
-//        listCrunchers.add(cruncherImpl)
-//        Mockito.`when`(allCrunchers!!.getCrunchers()).thenReturn(listCrunchers)
-//        cruncher!!.postConstructor()
-//        cruncher!!.addWork(resume)
-//        cruncher!!.addWork(resume1)
-//        cruncher!!.stop()
-//        cruncher!!.join()
-//        Mockito.verify(allCrunchers, Mockito.times(2)).getCrunchers()
-//        Mockito.verify(resumeRepository).save(resume)
-//        Mockito.verify(resumeRepository).save(resume1)
-//        Mockito.verify(resume).getResume(springMongoConfig)
-//        Mockito.verify(resume1).getResume(springMongoConfig)
-//    }
-//
-//    @Test
-//    @Throws(ResumeNotFound::class, ResumeReadException::class, InterruptedException::class)
-//    fun unableToFindResumeFile() {
-//        val resume = Mockito.mock(Resume::class.java)
-//        Mockito.`when`(resume.getResume(springMongoConfig)).thenThrow(ResumeNotFound(""))
-//        val listCrunchers = ArrayList<Cruncher>()
-//        listCrunchers.add(cruncherImpl)
-//        Mockito.`when`(allCrunchers!!.getCrunchers()).thenReturn(listCrunchers)
-//        cruncher!!.postConstructor()
-//        cruncher!!.addWork(resume)
-//        cruncher!!.stop()
-//        cruncher!!.join()
-//        Mockito.verify(allCrunchers, Mockito.times(0)).getCrunchers()
-//        Mockito.verify(resumeRepository, Mockito.times(0)).save(resume)
-//        Mockito.verify(resume).getResume(springMongoConfig)
-//    }
-//
-//    @Test
-//    @Throws(ResumeNotFound::class, ResumeReadException::class, InterruptedException::class)
-//    fun unableToReadResumeFile() {
-//        val resume = Mockito.mock(Resume::class.java)
-//        Mockito.`when`(resume.getResume(springMongoConfig)).thenThrow(ResumeReadException(""))
-//        val listCrunchers = ArrayList<Cruncher>()
-//        listCrunchers.add(cruncherImpl)
-//        Mockito.`when`(allCrunchers!!.getCrunchers()).thenReturn(listCrunchers)
-//        cruncher!!.postConstructor()
-//        cruncher!!.addWork(resume)
-//        cruncher!!.stop()
-//        cruncher!!.join()
-//        Mockito.verify(allCrunchers, Mockito.times(0)).getCrunchers()
-//        Mockito.verify(resumeRepository, Mockito.times(0)).save(resume)
-//        Mockito.verify(resume).getResume(springMongoConfig)
-//    }
+
+    @Test
+    fun `when 2 resumes are added, it process both of them`() {
+        val resumeUser1 = resumeRepository.save(
+                Resume(
+                        filename = "some-file-name.pdf",
+                        userId = "some-user-id",
+                        fileType = "pdf",
+                        cruncherData = CruncherMetaData(mutableMapOf()))
+        )
+        resumeFileRepository.save(ResumeFile(
+                filename = "some-file-name.pdf",
+                userId = "some-user-id",
+                fileStream = FileInputStreamFake("Some text in the file")
+        ))
+        cruncherImpl.crunchReturn.add(CruncherMetaData(
+                metaData = mutableMapOf("some-key" to 10.0)))
+
+        val resumeUser2 = resumeRepository.save(
+                Resume(
+                        filename = "some-other-file-name.pdf",
+                        userId = "some-other-user-id",
+                        fileType = "pdf",
+                        cruncherData = CruncherMetaData(mutableMapOf("the-key" to 99.0)))
+        )
+
+        resumeFileRepository.save(ResumeFile(
+                filename = "some-file-name.pdf",
+                userId = "some-other-user-id",
+                fileStream = FileInputStreamFake("Some other text in the file")
+        ))
+        cruncherImpl.crunchReturn.add(CruncherMetaData(
+                        metaData = mutableMapOf("some-other-key" to 9.0)))
+
+        cruncher.start()
+        cruncher.addWork(resumeUser1)
+        cruncher.addWork(resumeUser2)
+        cruncher.stop()
+        cruncher.join()
+        assertThat(cruncherImpl.crunchWasCalledWith.size).isEqualTo(2)
+        assertThat(cruncherImpl.crunchWasCalledWith.first()).contains("Some text in the file")
+        assertThat(cruncherImpl.crunchWasCalledWith[1]).contains("Some other text in the file")
+
+        val cruncherResumeUser1 = resumeRepository.getByUserId("some-user-id")!!
+        println(cruncherResumeUser1.cruncherData)
+        assertThat(cruncherResumeUser1.cruncherData.metaData["some-key"]).isEqualTo(10.0)
+
+        val cruncherResumeUser2 = resumeRepository.getByUserId("some-other-user-id")!!
+        println(cruncherResumeUser2.cruncherData)
+        assertThat(cruncherResumeUser2.cruncherData.metaData["some-other-key"]).isEqualTo(9.0)
+    }
+
+    @Test
+    fun `When resume need to be processed but cannot find file, starts and stops without calling the cruncher`() {
+        val resumeUser1 = resumeRepository.save(
+                Resume(
+                        filename = "some-file-name.pdf",
+                        userId = "some-user-id",
+                        fileType = "pdf",
+                        cruncherData = CruncherMetaData(mutableMapOf()))
+        )
+        cruncher.start()
+        cruncher.addWork(resumeUser1)
+        cruncher.stop()
+        cruncher.join()
+    }
 }

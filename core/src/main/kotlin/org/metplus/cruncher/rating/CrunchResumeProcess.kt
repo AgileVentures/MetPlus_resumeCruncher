@@ -13,7 +13,7 @@ class CrunchResumeProcess(
         private val allCrunchers: CruncherList,
         private val resumeRepository: ResumeRepository,
         private val resumeFileRepository: ResumeFileRepository
-) : ProcessCruncher<Resume>(allCrunchers) {
+) : ProcessCruncher<Resume>() {
 
     override fun process(resume: Resume) {
         logger.info("Going to process the resume for: " + resume.userId)
