@@ -2,7 +2,7 @@ package org.metplus.cruncher.rating
 
 
 data class CruncherMetaData(
-        val metaData: HashMap<String, Double>
+        val metaData: MutableMap<String, Double>
 )
 
 interface Cruncher {
