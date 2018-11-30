@@ -4,9 +4,7 @@ import org.slf4j.LoggerFactory
 import java.util.*
 import java.util.concurrent.Semaphore
 
-abstract class ProcessCruncher<Work>(
-        private val allCrunchers: CruncherList
-) {
+abstract class ProcessCruncher<Work> {
     private val logger = LoggerFactory.getLogger(ProcessCruncher::class.java)
     private var cruncher: Thread? = null
     private var workDeque: Deque<Work> = ArrayDeque()
