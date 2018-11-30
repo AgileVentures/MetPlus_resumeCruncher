@@ -102,7 +102,7 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
                 userId = "asdasdasd",
                 filename = "line_with_bold.pdf",
                 fileType = "pdf",
-                cruncherData = CruncherMetaData(mutableMapOf<String, Double>() as HashMap<String, Double>)
+                cruncherData = CruncherMetaData(mutableMapOf())
         ))
         resumeFileRepository.save(ResumeFile(
                 userId = "asdasdasd",

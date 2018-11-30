@@ -48,7 +48,7 @@ class CrunchResumeProcessTest {
                         filename = "some-file-name.pdf",
                         userId = "some-user-id",
                         fileType = "pdf",
-                        cruncherData = CruncherMetaData(mutableMapOf<String, Double>() as HashMap<String, Double>))
+                        cruncherData = CruncherMetaData(mutableMapOf()))
         )
         resumeFileRepository.save(ResumeFile(
                 filename = "some-file-name.pdf",
@@ -56,7 +56,7 @@ class CrunchResumeProcessTest {
                 fileStream = FileInputStreamFake("Some text in the file")
         ))
         cruncherImpl.crunchReturn = CruncherMetaData(
-                metaData = mutableMapOf("some-key" to 10.0) as HashMap<String, Double>
+                metaData = mutableMapOf("some-key" to 10.0)
         )
         cruncher.start()
         cruncher.addWork(resume)
