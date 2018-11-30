@@ -26,7 +26,7 @@ private fun ResumeMongo.toResume(): Resume {
             userId = id,
             fileType = fileType,
             filename = filename,
-            cruncherData = CruncherMetaData(data as HashMap<String, Double>)
+            cruncherData = CruncherMetaData(data)
     )
 }
 
