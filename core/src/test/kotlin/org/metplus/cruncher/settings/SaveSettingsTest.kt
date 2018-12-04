@@ -7,14 +7,14 @@ internal class SaveSettingsTest {
     @Test
     fun `When saving existing settings, return saved object`() {
         val settingsRepository = SettingsRepositoryFake()
-        val settings = Settings(
-                1, ApplicationSettings(hashMapOf()))
+        val settings = emptySettingsConstructor(1)
         val saveSettings = SaveSettings(settingsRepository)
         var wasCalled = false
         settingsRepository.save(settings)
         val newRepository = Settings(1,
                 ApplicationSettings(hashMapOf(
-                        "some setting" to Setting("some setting", "some value"))))
+                        "some setting" to Setting("some setting", "some value"))),
+                CruncherSettings(hashMapOf(), listOf()))
 
         saveSettings.process(newRepository) { result: Settings ->
             Assertions.assertThat(result)
@@ -36,7 +36,8 @@ internal class SaveSettingsTest {
         var wasCalled = false
         val newRepository = Settings(1,
                 ApplicationSettings(hashMapOf(
-                        "some setting" to Setting("some setting", "some value"))))
+                        "some setting" to Setting("some setting", "some value"))),
+                CruncherSettings(hashMapOf(), listOf()))
 
         saveSettings.process(newRepository) { result: Settings ->
             Assertions.assertThat(result)

@@ -1,17 +1,8 @@
 package org.metplus.cruncher.web.controller
 
-import org.metplus.cruncher.settings.ApplicationSettings
-import org.metplus.cruncher.settings.GetSettings
-import org.metplus.cruncher.settings.SaveSettings
-import org.metplus.cruncher.settings.Setting
-import org.metplus.cruncher.settings.Settings
+import org.metplus.cruncher.settings.*
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/admin/settings")
@@ -46,7 +37,7 @@ class SettingsController(
     data class SettingsResponse(
             val id: Int,
             val appSettings: ApplicationSettingsResponse,
-            val cruncherSettings: CruncherSettings
+            val cruncherSettings: CruncherSettingsResponse
     ) {
         fun toSettings(): Settings {
             val applicationSettings = mutableMapOf<String, Setting<*>>()
@@ -57,10 +48,16 @@ class SettingsController(
                     id = id,
                     applicationSettings = ApplicationSettings(
                             settings = applicationSettings as HashMap<String, Setting<*>>
-                    )
+                    ),
+                    cruncherSettings = cruncherSettings.toCruncherSettings()
             )
         }
     }
+
+    data class CruncherSettingsResponse(
+            val database: Map<String, List<String>>,
+            val cleanExpression: List<String>
+    )
 
     data class ApplicationSettingsResponse(
             val settings: HashMap<String, SettingReponse<*>>
@@ -70,9 +67,12 @@ class SettingsController(
             val name: String,
             val data: DataType
     )
+}
 
-    data class CruncherSettings(
-            val id: Int
+private fun SettingsController.CruncherSettingsResponse.toCruncherSettings(): CruncherSettings {
+    return CruncherSettings(
+            database = this.database,
+            cleanExpressions = this.cleanExpression
     )
 }
 
@@ -86,6 +86,13 @@ fun Settings.toSettingsResponse(): SettingsController.SettingsResponse? {
             appSettings = SettingsController.ApplicationSettingsResponse(
                     settings = applicationSettings as HashMap<String, SettingsController.SettingReponse<*>>
             ),
-            cruncherSettings = SettingsController.CruncherSettings(1)
+            cruncherSettings = cruncherSettings.toCruncerSettingsResponse()
+    )
+}
+
+private fun CruncherSettings.toCruncerSettingsResponse(): SettingsController.CruncherSettingsResponse {
+    return SettingsController.CruncherSettingsResponse(
+            database = database,
+            cleanExpression = cleanExpressions
     )
 }

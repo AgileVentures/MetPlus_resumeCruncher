@@ -9,7 +9,8 @@ import java.math.BigInteger
 @TypeAlias("settings")
 class SettingsMongo(
         @Id val id: BigInteger,
-        val appSettingsMongo: SettingsListMongo
+        val appSettingsMongo: SettingsListMongo,
+        val cruncherSettingsMongo: CruncherSettingsMongo
 )
 
 class SettingsListMongo(
@@ -21,4 +22,9 @@ class SettingsListMongo(
 class SettingMongo<DataType>(
         val name: String,
         val data: DataType
+)
+
+class CruncherSettingsMongo(
+        val database: Map<String, List<String>>,
+        val cleanExpressions: List<String>
 )

@@ -20,7 +20,8 @@ abstract class SettingsRepositoryTest {
                                 "color" to Setting<Int>("green", 1),
                                 "key" to Setting<String>("key", "asdafdasasdf")
                         )
-                )
+                ),
+                CruncherSettings(hashMapOf(), listOf())
         )
         val resultAfterSave = getRepository().save(settings)
 
@@ -38,7 +39,8 @@ abstract class SettingsRepositoryTest {
                                 "color" to Setting("green", 1),
                                 "key" to Setting("key", "asdafdasasdf")
                         )
-                )
+                ),
+                CruncherSettings(hashMapOf(), listOf())
         ))
 
         val updatedSetting = initialSetting.copy(applicationSettings =

@@ -7,7 +7,7 @@ class GetSettings(
         var settings = settingsRepository.getAll().firstOrNull()
 
         if (settings == null) {
-            settings = Settings(1, ApplicationSettings(hashMapOf()))
+            settings = Settings(1, ApplicationSettings(hashMapOf()), CruncherSettings(hashMapOf(), emptyList()))
         }
 
         observer(settings)

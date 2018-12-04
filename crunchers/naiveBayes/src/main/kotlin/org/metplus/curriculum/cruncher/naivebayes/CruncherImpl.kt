@@ -49,7 +49,7 @@ class CruncherImpl(
         return name
     }
 
-    fun train(database: Map<String, List<String>>) {
+    override fun train(database: Map<String, List<String>>) {
         logger.trace("train($database)")
         if (database.isNotEmpty()) {
             logger.debug("Training using a database with {} categories", database.size)

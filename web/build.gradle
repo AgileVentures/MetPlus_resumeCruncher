@@ -24,6 +24,7 @@ dependencies {
     compile("org.jetbrains.kotlin:kotlin-reflect")
     compile(project(':core'))
     compile(project(':persistence'))
+    compile(project(':crunchers/naiveBayes'))
 
 
     testCompile(project(path: ":core", configuration: 'testArtifacts'))
