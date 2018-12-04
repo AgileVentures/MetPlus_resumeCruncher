@@ -9,7 +9,7 @@ import org.metplus.cruncher.utilities.DocumentParserImpl
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayOutputStream
 
-class CrunchResumeProcess(
+open class CrunchResumeProcess(
         private val allCrunchers: CruncherList,
         private val resumeRepository: ResumeRepository,
         private val resumeFileRepository: ResumeFileRepository
