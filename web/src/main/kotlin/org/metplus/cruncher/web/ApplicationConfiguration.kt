@@ -15,12 +15,14 @@ import org.metplus.cruncher.persistence.model.ResumeRepositoryImpl
 import org.metplus.cruncher.persistence.model.ResumeRepositoryMongo
 import org.metplus.cruncher.persistence.model.SettingsRepositoryImpl
 import org.metplus.cruncher.persistence.model.SettingsRepositoryMongo
+import org.metplus.cruncher.rating.CruncherList
 import org.metplus.cruncher.resume.DownloadResume
 import org.metplus.cruncher.resume.ResumeFileRepository
 import org.metplus.cruncher.resume.ResumeRepository
 import org.metplus.cruncher.resume.UploadResume
 import org.metplus.cruncher.settings.GetSettings
 import org.metplus.cruncher.settings.SaveSettings
+import org.metplus.cruncher.web.rating.AsyncResumeProcess
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.SpringBootConfiguration
@@ -91,6 +93,13 @@ open class ApplicationConfiguration {
             @Autowired resumeRepository: ResumeRepository,
             @Autowired resumeFileRepository: ResumeFileRepository
     ): DownloadResume = DownloadResume(resumeRepository, resumeFileRepository)
+
+    @Bean
+    open fun asyncResumeProcess(
+            @Autowired allCrunchers: CruncherList,
+            @Autowired resumeRepository: ResumeRepository,
+            @Autowired resumeFileRepository: ResumeFileRepository
+    ) =  AsyncResumeProcess(allCrunchers, resumeRepository, resumeFileRepository)
 }
 
 @Configuration
