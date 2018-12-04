@@ -1,9 +1,6 @@
 package org.metplus.cruncher.persistence.model
 
-import org.metplus.cruncher.settings.ApplicationSettings
-import org.metplus.cruncher.settings.Setting
-import org.metplus.cruncher.settings.Settings
-import org.metplus.cruncher.settings.SettingsRepository
+import org.metplus.cruncher.settings.*
 import java.math.BigInteger
 
 class SettingsRepositoryImpl(
@@ -12,7 +9,8 @@ class SettingsRepositoryImpl(
     override fun save(settings: Settings): Settings {
         return settingsRepository.save(SettingsMongo(
                 id = settings.id.toBigInteger(),
-                appSettingsMongo = settings.applicationSettings.toSettingsListMongo()
+                appSettingsMongo = settings.applicationSettings.toSettingsListMongo(),
+                cruncherSettingsMongo = settings.cruncherSettings.toCruncherSettingsMongo()
         )).toSettings()
     }
 
@@ -23,7 +21,8 @@ class SettingsRepositoryImpl(
     private fun SettingsMongo.toSettings(): Settings {
         return org.metplus.cruncher.settings.Settings(
                 id = this.id.intValueExact(),
-                applicationSettings = this.appSettingsMongo.toApplicationSettings()
+                applicationSettings = this.appSettingsMongo.toApplicationSettings(),
+                cruncherSettings = this.cruncherSettingsMongo.toCruncherSettings()
         )
     }
 
@@ -56,4 +55,18 @@ class SettingsRepositoryImpl(
     private fun <DataType> Setting<DataType>.toMongoSetting(): SettingMongo<DataType> {
         return SettingMongo(name = name, data = data)
     }
+}
+
+private fun CruncherSettings.toCruncherSettingsMongo(): CruncherSettingsMongo {
+    return CruncherSettingsMongo(
+            database = this.database,
+            cleanExpressions = this.cleanExpressions
+    )
+}
+
+private fun CruncherSettingsMongo.toCruncherSettings(): CruncherSettings {
+    return CruncherSettings(
+            database = this.database,
+            cleanExpressions = this.cleanExpressions
+    )
 }

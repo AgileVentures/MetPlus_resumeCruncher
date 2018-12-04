@@ -8,15 +8,12 @@ data class CruncherMetaData(
 interface Cruncher {
     fun crunch(data: String): CruncherMetaData
     fun getCruncherName(): String
+    fun train(database: Map<String, List<String>>)
 }
 
-open class CruncherList {
-    private var allCrunchers = mutableListOf<Cruncher>()
-
-    fun addCruncher(cruncher: Cruncher) {
-        allCrunchers.add(cruncher)
-    }
-
+open class CruncherList(
+    private var allCrunchers: List<Cruncher> = mutableListOf()
+) {
     fun getCrunchers(): List<Cruncher> {
         return allCrunchers
     }
