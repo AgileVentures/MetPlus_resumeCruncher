@@ -7,8 +7,7 @@ class GetSettingsTest {
     @Test
     fun `When no settings are present, return empty object`() {
         val settingsRepository = SettingsRepositoryFake()
-        val settings = Settings(
-                1, ApplicationSettings(hashMapOf()))
+        val settings = emptySettingsConstructor(1)
         val getSettings = GetSettings(settingsRepository)
         var wasCalled = false
 
@@ -25,8 +24,7 @@ class GetSettingsTest {
     @Test
     fun `When settings are present, return the settings`() {
         val settingsRepository = SettingsRepositoryFake()
-        val settings = Settings(
-                1, ApplicationSettings(hashMapOf()))
+        val settings = emptySettingsConstructor(1)
         val getSettings = GetSettings(settingsRepository)
         var wasCalled = false
 

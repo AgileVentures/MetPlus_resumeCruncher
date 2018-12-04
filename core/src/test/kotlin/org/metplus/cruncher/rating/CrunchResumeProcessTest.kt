@@ -22,8 +22,7 @@ class CrunchResumeProcessTest {
     @BeforeEach
     fun setup() {
         cruncherImpl = CruncherStub()
-        val allCrunchers = CruncherList()
-        allCrunchers.addCruncher(cruncherImpl)
+        val allCrunchers = CruncherList(listOf(cruncherImpl))
         resumeRepository = ResumeRepositoryFake()
         resumeFileRepository = ResumeFileRepositoryFake()
         cruncher = CrunchResumeProcess(

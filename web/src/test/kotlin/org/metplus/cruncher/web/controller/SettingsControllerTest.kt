@@ -5,17 +5,11 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.assertj.core.api.Assertions
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.hasEntry
-import org.hamcrest.Matchers.hasKey
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.metplus.cruncher.settings.ApplicationSettings
-import org.metplus.cruncher.settings.Setting
-import org.metplus.cruncher.settings.Settings
-import org.metplus.cruncher.settings.SettingsRepository
-import org.metplus.cruncher.settings.SettingsRepositoryFake
+import org.metplus.cruncher.settings.*
 import org.metplus.cruncher.web.TestConfiguration
 import org.metplus.cruncher.web.security.services.TokenService
 import org.springframework.beans.factory.annotation.Autowired
@@ -108,7 +102,8 @@ class SettingsControllerTest(@Autowired private val mvc: MockMvc) {
         val settingsBefore = settingsRepository.save(
                 Settings(1, ApplicationSettings(
                         hashMapOf("some content" to Setting("some content", "some value"))
-                ))
+                ),
+                        CruncherSettings(hashMapOf("feature" to listOf("key1", "key2")), listOf("a", "b")))
         )
         val jsonResponseRepresentation = jacksonObjectMapper().writeValueAsString(settingsBefore.toSettingsResponse())
 
@@ -134,6 +129,8 @@ class SettingsControllerTest(@Autowired private val mvc: MockMvc) {
                 .andExpect(jsonPath("$.appSettings.settings", hasKey("some content")))
                 .andExpect(jsonPath("$.appSettings.settings['some content']", hasEntry("name", "some content")))
                 .andExpect(jsonPath("$.appSettings.settings['some content']", hasEntry("data", "some value")))
+                .andExpect(jsonPath("$.cruncherSettings.database['feature']", contains("key1", "key2")))
+                .andExpect(jsonPath("$.cruncherSettings.cleanExpression", contains("a", "b")))
                 .andReturn().response
     }
 

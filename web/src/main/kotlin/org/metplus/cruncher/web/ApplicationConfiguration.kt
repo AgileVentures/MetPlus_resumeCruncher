@@ -16,16 +16,23 @@ import org.metplus.cruncher.persistence.model.ResumeRepositoryMongo
 import org.metplus.cruncher.persistence.model.SettingsRepositoryImpl
 import org.metplus.cruncher.persistence.model.SettingsRepositoryMongo
 import org.metplus.cruncher.rating.CruncherList
+import org.metplus.cruncher.rating.TrainCruncher
+import org.metplus.cruncher.rating.TrainCruncherObserver
 import org.metplus.cruncher.resume.DownloadResume
 import org.metplus.cruncher.resume.ResumeFileRepository
 import org.metplus.cruncher.resume.ResumeRepository
 import org.metplus.cruncher.resume.UploadResume
+import org.metplus.cruncher.settings.CruncherSettings
 import org.metplus.cruncher.settings.GetSettings
 import org.metplus.cruncher.settings.SaveSettings
 import org.metplus.cruncher.web.rating.AsyncResumeProcess
+import org.metplus.curriculum.cruncher.naivebayes.CruncherImpl
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.SpringBootConfiguration
+import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.mongodb.MongoDbFactory
@@ -33,9 +40,11 @@ import org.springframework.data.mongodb.config.AbstractMongoConfiguration
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories
+import org.springframework.stereotype.Component
 import java.util.ArrayList
 
 @SpringBootConfiguration
+@EnableConfigurationProperties
 @EnableMongoRepositories(basePackages = ["org.metplus.cruncher.persistence"])
 open class ApplicationConfiguration {
     @Bean
@@ -95,11 +104,34 @@ open class ApplicationConfiguration {
     ): DownloadResume = DownloadResume(resumeRepository, resumeFileRepository)
 
     @Bean
+    open fun allCrunchers(
+            naiveBayesCruncherImpl: CruncherImpl,
+            trainCruncher: TrainCruncher
+    ): CruncherList {
+        trainCruncher.process(observer = object : TrainCruncherObserver {
+            override fun onSuccess() {
+            }
+        })
+        return CruncherList(listOf(naiveBayesCruncherImpl))
+    }
+
+
+    @Bean
     open fun asyncResumeProcess(
             @Autowired allCrunchers: CruncherList,
             @Autowired resumeRepository: ResumeRepository,
             @Autowired resumeFileRepository: ResumeFileRepository
-    ) =  AsyncResumeProcess(allCrunchers, resumeRepository, resumeFileRepository)
+    ) = AsyncResumeProcess(allCrunchers, resumeRepository, resumeFileRepository)
+
+    @Bean
+    open fun naiveBayesImpl() = CruncherImpl()
+
+    @Bean
+    open fun cruncherTrainer(
+            @Autowired settingsRepository: SettingsRepositoryImpl,
+            @Autowired cruncherImpl: CruncherImpl,
+            @Autowired cruncherConfiguration: CruncherConfiguration
+    ) = TrainCruncher(settingsRepository, cruncherImpl, cruncherConfiguration.cruncherSettings)
 }
 
 @Configuration
@@ -165,4 +197,13 @@ open class SpringMongoConfig : AbstractMongoConfiguration() {
 
         private val logger = LoggerFactory.getLogger(SpringMongoConfig::class.java)
     }
+}
+
+@ConfigurationProperties(prefix = "naive-bayes")
+@Configuration
+open class CruncherConfiguration(
+        var learnDatabase: Map<String, List<String>> = mutableMapOf(),
+        var cleanExpressions: List<String> = mutableListOf()
+) {
+    val cruncherSettings = CruncherSettings(this.learnDatabase, this.cleanExpressions)
 }
