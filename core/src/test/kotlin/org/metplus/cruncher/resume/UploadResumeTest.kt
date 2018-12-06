@@ -4,22 +4,25 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.metplus.cruncher.rating.CrunchResumeProcessSpy
 import org.metplus.cruncher.rating.CruncherMetaData
 
 internal class UploadResumeTest {
     private lateinit var resumeRepository: ResumeRepository
     private lateinit var uploadResume: UploadResume
     private lateinit var resumeFileRepository: ResumeFileRepository
+    private lateinit var cruncherResumeProcessSpy: CrunchResumeProcessSpy
 
     @BeforeEach
     fun setup() {
         resumeRepository = ResumeRepositoryFake()
         resumeFileRepository = ResumeFileRepositoryFake()
-        uploadResume = UploadResume(resumeRepository, resumeFileRepository)
+        cruncherResumeProcessSpy = CrunchResumeProcessSpy()
+        uploadResume = UploadResume(resumeRepository, resumeFileRepository, cruncherResumeProcessSpy)
     }
 
     @Test
-    fun `when resume does not exist, it creates a new resume`() {
+    fun `when resume does not exist, it creates a new resume and enqueues the resume to be processed`() {
         val newResume = Resume(
                 userId = "someUserId",
                 fileType = "pdf",
@@ -52,10 +55,11 @@ internal class UploadResumeTest {
                 .isEqualToComparingFieldByField(newResume)
         assertThat(resumeFileRepository.getByUserId("someUserId"))
                 .isNotNull
+        assertThat(cruncherResumeProcessSpy.nextWorkInQueue()).isEqualTo(newResume)
     }
 
     @Test
-    fun `when resume exists, it overrides with new resume and saves the file`() {
+    fun `when resume exists, it overrides with new resume and saves the file and enqueues the resume to be processed`() {
         resumeRepository.save(Resume(
                 filename = "some_file_name.pdf",
                 fileType = "pdf",
@@ -94,6 +98,7 @@ internal class UploadResumeTest {
 
         assertThat(resumeRepository.getByUserId("someUserId"))
                 .isEqualToComparingFieldByField(newResume)
+        assertThat(cruncherResumeProcessSpy.nextWorkInQueue()).isEqualTo(newResume)
     }
 
     @Test
@@ -121,13 +126,14 @@ internal class UploadResumeTest {
                 }) as Boolean).isTrue()
 
         assertThat(resumeRepository.getByUserId("someUserId")).isNull()
+        assertThat(cruncherResumeProcessSpy.nextWorkInQueue()).isNull()
     }
 
     @Test
     fun `when resume throw exception while saving, it does not save the file and call the onException observer`() {
         resumeRepository = ResumeRepositoryStub()
         (resumeRepository as ResumeRepositoryStub).throwOnSave = Exception("Some exception")
-        uploadResume = UploadResume(resumeRepository, resumeFileRepository)
+        uploadResume = UploadResume(resumeRepository, resumeFileRepository, cruncherResumeProcessSpy)
 
         val fileInputStream = FileInputStreamFake("some content")
         assertThat(uploadResume.process(userId = "someUserId",
@@ -151,9 +157,11 @@ internal class UploadResumeTest {
                     }
 
                 }) as Boolean).isTrue()
-        try{
+        try {
             resumeFileRepository.getByUserId("someUserId")
             fail("Exception should have been thrown")
-        } catch (exception: ResumeNotFound) {}
+        } catch (exception: ResumeNotFound) {
+            assertThat(cruncherResumeProcessSpy.nextWorkInQueue()).isNull()
+        }
     }
 }
