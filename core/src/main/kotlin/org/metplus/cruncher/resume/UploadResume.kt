@@ -1,11 +1,14 @@
 package org.metplus.cruncher.resume
 
+import org.metplus.cruncher.rating.CrunchResumeProcess
 import org.metplus.cruncher.rating.CruncherMetaData
+import org.metplus.cruncher.rating.ProcessCruncher
 import java.io.InputStream
 
 class UploadResume(
         private val resumeRepository: ResumeRepository,
-        private val resumeFileRepository: ResumeFileRepository
+        private val resumeFileRepository: ResumeFileRepository,
+        private val crunchResumeProcess: ProcessCruncher<Resume>
 ) {
     fun process(userId: String, resumeName: String, file: InputStream, size: Long, observer: UploadResumeObserver<*>): Any {
         val fileType = resumeName.split(".").last()
@@ -25,7 +28,9 @@ class UploadResume(
                     userId = userId,
                     fileStream = file
             ))
-            observer.onSuccess(resumeRepository.save(resume))!!
+            val savedResume = resumeRepository.save(resume)
+            crunchResumeProcess.addWork(savedResume)
+            observer.onSuccess(savedResume)!!
         } catch (exception: Exception) {
             resumeFileRepository.deleteIfExists(userId)
             observer.onException(exception, resume)!!
