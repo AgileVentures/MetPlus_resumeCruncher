@@ -15,6 +15,7 @@ import org.metplus.cruncher.persistence.model.ResumeRepositoryImpl
 import org.metplus.cruncher.persistence.model.ResumeRepositoryMongo
 import org.metplus.cruncher.persistence.model.SettingsRepositoryImpl
 import org.metplus.cruncher.persistence.model.SettingsRepositoryMongo
+import org.metplus.cruncher.rating.CrunchResumeProcess
 import org.metplus.cruncher.rating.CruncherList
 import org.metplus.cruncher.rating.TrainCruncher
 import org.metplus.cruncher.rating.TrainCruncherObserver
@@ -94,8 +95,9 @@ open class ApplicationConfiguration {
     @Bean
     open fun uploadResume(
             @Autowired resumeRepository: ResumeRepository,
-            @Autowired resumeFileRepository: ResumeFileRepository
-    ): UploadResume = UploadResume(resumeRepository, resumeFileRepository)
+            @Autowired resumeFileRepository: ResumeFileRepository,
+            @Autowired crunchResumeProcess: CrunchResumeProcess
+    ): UploadResume = UploadResume(resumeRepository, resumeFileRepository, crunchResumeProcess)
 
     @Bean
     open fun downloadResume(

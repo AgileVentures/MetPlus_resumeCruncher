@@ -4,7 +4,11 @@ import org.metplus.cruncher.job.CreateJob
 import org.metplus.cruncher.job.JobRepositoryFake
 import org.metplus.cruncher.job.JobsRepository
 import org.metplus.cruncher.job.UpdateJob
+import org.metplus.cruncher.rating.CrunchResumeProcess
+import org.metplus.cruncher.rating.CrunchResumeProcessSpy
+import org.metplus.cruncher.rating.ProcessCruncher
 import org.metplus.cruncher.resume.DownloadResume
+import org.metplus.cruncher.resume.Resume
 import org.metplus.cruncher.resume.ResumeFileRepository
 import org.metplus.cruncher.resume.ResumeFileRepositoryFake
 import org.metplus.cruncher.resume.ResumeRepository
@@ -54,12 +58,16 @@ open class TestConfiguration {
     @Bean
     open fun uploadResume(
             @Autowired resumeRepository: ResumeRepository,
-            @Autowired resumeFileRepository: ResumeFileRepository
-    ): UploadResume = UploadResume(resumeRepository, resumeFileRepository)
+            @Autowired resumeFileRepository: ResumeFileRepository,
+            @Autowired crunchResumeProcess: ProcessCruncher<Resume>
+    ): UploadResume = UploadResume(resumeRepository, resumeFileRepository, crunchResumeProcess)
 
     @Bean
     open fun downloadResume(
             @Autowired resumeRepository: ResumeRepository,
             @Autowired resumeFileRepository: ResumeFileRepository
     ): DownloadResume = DownloadResume(resumeRepository, resumeFileRepository)
+
+    @Bean
+    open fun crunchResumeProcess(): ProcessCruncher<Resume> = CrunchResumeProcessSpy()
 }
