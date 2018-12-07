@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
+import org.metplus.cruncher.rating.emptyMetaData
 
 internal class CreateJobTest {
     private lateinit var jobsRepository: JobsRepository
@@ -19,7 +20,9 @@ internal class CreateJobTest {
         val newJob = Job(
                 "someid",
                 "some title",
-                "some description")
+                "some description",
+                emptyMetaData(),
+                emptyMetaData())
         var wasObserverCalled = false
 
         createJob.process(newJob, object : CreateJobObserver {
@@ -43,7 +46,9 @@ internal class CreateJobTest {
         val newJob = Job(
                 "someid",
                 "some title",
-                "some description")
+                "some description",
+                emptyMetaData(),
+                emptyMetaData())
         var wasObserverCalled = false
         jobsRepository.save(newJob)
 
