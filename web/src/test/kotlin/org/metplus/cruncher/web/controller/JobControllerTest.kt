@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.metplus.cruncher.job.Job
 import org.metplus.cruncher.job.JobRepositoryFake
 import org.metplus.cruncher.job.JobsRepository
+import org.metplus.cruncher.rating.emptyMetaData
 import org.metplus.cruncher.web.TestConfiguration
 import org.metplus.cruncher.web.security.services.TokenService
 import org.springframework.beans.factory.annotation.Autowired
@@ -58,7 +59,7 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
     @ParameterizedTest(name = "{index} => API Version: {0}")
     @ValueSource(strings = ["v1", "v2"])
     fun `When a job exists, it returns error and do not update the values`(versionId: String) {
-        val job = Job("1", "some title", "some description")
+        val job = Job("1", "some title", "some description", emptyMetaData(), emptyMetaData())
         jobsRepository.save(job)
 
         createNewJob(
@@ -87,7 +88,7 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
     @ParameterizedTest(name = "{index} => API Version: {0}")
     @ValueSource(strings = ["v1", "v2"])
     fun `when creating a job that does not exist, it returns success`(versionId: String) {
-        createNewJob(versionId, Job("Job Identifier to create", "Title of the job", "Description of the job"))
+        createNewJob(versionId, Job("Job Identifier to create", "Title of the job", "Description of the job", emptyMetaData(), emptyMetaData()))
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                 .andExpect(jsonPath("$.resultCode", equalTo(ResultCodes.SUCCESS.toString())))
@@ -147,7 +148,7 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
     @ParameterizedTest(name = "{index} => API Version: {0}")
     @ValueSource(strings = ["v1", "v2"])
     fun `when update a job that exists, it returns success`(versionId: String) {
-        val job = Job("1", "My current title", "My current description")
+        val job = Job("1", "My current title", "My current description", emptyMetaData(), emptyMetaData())
         jobsRepository.save(job)
 
         updateJob(versionId,

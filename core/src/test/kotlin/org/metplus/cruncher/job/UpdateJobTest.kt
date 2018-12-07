@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.metplus.cruncher.rating.emptyMetaData
 
 internal class UpdateJobTest {
     var jobsRepository: JobRepositoryFake = JobRepositoryFake()
@@ -31,7 +32,7 @@ internal class UpdateJobTest {
 
     @Test
     fun `when job being updated can be found, it calls the onSuccess observer and update the job`() {
-        jobsRepository.save(Job("1", "Some title", "Some description"))
+        jobsRepository.save(Job("1", "Some title", "Some description", emptyMetaData(), emptyMetaData()))
         val updateJob = UpdateJob(jobsRepository)
 
         var wasOnSuccessCalled = false
@@ -52,7 +53,7 @@ internal class UpdateJobTest {
 
     @Test
     fun `when job being updated can be found and only title is present, it calls the onSuccess observer and only update the title job`() {
-        jobsRepository.save(Job("1", "Some title", "Some description"))
+        jobsRepository.save(Job("1", "Some title", "Some description", emptyMetaData(), emptyMetaData()))
         val updateJob = UpdateJob(jobsRepository)
 
         var wasOnSuccessCalled = false
@@ -73,7 +74,7 @@ internal class UpdateJobTest {
 
     @Test
     fun `when job being updated can be found and only description is present, it calls the onSuccess observer and only update the description job`() {
-        jobsRepository.save(Job("1", "Some title", "Some description"))
+        jobsRepository.save(Job("1", "Some title", "Some description", emptyMetaData(), emptyMetaData()))
         val updateJob = UpdateJob(jobsRepository)
 
         var wasOnSuccessCalled = false

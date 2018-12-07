@@ -5,6 +5,7 @@ import org.metplus.cruncher.job.CreateJobObserver
 import org.metplus.cruncher.job.Job
 import org.metplus.cruncher.job.UpdateJob
 import org.metplus.cruncher.job.UpdateJobObserver
+import org.metplus.cruncher.rating.CruncherMetaData
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -30,7 +31,7 @@ class JobController(
                @RequestParam("title") title: String,
                @RequestParam("description") description: String): CruncherResponse {
         var cruncherResponse: CruncherResponse? = null
-        val jobToBeCreated = Job(id, title, description)
+        val jobToBeCreated = Job(id, title, description, CruncherMetaData(mutableMapOf()), CruncherMetaData(mutableMapOf()))
         createJob.process(jobToBeCreated, observer = object : CreateJobObserver {
             override fun onSuccess(job: Job) {
                 cruncherResponse = CruncherResponse(ResultCodes.SUCCESS, "Job added successfully")

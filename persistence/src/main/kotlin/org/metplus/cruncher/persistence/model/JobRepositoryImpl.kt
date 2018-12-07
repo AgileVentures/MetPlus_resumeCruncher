@@ -19,7 +19,9 @@ private fun JobMongo.toJob(): Job {
     return Job(
             id = id,
             title = title,
-            description = description
+            titleMetaData = titleMetadata,
+            description = description,
+            descriptionMetaData = descriptionMetadata
     )
 }
 
@@ -27,6 +29,8 @@ private fun Job.toJobMongo(): JobMongo {
     return JobMongo(
             id = id,
             title = title,
-            description = description
+            titleMetadata = titleMetaData,
+            description = description,
+            descriptionMetadata = descriptionMetaData
     )
 }
