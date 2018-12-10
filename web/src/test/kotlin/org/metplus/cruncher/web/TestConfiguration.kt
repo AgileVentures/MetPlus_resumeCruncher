@@ -1,9 +1,11 @@
 package org.metplus.cruncher.web
 
 import org.metplus.cruncher.job.CreateJob
+import org.metplus.cruncher.job.Job
 import org.metplus.cruncher.job.JobRepositoryFake
 import org.metplus.cruncher.job.JobsRepository
 import org.metplus.cruncher.job.UpdateJob
+import org.metplus.cruncher.rating.CrunchJobProcessSpy
 import org.metplus.cruncher.rating.CrunchResumeProcess
 import org.metplus.cruncher.rating.CrunchResumeProcessSpy
 import org.metplus.cruncher.rating.ProcessCruncher
@@ -47,7 +49,10 @@ open class TestConfiguration {
     open fun saveSettings(): SaveSettings = SaveSettings(getSettingsRepository())
 
     @Bean
-    open fun createJob(@Autowired jobsRepository: JobsRepository): CreateJob = CreateJob(jobsRepository)
+    open fun createJob(
+            @Autowired jobsRepository: JobsRepository,
+            @Autowired crunchJobProcessSpy: ProcessCruncher<Job>
+    ): CreateJob = CreateJob(jobsRepository, crunchJobProcessSpy)
 
     @Bean
     open fun updateJob(@Autowired jobsRepository: JobsRepository): UpdateJob = UpdateJob(jobsRepository)
@@ -70,4 +75,7 @@ open class TestConfiguration {
 
     @Bean
     open fun crunchResumeProcess(): ProcessCruncher<Resume> = CrunchResumeProcessSpy()
+
+    @Bean
+    open fun crunchJobProcess(): ProcessCruncher<Job> = CrunchJobProcessSpy()
 }
