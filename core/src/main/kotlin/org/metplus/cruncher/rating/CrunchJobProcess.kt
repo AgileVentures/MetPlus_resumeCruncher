@@ -5,7 +5,7 @@ import org.metplus.cruncher.job.JobsRepository
 import org.slf4j.LoggerFactory
 
 
-class CrunchJobProcess(
+open class CrunchJobProcess(
         private val allCrunchers: CruncherList,
         private val jobRepository: JobsRepository) : ProcessCruncher<Job>() {
     private val logger = LoggerFactory.getLogger(CrunchJobProcess::class.java)

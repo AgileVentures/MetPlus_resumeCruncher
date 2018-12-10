@@ -1,12 +1,18 @@
 package org.metplus.cruncher.job
 
+import org.metplus.cruncher.rating.ProcessCruncher
+
 class CreateJob(
-        private val jobsRepository: JobsRepository
+        private val jobsRepository: JobsRepository,
+        private val crunchJobProcess: ProcessCruncher<Job>
 ) {
     fun process(job: Job, observer: CreateJobObserver) {
         if (jobsRepository.getById(job.id) != null)
             return observer.onAlreadyExists()
-        return observer.onSuccess(jobsRepository.save(job))
+
+        val savedJob = jobsRepository.save(job)
+        crunchJobProcess.addWork(savedJob)
+        return observer.onSuccess(savedJob)
     }
 }
 
