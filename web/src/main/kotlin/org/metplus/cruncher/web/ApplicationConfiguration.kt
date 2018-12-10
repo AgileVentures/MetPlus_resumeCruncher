@@ -15,6 +15,7 @@ import org.metplus.cruncher.persistence.model.ResumeRepositoryImpl
 import org.metplus.cruncher.persistence.model.ResumeRepositoryMongo
 import org.metplus.cruncher.persistence.model.SettingsRepositoryImpl
 import org.metplus.cruncher.persistence.model.SettingsRepositoryMongo
+import org.metplus.cruncher.rating.CrunchJobProcess
 import org.metplus.cruncher.rating.CrunchResumeProcess
 import org.metplus.cruncher.rating.CruncherList
 import org.metplus.cruncher.rating.TrainCruncher
@@ -26,6 +27,7 @@ import org.metplus.cruncher.resume.UploadResume
 import org.metplus.cruncher.settings.CruncherSettings
 import org.metplus.cruncher.settings.GetSettings
 import org.metplus.cruncher.settings.SaveSettings
+import org.metplus.cruncher.web.rating.AsyncJobProcess
 import org.metplus.cruncher.web.rating.AsyncResumeProcess
 import org.metplus.curriculum.cruncher.naivebayes.CruncherImpl
 import org.slf4j.LoggerFactory
@@ -84,8 +86,9 @@ open class ApplicationConfiguration {
 
     @Bean
     open fun createJob(
-            @Autowired jobsRepository: JobsRepository
-    ): CreateJob = CreateJob(jobsRepository)
+            @Autowired jobsRepository: JobsRepository,
+            @Autowired crunchJobProcess: CrunchJobProcess
+    ): CreateJob = CreateJob(jobsRepository, crunchJobProcess)
 
     @Bean
     open fun updateJob(
@@ -117,13 +120,18 @@ open class ApplicationConfiguration {
         return CruncherList(listOf(naiveBayesCruncherImpl))
     }
 
-
     @Bean
     open fun asyncResumeProcess(
             @Autowired allCrunchers: CruncherList,
             @Autowired resumeRepository: ResumeRepository,
             @Autowired resumeFileRepository: ResumeFileRepository
     ) = AsyncResumeProcess(allCrunchers, resumeRepository, resumeFileRepository)
+
+    @Bean
+    open fun asyncJobProcess(
+            @Autowired allCrunchers: CruncherList,
+            @Autowired jobsRepository: JobsRepository
+    ) = AsyncJobProcess(allCrunchers, jobsRepository)
 
     @Bean
     open fun naiveBayesImpl() = CruncherImpl()
