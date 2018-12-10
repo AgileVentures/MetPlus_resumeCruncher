@@ -92,8 +92,9 @@ open class ApplicationConfiguration {
 
     @Bean
     open fun updateJob(
-            @Autowired jobsRepository: JobsRepository
-    ): UpdateJob = UpdateJob(jobsRepository)
+            @Autowired jobsRepository: JobsRepository,
+            @Autowired crunchJobProcess: CrunchJobProcess
+    ): UpdateJob = UpdateJob(jobsRepository, crunchJobProcess)
 
     @Bean
     open fun uploadResume(

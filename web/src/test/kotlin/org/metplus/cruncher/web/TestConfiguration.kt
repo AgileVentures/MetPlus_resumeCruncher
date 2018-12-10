@@ -55,7 +55,9 @@ open class TestConfiguration {
     ): CreateJob = CreateJob(jobsRepository, crunchJobProcessSpy)
 
     @Bean
-    open fun updateJob(@Autowired jobsRepository: JobsRepository): UpdateJob = UpdateJob(jobsRepository)
+    open fun updateJob(@Autowired jobsRepository: JobsRepository,
+                       @Autowired crunchJobProcessSpy: ProcessCruncher<Job>
+    ): UpdateJob = UpdateJob(jobsRepository, crunchJobProcess())
 
     @Bean
     open fun tokenService(): TokenService = LocalTokenService()
