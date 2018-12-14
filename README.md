@@ -20,10 +20,10 @@ In order to install and run the application you need to have access to one mongo
 You can use a Local Mongo instance, a Docker container, a Virtual Machine or a database as a Service like [mlab](http://www.mlab.com)
 
 ### Examples of installation of mongo
-In the following points you there is more information on how to create a mongo database
+In the following there is more information on how to create a mongo database
 #### (Example) Local mongo database
 
-Follow the instruction to on [mongodb.com](https://www.mongodb.com/download-center?jmp=nav#community) to install in your operating system the database
+Follow the instructions on [mongodb.com](https://www.mongodb.com/download-center?jmp=nav#community) to install mongo on your operating system
 
 When this is done jump to the mongo database configuration section
 #### (Example) Mongo in docker container
@@ -45,7 +45,7 @@ docker exec -it pets-mongo mongo resumeCruncher
 
 ### Mongo configuration
 
-Before we can start the Cruncher we need to create a database to connect to, and a user for authentication. 
+Before we can start the Cruncher, we need to create a database to connect to and a user for authentication. 
 To accomplish that connect to the Mongo instance using mongo CLI or a a visual app like robomongo and execute the following:
 
 ```mongo
@@ -70,7 +70,7 @@ To accomplish that connect to the Mongo instance using mongo CLI or a a visual a
  
  We are using a default configuration plus specific configuration for `production`, `development` and `unit-database` profiles.
  
- To launch with a specific profile the application should be launch with the following command:
+ To launch with a specific profile the application should be launched with the following command:
  
  ```bash
  $ SPRING_PROFILES_ACTIVE="production" ./gradlew startCruncher
