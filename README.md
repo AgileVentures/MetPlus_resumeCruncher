@@ -194,10 +194,10 @@ To send requests to the application a browser can be user pointing to the addres
 
 The API documentation can be found in: http://joaopapereira.github.io/MetPlus_resumeCruncher/
 
-To start you need to authenticate doing 
+To start you need to authenticate: 
 
 ```
-Before we can start the Cruncher we need to create a user and a database to connect to.POST /api/v1/authenticate HTTP/1.1
+POST /api/v1/authenticate HTTP/1.1
 Accept: application/json
 X-Auth-Username: backend_admin
 X-Auth-Password: backendpassword
