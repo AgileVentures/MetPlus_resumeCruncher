@@ -204,7 +204,7 @@ X-Auth-Password: backendpassword
 Host: localhost
 ```
 
-The answer will get you a token in the following request you need to include the token like:
+The response will include a token. In subsequent requests you will need to include the token as follows:
 
 ```
 GET /api/v1/curriculum/asdasdasd HTTP/1.1
