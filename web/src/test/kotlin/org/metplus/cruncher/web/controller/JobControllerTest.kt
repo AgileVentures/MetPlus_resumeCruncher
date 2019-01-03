@@ -278,4 +278,28 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
                 .header("X-Auth-Token", token)
         )
     }
+
+
+    @ParameterizedTest(name = "{index} => API Version: {0}")
+    @ValueSource(strings = ["v1", "v2"])
+    fun `when reindexing jobs, it returns information about of jobs to be processed`(versionId: String) {
+        jobsRepository.save(Job("2", "My other current title", "My other current description", emptyMetaData(), emptyMetaData()))
+        jobsRepository.save(Job("3", "Another current title", "Another current description", emptyMetaData(), emptyMetaData()))
+        mvc.perform(get("/api/$versionId/job/reindex")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .header("X-Auth-Token", token))
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
+                .andExpect(jsonPath("$.resultCode", equalTo(ResultCodes.SUCCESS.toString())))
+                .andExpect(jsonPath("$.message", equalTo("Going to reindex 2 jobs")))
+                .andDo(document("job/match-not-found/$versionId",
+                        requestHeaders(headerWithName("X-Auth-Token")
+                                .description("Authentication token retrieved from the authentication")),
+                        responseFields(
+                                fieldWithPath("resultCode").type(ResultCodes::class.java).description("Result code"),
+                                fieldWithPath("message").description("Message associated with the result code")
+                        )
+                ))
+    }
 }

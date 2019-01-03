@@ -5,9 +5,9 @@ import org.metplus.cruncher.job.Job
 import org.metplus.cruncher.job.JobRepositoryFake
 import org.metplus.cruncher.job.JobsRepository
 import org.metplus.cruncher.job.MatchWithResume
+import org.metplus.cruncher.job.ReCrunchAllJobs
 import org.metplus.cruncher.job.UpdateJob
 import org.metplus.cruncher.rating.CrunchJobProcessSpy
-import org.metplus.cruncher.rating.CrunchResumeProcess
 import org.metplus.cruncher.rating.CrunchResumeProcessSpy
 import org.metplus.cruncher.rating.Matcher
 import org.metplus.cruncher.rating.MatcherStub
@@ -92,4 +92,9 @@ open class TestConfiguration {
 
     @Bean
     open fun matcher(): Matcher<Resume, Job> = MatcherStub()
+
+    @Bean
+    open fun reCrunchAllJobs(
+            jobsRepository: JobsRepository,
+            jobProcess: ProcessCruncher<Job>) = ReCrunchAllJobs(jobsRepository, jobProcess)
 }
