@@ -6,7 +6,9 @@ import com.mongodb.MongoCredential
 import com.mongodb.ServerAddress
 import com.mongodb.WriteConcern
 import org.metplus.cruncher.job.CreateJob
+import org.metplus.cruncher.job.Job
 import org.metplus.cruncher.job.JobsRepository
+import org.metplus.cruncher.job.MatchWithResume
 import org.metplus.cruncher.job.UpdateJob
 import org.metplus.cruncher.persistence.model.JobRepositoryImpl
 import org.metplus.cruncher.persistence.model.JobRepositoryMongo
@@ -18,9 +20,11 @@ import org.metplus.cruncher.persistence.model.SettingsRepositoryMongo
 import org.metplus.cruncher.rating.CrunchJobProcess
 import org.metplus.cruncher.rating.CrunchResumeProcess
 import org.metplus.cruncher.rating.CruncherList
+import org.metplus.cruncher.rating.Matcher
 import org.metplus.cruncher.rating.TrainCruncher
 import org.metplus.cruncher.rating.TrainCruncherObserver
 import org.metplus.cruncher.resume.DownloadResume
+import org.metplus.cruncher.resume.Resume
 import org.metplus.cruncher.resume.ResumeFileRepository
 import org.metplus.cruncher.resume.ResumeRepository
 import org.metplus.cruncher.resume.UploadResume
@@ -30,9 +34,9 @@ import org.metplus.cruncher.settings.SaveSettings
 import org.metplus.cruncher.web.rating.AsyncJobProcess
 import org.metplus.cruncher.web.rating.AsyncResumeProcess
 import org.metplus.curriculum.cruncher.naivebayes.CruncherImpl
+import org.metplus.curriculum.cruncher.naivebayes.MatcherImpl
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.SpringBootConfiguration
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -43,8 +47,7 @@ import org.springframework.data.mongodb.config.AbstractMongoConfiguration
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories
-import org.springframework.stereotype.Component
-import java.util.ArrayList
+import java.util.*
 
 @SpringBootConfiguration
 @EnableConfigurationProperties
@@ -97,6 +100,13 @@ open class ApplicationConfiguration {
     ): UpdateJob = UpdateJob(jobsRepository, crunchJobProcess)
 
     @Bean
+    open fun matchWithResume(@Autowired resumeRepository: ResumeRepository,
+                             @Autowired jobsRepository: JobsRepository,
+                             @Autowired matcher: Matcher<Resume, Job>
+    ): MatchWithResume = MatchWithResume(resumeRepository, jobsRepository, matcher)
+
+
+    @Bean
     open fun uploadResume(
             @Autowired resumeRepository: ResumeRepository,
             @Autowired resumeFileRepository: ResumeFileRepository,
@@ -133,6 +143,9 @@ open class ApplicationConfiguration {
             @Autowired allCrunchers: CruncherList,
             @Autowired jobsRepository: JobsRepository
     ) = AsyncJobProcess(allCrunchers, jobsRepository)
+
+    @Bean
+    open fun matcher(): Matcher<Resume, Job> = MatcherImpl()
 
     @Bean
     open fun naiveBayesImpl() = CruncherImpl()
