@@ -5,9 +5,10 @@ enum class ResultCodes {
     JOB_ID_EXISTS,
     SUCCESS,
     JOB_NOT_FOUND,
-    FATAL_ERROR
+    FATAL_ERROR,
+    RESUME_NOT_FOUND
 }
 
-data class CruncherResponse(
+open class CruncherResponse(
         val resultCode: ResultCodes,
         val message: String)

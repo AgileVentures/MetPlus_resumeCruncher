@@ -41,4 +41,16 @@ abstract class JobRepositoryTest {
 
         assertThat(afterSave).isNull()
     }
+
+    @Test
+    fun `when retrieving all jobs and 2 jobs exist, it return 2 jobs`() {
+        val firstJob = Job("some-id", "some title", "some description", emptyMetaData(), emptyMetaData())
+        val secondJob = Job("some-other-id", "some other title", "some other description", emptyMetaData(), emptyMetaData())
+        getJobRepository().save(firstJob)
+        getJobRepository().save(secondJob)
+
+        val savedJobs = getJobRepository().getAll()
+        assertThat(savedJobs).hasSize(2)
+        assertThat(savedJobs).isEqualTo(listOf(firstJob, secondJob))
+    }
 }
