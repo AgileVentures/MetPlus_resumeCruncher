@@ -13,6 +13,10 @@ class JobRepositoryFake : JobsRepository {
         return jobs[id]
     }
 
+    override fun getAll(): List<Job> {
+        return jobs.values.toList()
+    }
+
     fun removeAll() {
         jobs.clear()
     }

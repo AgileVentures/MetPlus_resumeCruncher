@@ -2,21 +2,15 @@ package org.metplus.curriculum.cruncher.naivebayes
 
 
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.data.Offset
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.metplus.cruncher.job.Job
-import org.metplus.cruncher.job.JobsRepository
 import org.metplus.cruncher.rating.CruncherMetaData
 import org.metplus.cruncher.resume.Resume
-import org.metplus.cruncher.resume.ResumeRepository
 
 open class Base {
-
-    protected lateinit var jobRespository: JobsRepository
-    protected lateinit var resumeRespository: ResumeRepository
-
     protected lateinit var matcher: MatcherImpl
-    protected lateinit var cruncher: CruncherImpl
     protected lateinit var resumeCategoryOneAndTwo: Resume
     protected lateinit var resumeCategoryOne: Resume
     protected lateinit var jobTitleCat1DescCat2: Job
@@ -24,15 +18,15 @@ open class Base {
 
     @BeforeEach
     fun before() {
-        cruncher = CruncherImpl()
         matcher = MatcherImpl()
 
 
-//        val categories = ArrayList<String>()
-//        categories.add("cat_1_job")
-//        resumeCategoryOne = createResume(categories)
-//
-//        categories.add("cat_2_job")
+        resumeCategoryOne = Resume(
+                "some-filename",
+                "some-other-user-id",
+                "pdf",
+                CruncherMetaData(mutableMapOf("cat_1_job" to 1.0)))
+
         resumeCategoryOneAndTwo = Resume(
                 "filename",
                 "some-user-id",
@@ -40,57 +34,32 @@ open class Base {
                 CruncherMetaData(mutableMapOf("cat_1_job" to 1.0,
                         "cat_2_job" to .9)))
 
-        val titleData = CruncherMetaData(mutableMapOf("cat_1_job" to 1.0))
-        val descriptionData = CruncherMetaData(mutableMapOf("cat_2_job" to 1.0))
+        var titleData = CruncherMetaData(mutableMapOf("cat_1_job" to 1.0))
+        var descriptionData = CruncherMetaData(mutableMapOf("cat_2_job" to 1.0))
         jobTitleCat1DescCat2 = Job(
                 "cat-1 and cat-2",
                 "some title",
                 "some description",
                 titleData,
                 descriptionData)
-//
-//        jobTitleCat3DescCat4 = Job()
-//        titleData = NaiveBayesMetaData()
-//        titleData.addCategory("cat_3_job", 1.0)
-//        descriptionData = NaiveBayesMetaData()
-//        descriptionData.addCategory("cat_4_job", 1.0)
-//        setJobMetaData(jobTitleCat3DescCat4, titleData, descriptionData)
+
+        titleData = CruncherMetaData(mutableMapOf("cat_3_job" to 1.0))
+        descriptionData = CruncherMetaData(mutableMapOf("cat_4_job" to 1.0))
+        jobTitleCat3DescCat4 = Job(
+                "cat-3 and cat-4",
+                "some other title",
+                "some other description",
+                titleData,
+                descriptionData
+        )
     }
-//    protected fun setJobMetaData(job: Job,
-//                                 titleMetaData: NaiveBayesMetaData,
-//                                 descriptionMetaData: NaiveBayesMetaData) {
-//        val allDescriptionMetaData = HashMap<String, MetaData>()
-//        val allTitleMetaData = HashMap<String, MetaData>()
-//        allTitleMetaData[CruncherImpl.CRUNCHER_NAME] = titleMetaData
-//        allDescriptionMetaData[CruncherImpl.CRUNCHER_NAME] = descriptionMetaData
-//        val titleData = DocumentWithMetaData()
-//        titleData.setMetaData(allTitleMetaData)
-//        job.setTitleMetaData(titleData)
-//        val descriptionData = DocumentWithMetaData()
-//        descriptionData.setMetaData(allDescriptionMetaData)
-//        job.setDescriptionMetaData(descriptionData)
-//    }
-//
-//    protected fun createResume(categories: List<String>): Resume {
-//        val resumeMetaData = NaiveBayesMetaData()
-//        var probability = 1.0
-//        for (category in categories) {
-//            resumeMetaData.addCategory(category, probability)
-//            probability -= .1
-//        }
-//        val resumeCruncherMetaData = HashMap<String, MetaData>()
-//        resumeCruncherMetaData[cruncher.getCruncherName()] = resumeMetaData
-//        val resume = Resume()
-//        resume.setMetaData(resumeCruncherMetaData)
-//        return resume
-//    }
 }
 
 class MatchAgainstResume : Base() {
     @Test
-    fun `when matching a resume with categories, it return a empty list of jobs`() {
+    fun `when matching a resume with no categories, it return a empty list of jobs`() {
         val resume = Resume("some_file.pdf", "user-id", "pdf", CruncherMetaData(mutableMapOf()))
-        val allJobs = listOf<Job>(
+        val allJobs = listOf(
                 Job("1",
                         "some title",
                         "some description",
@@ -116,340 +85,337 @@ class MatchAgainstResume : Base() {
         val results = matcher.match(resumeCategoryOneAndTwo, allJobs)
 
         assertThat(results).hasSize(1)
-        assertThat(results.first()).isEqualTo(jobTitleCat1DescCat2.copy())
+        assertThat(results.first()).isEqualToIgnoringGivenFields(jobTitleCat1DescCat2.copy(), "starRating")
 
-//        assertEquals(3.87, results.get(0).getStarRating(), 0.01)
+        assertThat(results.first().starRating).isEqualTo(3.87, Offset.offset(0.001))
     }
-//
-//    @Test
-//    fun resumeWithTwoCategory_shouldMatchNoJob() {
-//
-//        val allJobs = ArrayList<Job>()
-//        allJobs.add(jobTitleCat3DescCat4)
-//        `when`(jobRespository.findAll()).thenReturn(allJobs)
-//
-//        val expectedResults = ArrayList<Job>()
-//
-//        assertEquals(expectedResults, matcher.match(resumeCategoryOneAndTwo))
-//    }
-//
-//    @Test
-//    fun resumeWithSixCategoryAndOnlySixMatch_shouldMatchNoJob() {
-//        val resumeCategories = ArrayList<String>()
-//        resumeCategories.add("cat_1_job")
-//        resumeCategories.add("cat_2_job")
-//        resumeCategories.add("cat_5_job")
-//        resumeCategories.add("cat_6_job")
-//        resumeCategories.add("cat_7_job")
-//        resumeCategories.add("cat_3_job")
-//        val resume = createResume(resumeCategories)
-//
-//        val allJobs = ArrayList<Job>()
-//        allJobs.add(jobTitleCat3DescCat4)
-//        `when`(jobRespository.findAll()).thenReturn(allJobs)
-//
-//        val expectedResults = ArrayList<Job>()
-//
-//        assertEquals(expectedResults, matcher.match(resume))
-//    }
-//
-//    @Test
-//    fun resumeWith1CategoryAndJobCategoryInDescriptionSixMatch_shouldMatchNoJob() {
-//        val job1 = Job()
-//        val titleData = NaiveBayesMetaData()
-//        titleData.addCategory("cat_2_job", 1.0)
-//        titleData.addCategory("cat_3_job", .9)
-//        val descriptionData = NaiveBayesMetaData()
-//        descriptionData.addCategory("cat_4_job", 1.0)
-//        descriptionData.addCategory("cat_5_job", .9)
-//        descriptionData.addCategory("cat_6_job", .8)
-//        descriptionData.addCategory("cat_1_job", .7)
-//        setJobMetaData(job1, titleData, descriptionData)
-//
-//        val allJobs = ArrayList<Job>()
-//        allJobs.add(job1)
-//        `when`(jobRespository.findAll()).thenReturn(allJobs)
-//
-//        val expectedResults = ArrayList<Job>()
-//
-//        assertEquals(expectedResults, matcher.match(resumeCategoryOne))
-//    }
-//
-//    @Test
-//    fun resumeWith1CategoryAndJobCategoryInTitleThirdMatch_shouldMatchNoJob() {
-//        val job1 = Job()
-//        val titleData = NaiveBayesMetaData()
-//        titleData.addCategory("cat_2_job", 1.0)
-//        titleData.addCategory("cat_3_job", .9)
-//        titleData.addCategory("cat_1_job", .7)
-//        val descriptionData = NaiveBayesMetaData()
-//        descriptionData.addCategory("cat_4_job", 1.0)
-//        descriptionData.addCategory("cat_5_job", .9)
-//        descriptionData.addCategory("cat_6_job", .8)
-//        setJobMetaData(job1, titleData, descriptionData)
-//
-//        val allJobs = ArrayList<Job>()
-//        allJobs.add(job1)
-//        `when`(jobRespository.findAll()).thenReturn(allJobs)
-//
-//        val expectedResults = ArrayList<Job>()
-//
-//        assertEquals(expectedResults, matcher.match(resumeCategoryOne))
-//    }
-//
-//    @Test
-//    fun resumeWith1CategoryTwiceWith2SuffixAndJobCategoryInTitleThirdMatch_shouldMatchJobWith258StarRating() {
-//        val job1 = Job()
-//        val titleData = NaiveBayesMetaData()
-//        titleData.addCategory("cat_1_job", .7)
-//        val descriptionData = NaiveBayesMetaData()
-//        descriptionData.addCategory("cat_4_job", 1.0)
-//        setJobMetaData(job1, titleData, descriptionData)
-//
-//        val allJobs = ArrayList<Job>()
-//        allJobs.add(job1)
-//        `when`(jobRespository.findAll()).thenReturn(allJobs)
-//
-//        val expectedResults = ArrayList<Job>()
-//        expectedResults.add(job1)
-//
-//
-//        val categories = ArrayList<String>()
-//        categories.add("cat_1_resume")
-//        categories.add("cat_1_job")
-//        resumeCategoryOne = createResume(categories)
-//
-//        assertEquals(expectedResults, matcher.match(resumeCategoryOne))
-//        assertEquals(2.58, expectedResults[0].getStarRating(), 0.01)
-//    }
+
+    @Test
+    fun `when matching a resume with jobs that do not match any category, it returns an empty list`() {
+        val allJobs = ArrayList<Job>()
+        allJobs.add(jobTitleCat3DescCat4)
+
+        assertThat(matcher.match(resumeCategoryOneAndTwo, allJobs)).isEmpty()
+    }
+
+    @Test
+    fun `when resume as matching category in sixth position, it returns an empty list`() {
+        val resume = Resume(
+                "filename",
+                "some-user-id",
+                "pdf",
+                CruncherMetaData(mutableMapOf(
+                        "cat_1_job" to 1.0,
+                        "cat_2_job" to .9,
+                        "cat_5_job" to .8,
+                        "cat_6_job" to .7,
+                        "cat_7_job" to .6,
+                        "cat_4_job" to .5)))
+
+        val allJobs = ArrayList<Job>()
+        allJobs.add(jobTitleCat3DescCat4)
+
+        assertThat(matcher.match(resume, allJobs)).isEmpty()
+    }
+
+    @Test
+    fun `when resume with one category matches with job description category in the sixth position it should not return as a match`() {
+        val titleData = CruncherMetaData(mutableMapOf(
+                "cat_2_job" to 1.0,
+                "cat_3_job" to 0.9))
+        val descriptionData = CruncherMetaData(mutableMapOf(
+                "cat_4_job" to 1.0,
+                "cat_5_job" to .9,
+                "cat_6_job" to .8,
+                "cat_1_job" to .7))
+        val job = Job(
+                "cat-3 and cat-4",
+                "some other title",
+                "some other description",
+                titleData,
+                descriptionData
+        )
+
+        val allJobs = listOf(job)
+        assertThat(matcher.match(resumeCategoryOne, allJobs)).isEmpty()
+    }
+
+    @Test
+    fun `when resume has 1 category and matches the third Job Title category it returns no match`() {
+        val titleData = CruncherMetaData(mutableMapOf(
+                "cat_2_job" to 1.0,
+                "cat_3_job" to 0.9,
+                "cat_1_job" to .7))
+        val descriptionData = CruncherMetaData(mutableMapOf(
+                "cat_4_job" to 1.0,
+                "cat_5_job" to .9,
+                "cat_6_job" to .8))
+        val job = Job(
+                "cat-3 and cat-4",
+                "some other title",
+                "some other description",
+                titleData,
+                descriptionData
+        )
+
+        val allJobs = listOf(job)
+        assertThat(matcher.match(resumeCategoryOne, allJobs)).isEmpty()
+    }
+
+    @Test
+    fun `when resume as the same category twice with different suffix and Job Title matches, it matches with 285 star rating`() {
+        val titleData = CruncherMetaData(mutableMapOf(
+                "cat_1_job" to .7))
+        val descriptionData = CruncherMetaData(mutableMapOf(
+                "cat_4_job" to 1.0))
+        val job = Job(
+                "cat-3 and cat-4",
+                "some other title",
+                "some other description",
+                titleData,
+                descriptionData
+        )
+
+        val expectedResults = ArrayList<Job>()
+        expectedResults.add(job)
+
+        val allJobs = listOf(job)
+
+        val resume = Resume(
+                "some-filename",
+                "some-other-user-id",
+                "pdf",
+                CruncherMetaData(mutableMapOf(
+                        "cat_1_resume" to 1.0,
+                        "cat_1_job" to .9
+                )))
+
+        val results = matcher.match(resume, allJobs)
+        assertThat(results).hasSize(1)
+        assertThat(results.first()).isEqualToIgnoringGivenFields(job.copy(), "starRating")
+
+        assertThat(results.first().starRating).isEqualTo(2.58, Offset.offset(0.001))
+    }
 
 }
-//
-//class MatchAgainstJob : Base() {
-//    @Test
-//    fun nullJob_shouldReturnEmptyList() {
-//        assertEquals(0, matcher.matchInverse(null).size())
-//    }
-//
-//    @Test
-//    fun jobWithoutCategories_shouldReturnEmptyList() {
-//        val job = Job()
-//        assertEquals(0, matcher.matchInverse(job).size())
-//    }
-//
-//    @Test
-//    fun jobWithTwoCategory_shouldMatchOneResumeWithStarRating258() {
-//
-//        val allResumes = ArrayList<Resume>()
-//        allResumes.add(resumeCategoryOne)
-//        `when`(resumeRespository.findAll()).thenReturn(allResumes)
-//
-//
-//        val expectedResults = ArrayList<Resume>()
-//        expectedResults.add(resumeCategoryOne)
-//
-//        val results = matcher.matchInverse(jobTitleCat1DescCat2)
-//
-//        assertEquals(expectedResults, results)
-//        assertEquals(2.58, results.get(0).getStarRating(), 0.01)
-//    }
-//
-//    @Test
-//    fun jobWithTwoCategory_shouldMatchNoResume() {
-//        val allResumes = ArrayList<Resume>()
-//        allResumes.add(resumeCategoryOneAndTwo)
-//        `when`(resumeRespository.findAll()).thenReturn(allResumes)
-//
-//        val expectedResults = ArrayList<Resume>()
-//
-//        assertEquals(expectedResults, matcher.matchInverse(jobTitleCat3DescCat4))
-//    }
-//
-//    @Test
-//    fun jobWithSixCategoriesAndOnlySixthMatch_shouldMatchNoResume() {
-//        val resumeCategories = ArrayList<String>()
-//        resumeCategories.add("cat_1_job")
-//        resumeCategories.add("cat_2_job")
-//        resumeCategories.add("cat_5_job")
-//        resumeCategories.add("cat_6_job")
-//        resumeCategories.add("cat_7_job")
-//        resumeCategories.add("cat_3_job")
-//        val resume = createResume(resumeCategories)
-//
-//        val allResumes = ArrayList<Resume>()
-//        allResumes.add(resume)
-//        `when`(resumeRespository.findAll()).thenReturn(allResumes)
-//
-//        val expectedResults = ArrayList<Resume>()
-//
-//        assertEquals(expectedResults, matcher.matchInverse(jobTitleCat3DescCat4))
-//    }
-//
-//    @Test
-//    fun jobWithCategory1In4thPositionInDescriptionAndResumeWithCategory1_shouldMatchNoResume() {
-//        val job1 = Job()
-//        val titleData = NaiveBayesMetaData()
-//        titleData.addCategory("cat_2_job", 1.0)
-//        titleData.addCategory("cat_3_job", .9)
-//        val descriptionData = NaiveBayesMetaData()
-//        descriptionData.addCategory("cat_4_job", 1.0)
-//        descriptionData.addCategory("cat_5_job", .9)
-//        descriptionData.addCategory("cat_6_job", .8)
-//        descriptionData.addCategory("cat_1_job", .7)
-//        setJobMetaData(job1, titleData, descriptionData)
-//
-//        val allResumes = ArrayList<Resume>()
-//        allResumes.add(resumeCategoryOne)
-//        `when`(resumeRespository.findAll()).thenReturn(allResumes)
-//
-//        val expectedResults = ArrayList<Resume>()
-//
-//        assertEquals(expectedResults, matcher.matchInverse(job1))
-//    }
-//
-//    @Test
-//    fun jobWithCat1In3rdPositionInTitleAndResumeWithCategory1_shoudMatchNoResume() {
-//        val job1 = Job()
-//        val titleData = NaiveBayesMetaData()
-//        titleData.addCategory("cat_2_job", 1.0)
-//        titleData.addCategory("cat_3_job", .9)
-//        titleData.addCategory("cat_1_job", .7)
-//        val descriptionData = NaiveBayesMetaData()
-//        descriptionData.addCategory("cat_4_job", 1.0)
-//        descriptionData.addCategory("cat_5_job", .9)
-//        descriptionData.addCategory("cat_6_job", .8)
-//        setJobMetaData(job1, titleData, descriptionData)
-//
-//        val allResumes = ArrayList<Resume>()
-//        allResumes.add(resumeCategoryOne)
-//        `when`(resumeRespository.findAll()).thenReturn(allResumes)
-//
-//        val expectedResults = ArrayList<Resume>()
-//
-//        assertEquals(expectedResults, matcher.matchInverse(job1))
-//    }
-//
-//    @Test
-//    fun jobWithCat1In3rdPositionWithRepeatedCat2InTitleAndResumeWithCategory1_shoudMatchResume() {
-//        val job1 = Job()
-//        val titleData = NaiveBayesMetaData()
-//        titleData.addCategory("cat_2_job", 1.0)
-//        titleData.addCategory("cat_2_resume", .9)
-//        titleData.addCategory("cat_1_job", .7)
-//        val descriptionData = NaiveBayesMetaData()
-//        descriptionData.addCategory("cat_4_job", 1.0)
-//        descriptionData.addCategory("cat_5_job", .9)
-//        descriptionData.addCategory("cat_6_job", .8)
-//        setJobMetaData(job1, titleData, descriptionData)
-//
-//        val allResumes = ArrayList<Resume>()
-//        allResumes.add(resumeCategoryOne)
-//        `when`(resumeRespository.findAll()).thenReturn(allResumes)
-//
-//        val expectedResults = ArrayList<Resume>()
-//        expectedResults.add(resumeCategoryOne)
-//
-//        val results = matcher.matchInverse(job1)
-//        assertEquals(expectedResults, results)
-//        assertEquals(1.20, results.get(0).getStarRating(), 0.01)
-//    }
-//
-//    @Test
-//    fun jobCategory1DuplicatedAndResumeWithCategory1_shoudMatchResume() {
-//        val job1 = Job()
-//        val titleData = NaiveBayesMetaData()
-//        titleData.addCategory("cat_2_job", 1.0)
-//        titleData.addCategory("cat_2_resume", .9)
-//        titleData.addCategory("cat_1_job", .7)
-//        val descriptionData = NaiveBayesMetaData()
-//        descriptionData.addCategory("cat_4_job", 1.0)
-//        descriptionData.addCategory("cat_1_resume", .7)
-//        descriptionData.addCategory("cat_5_job", .9)
-//        descriptionData.addCategory("cat_6_job", .8)
-//        setJobMetaData(job1, titleData, descriptionData)
-//
-//        val allResumes = ArrayList<Resume>()
-//        allResumes.add(resumeCategoryOne)
-//        `when`(resumeRespository.findAll()).thenReturn(allResumes)
-//
-//        val expectedResults = ArrayList<Resume>()
-//        expectedResults.add(resumeCategoryOne)
-//
-//        val results = matcher.matchInverse(job1)
-//        assertEquals(expectedResults, results)
-//        assertEquals(1.20, results.get(0).getStarRating(), 0.01)
-//    }
-//}
-//
-//class MatchSimilarity : Base() {
-//    @Test
-//    fun nullResume_shouldReturn0() {
-//        assertEquals(0, matcher.matchSimilarity(null, jobTitleCat1DescCat2), 1)
-//    }
-//
-//    @Test
-//    fun nullJob_shouldReturn0() {
-//        assertEquals(0, matcher.matchSimilarity(resumeCategoryOne, null), 1)
-//    }
-//
-//    @Test
-//    fun resumeWithoutCategories_shouldReturn0() {
-//        assertEquals(0, matcher.matchSimilarity(Resume(), jobTitleCat1DescCat2), 1)
-//    }
-//
-//    @Test
-//    fun jobWithoutCategories_shouldReturn0() {
-//        assertEquals(0, matcher.matchSimilarity(resumeCategoryOne, Job()), 1)
-//    }
-//
-//    @Test
-//    fun jobWithCat1InTitleAnd2InDescription_ResumeWithCat1And2_shouldReturn381() {
-//        assertEquals(3.87, matcher.matchSimilarity(resumeCategoryOneAndTwo, jobTitleCat1DescCat2), 0.01)
-//    }
-//}
-//
-//class CheckStarRating : Base() {
-//    @Test
-//    fun twoListsWith1ElementEqual_shouldReturn5Stars() {
-//        val element = ArrayList<String>()
-//        element.add("cat_1")
-//        element.add("cat_2")
-//        element.add("cat_3")
-//        element.add("cat_4")
-//        element.add("cat_5")
-//        assertEquals(5, matcher.calculateStarRating(element, element), 0.01)
-//    }
-//
-//
-//    @Test
-//    fun twoListsWith1ElementDifferent_shouldReturn0Stars() {
-//        val base = ArrayList<String>()
-//        base.add("cat_1")
-//        val compare = ArrayList<String>()
-//        compare.add("cat_2")
-//        assertEquals(0, matcher.calculateStarRating(base, compare), 0.01)
-//    }
-//
-//    @Test
-//    fun twoListsWith1ElementDifferent_firstBaseCategoryInSecondCompare_shouldReturn0Stars() {
-//        val base = ArrayList<String>()
-//        base.add("cat_1")
-//        val compare = ArrayList<String>()
-//        compare.add("cat_2")
-//        compare.add("cat_1")
-//        assertEquals(1.94, matcher.calculateStarRating(base, compare), 0.01)
-//    }
-//
-//    @Test
-//    fun twoListsWith1ElementDifferent_firstAndSecondBaseCategoryInForthAndThirdCompare_shouldReturn0Stars() {
-//        val base = ArrayList<String>()
-//        base.add("cat_1")
-//        base.add("cat_2")
-//        val compare = ArrayList<String>()
-//        compare.add("cat_3")
-//        compare.add("cat_4")
-//        compare.add("cat_2")
-//        compare.add("cat_1")
-//        assertEquals(2.42, matcher.calculateStarRating(base, compare), 0.01)
-//    }
-//}
+
+class MatchAgainstJob : Base() {
+    @Test
+    fun `when job as no categories, it returns empty list`() {
+        val job = Job(
+                "some-id",
+                "some title",
+                "some description",
+                CruncherMetaData(mutableMapOf()),
+                CruncherMetaData(mutableMapOf())
+        )
+
+        assertThat(matcher.matchInverse(job, listOf(resumeCategoryOne))).isEmpty()
+    }
+
+    @Test
+    fun `when Job as Category Two and Resume as it too, it returns resume with 258 star rating`() {
+        val expectedResults = ArrayList<Resume>()
+        expectedResults.add(resumeCategoryOne)
+
+        val results = matcher.matchInverse(jobTitleCat1DescCat2, listOf(resumeCategoryOne))
+
+        assertThat(results).hasSize(1)
+        assertThat(results.first()).isEqualToIgnoringGivenFields(resumeCategoryOne.copy(), "starRating")
+        assertThat(results.first().starRating).isEqualTo(2.58, Offset.offset(0.01))
+    }
+
+    @Test
+    fun `when job as category two and resume doesn't, it does not return any resume`() {
+        assertThat(matcher.match(resumeCategoryOne, listOf(jobTitleCat3DescCat4))).isEmpty()
+    }
+
+    @Test
+    fun `when resume with 6 categories and Job that matches sixth, it returns no resume`() {
+        val resume = Resume(
+                "some-filename",
+                "some-other-user-id",
+                "pdf",
+                CruncherMetaData(mutableMapOf(
+                        "cat_1_job" to 1.0,
+                        "cat_2_job" to .9,
+                        "cat_5_job" to .8,
+                        "cat_6_job" to .8,
+                        "cat_7_job" to .7,
+                        "cat_3_job" to .6
+                )))
+        assertThat(matcher.matchInverse(jobTitleCat3DescCat4, listOf(resume))).isEmpty()
+    }
+
+    @Test
+    fun `when job category 1 is the 4th in the description and 1rst in the resume, it returns no resume`() {
+        val job = Job(
+                "job-id",
+                "job title",
+                "job description",
+                CruncherMetaData(mutableMapOf(
+                        "cat_2_job" to 1.0,
+                        "cat_3_job" to 0.9
+                )),
+                CruncherMetaData(mutableMapOf(
+                        "cat_4_job" to 1.0,
+                        "cat_5_job" to 0.9,
+                        "cat_6_job" to 0.8,
+                        "cat_1_job" to 0.7
+                ))
+        )
+
+        assertThat(matcher.matchInverse(job, listOf(resumeCategoryOne))).isEmpty()
+    }
+
+    @Test
+    fun `when job as category 1 in the 3rd position of the title and resume is category 1, it returns no resume`() {
+        val job = Job(
+                "job-id",
+                "job title",
+                "job description",
+                CruncherMetaData(mutableMapOf(
+                        "cat_2_job" to 1.0,
+                        "cat_3_job" to 0.9,
+                        "cat_1_job" to 0.7
+                )),
+                CruncherMetaData(mutableMapOf(
+                        "cat_4_job" to 1.0,
+                        "cat_5_job" to 0.9,
+                        "cat_6_job" to 0.8
+                ))
+        )
+
+        assertThat(matcher.matchInverse(job, listOf(resumeCategoryOne))).isEmpty()
+    }
+
+    @Test
+    fun `when job as category 1 in 3rd position but previous 2 are the same category and resume is category 1, it returns the resume with star rating of 120`() {
+        val job = Job(
+                "job-id",
+                "job title",
+                "job description",
+                CruncherMetaData(mutableMapOf(
+                        "cat_2_job" to 1.0,
+                        "cat_2_resume" to 0.9,
+                        "cat_1_job" to 0.7
+                )),
+                CruncherMetaData(mutableMapOf(
+                        "cat_4_job" to 1.0,
+                        "cat_5_job" to 0.9,
+                        "cat_6_job" to 0.8
+                ))
+        )
+
+        val expectedResults = ArrayList<Resume>()
+        expectedResults.add(resumeCategoryOne)
+
+        val results = matcher.matchInverse(job, listOf(resumeCategoryOne))
+        assertThat(results).hasSize(1)
+        assertThat(results.first()).isEqualToIgnoringGivenFields(resumeCategoryOne.copy(), "starRating")
+        assertThat(results.first().starRating).isEqualTo(1.2, Offset.offset(.01))
+    }
+
+    @Test
+    fun `when job as category 1 in Title and Description and resume as category 1, it returns resume with star rating 120`() {
+        val job = Job(
+                "job-id",
+                "job title",
+                "job description",
+                CruncherMetaData(mutableMapOf(
+                        "cat_2_job" to 1.0,
+                        "cat_1_job" to 0.9
+                )),
+                CruncherMetaData(mutableMapOf(
+                        "cat_4_job" to 1.0,
+                        "cat_1_resume" to 0.9,
+                        "cat_5_job" to 0.8
+                ))
+        )
+
+        val results = matcher.matchInverse(job, listOf(resumeCategoryOne))
+        assertThat(results).hasSize(1)
+        assertThat(results.first()).isEqualToIgnoringGivenFields(resumeCategoryOne.copy(), "starRating")
+        assertThat(results.first().starRating).isEqualTo(1.2, Offset.offset(.01))
+    }
+}
+
+class MatchSimilarity : Base() {
+    @Test
+    fun `when resume as no categories, it returns 0`() {
+        val resume = Resume(
+                "filename",
+                "some-user-id",
+                "pdf",
+                CruncherMetaData(mutableMapOf()))
+        assertThat(matcher.similarityRating(resume, jobTitleCat3DescCat4)).isEqualTo(.0)
+    }
+
+    @Test
+    fun `when job as no categories, it returns 0`() {
+        val job = Job(
+                "job-id",
+                "job title",
+                "job description",
+                CruncherMetaData(mutableMapOf()),
+                CruncherMetaData(mutableMapOf())
+        )
+        assertThat(matcher.similarityRating(resumeCategoryOne, job)).isEqualTo(.0)
+    }
+
+    @Test
+    fun `when job with category 1 in title and 2 in description and resume with category 1 and 2, it returns 387`() {
+        assertThat(matcher.similarityRating(resumeCategoryOneAndTwo, jobTitleCat1DescCat2))
+                .isEqualTo(3.87, Offset.offset(0.01))
+    }
+}
+
+class CheckStarRating : Base() {
+    @Test
+    fun `when 2 lists have the categories in the same order, it returns 5 stars`() {
+        val element = ArrayList<String>()
+        element.add("cat_1")
+        element.add("cat_2")
+        element.add("cat_3")
+        element.add("cat_4")
+        element.add("cat_5")
+        assertThat(matcher.calculateStarRating(element, element))
+                .isEqualTo(5.0, Offset.offset(.01))
+    }
+
+
+    @Test
+    fun `when the lists have 1 category and is different, it return 0 stars`() {
+        val base = ArrayList<String>()
+        base.add("cat_1")
+        val compare = ArrayList<String>()
+        compare.add("cat_2")
+        assertThat(matcher.calculateStarRating(base, compare))
+                .isEqualTo(.0, Offset.offset(0.01))
+    }
+
+    @Test
+    fun `when first list as category 1 and second as category 2 and 1, it returns 194 stars`() {
+        val base = ArrayList<String>()
+        base.add("cat_1")
+        val compare = ArrayList<String>()
+        compare.add("cat_2")
+        compare.add("cat_1")
+        assertThat(matcher.calculateStarRating(base, compare))
+                .isEqualTo(1.94, Offset.offset(0.01))
+    }
+
+    @Test
+    fun `when first list as categories 1,2 and second 3,4,2,1, it returns 242 stars`() {
+        val base = ArrayList<String>()
+        base.add("cat_1")
+        base.add("cat_2")
+        val compare = ArrayList<String>()
+        compare.add("cat_3")
+        compare.add("cat_4")
+        compare.add("cat_2")
+        compare.add("cat_1")
+        assertThat(matcher.calculateStarRating(base, compare))
+                .isEqualTo(2.42, Offset.offset(0.01))
+    }
+}

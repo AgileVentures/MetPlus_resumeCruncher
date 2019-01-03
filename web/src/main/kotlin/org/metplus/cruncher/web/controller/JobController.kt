@@ -3,10 +3,13 @@ package org.metplus.cruncher.web.controller
 import org.metplus.cruncher.job.CreateJob
 import org.metplus.cruncher.job.CreateJobObserver
 import org.metplus.cruncher.job.Job
+import org.metplus.cruncher.job.MatchWithResume
+import org.metplus.cruncher.job.MatchWithResumeObserver
 import org.metplus.cruncher.job.UpdateJob
 import org.metplus.cruncher.job.UpdateJobObserver
 import org.metplus.cruncher.rating.CruncherMetaData
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -22,7 +25,8 @@ import org.springframework.web.bind.annotation.RestController
 ])
 class JobController(
         @Autowired private val createJob: CreateJob,
-        @Autowired private val updateJob: UpdateJob
+        @Autowired private val updateJob: UpdateJob,
+        @Autowired private val matchWithResume: MatchWithResume
 ) {
 
     @PostMapping("create")
@@ -70,4 +74,58 @@ class JobController(
         })
         return cruncherResponse!!
     }
+
+    @GetMapping("match/{resumeId}")
+    @ResponseBody
+    fun match(@PathVariable("resumeId") resumeId: String): CruncherResponse {
+        return matchWithResume.process(resumeId, object : MatchWithResumeObserver<CruncherResponse> {
+            override fun success(matchedJobs: List<Job>): CruncherResponse {
+                return JobsMatchedAnswer(
+                        resultCode = ResultCodes.SUCCESS,
+                        message = "Resume $resumeId matches ${matchedJobs.size} jobs",
+                        jobs = mapOf("naiveBayes" to matchedJobs.map { it.toJobAnswer() })
+                )
+            }
+
+            override fun resumeNotFound(resumeId: String): CruncherResponse {
+                return CruncherResponse(
+                        resultCode = ResultCodes.RESUME_NOT_FOUND,
+                        message = "Resume $resumeId does not exist"
+                )
+            }
+
+            override fun noMatches(resumeId: String): CruncherResponse {
+                return JobsMatchedAnswer(
+                        resultCode = ResultCodes.SUCCESS,
+                        message = "Resume $resumeId as no matches",
+                        jobs = mapOf("naiveBayes" to emptyList())
+                )
+            }
+
+        })
+    }
 }
+
+private fun Job.toJobAnswer(): JobAnswer {
+    return JobAnswer(
+            id,
+            title,
+            description,
+            starRating
+    )
+}
+
+class JobsMatchedAnswer(
+        resultCode: ResultCodes,
+        message: String,
+        val jobs: Map<String, List<JobAnswer>>
+) : CruncherResponse(
+        resultCode,
+        message)
+
+data class JobAnswer(
+        val id: String,
+        val title: String,
+        val description: String,
+        val stars: Double
+)

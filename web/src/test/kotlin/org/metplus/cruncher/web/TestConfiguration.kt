@@ -4,10 +4,13 @@ import org.metplus.cruncher.job.CreateJob
 import org.metplus.cruncher.job.Job
 import org.metplus.cruncher.job.JobRepositoryFake
 import org.metplus.cruncher.job.JobsRepository
+import org.metplus.cruncher.job.MatchWithResume
 import org.metplus.cruncher.job.UpdateJob
 import org.metplus.cruncher.rating.CrunchJobProcessSpy
 import org.metplus.cruncher.rating.CrunchResumeProcess
 import org.metplus.cruncher.rating.CrunchResumeProcessSpy
+import org.metplus.cruncher.rating.Matcher
+import org.metplus.cruncher.rating.MatcherStub
 import org.metplus.cruncher.rating.ProcessCruncher
 import org.metplus.cruncher.resume.DownloadResume
 import org.metplus.cruncher.resume.Resume
@@ -60,6 +63,12 @@ open class TestConfiguration {
     ): UpdateJob = UpdateJob(jobsRepository, crunchJobProcess())
 
     @Bean
+    open fun matchWithResume(@Autowired resumeRepository: ResumeRepository,
+                             @Autowired jobsRepository: JobsRepository,
+                             @Autowired matcher: Matcher<Resume, Job>
+    ): MatchWithResume = MatchWithResume(resumeRepository, jobsRepository, matcher)
+
+    @Bean
     open fun tokenService(): TokenService = LocalTokenService()
 
     @Bean
@@ -80,4 +89,7 @@ open class TestConfiguration {
 
     @Bean
     open fun crunchJobProcess(): ProcessCruncher<Job> = CrunchJobProcessSpy()
+
+    @Bean
+    open fun matcher(): Matcher<Resume, Job> = MatcherStub()
 }
