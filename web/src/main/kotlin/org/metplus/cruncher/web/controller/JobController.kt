@@ -5,6 +5,8 @@ import org.metplus.cruncher.job.CreateJobObserver
 import org.metplus.cruncher.job.Job
 import org.metplus.cruncher.job.MatchWithResume
 import org.metplus.cruncher.job.MatchWithResumeObserver
+import org.metplus.cruncher.job.ReCrunchAllJobs
+import org.metplus.cruncher.job.ReCrunchAllJobsObserver
 import org.metplus.cruncher.job.UpdateJob
 import org.metplus.cruncher.job.UpdateJobObserver
 import org.metplus.cruncher.rating.CruncherMetaData
@@ -26,7 +28,8 @@ import org.springframework.web.bind.annotation.RestController
 class JobController(
         @Autowired private val createJob: CreateJob,
         @Autowired private val updateJob: UpdateJob,
-        @Autowired private val matchWithResume: MatchWithResume
+        @Autowired private val matchWithResume: MatchWithResume,
+        @Autowired private val reCrunchAllJobs: ReCrunchAllJobs
 ) {
 
     @PostMapping("create")
@@ -99,6 +102,20 @@ class JobController(
                         resultCode = ResultCodes.SUCCESS,
                         message = "Resume $resumeId as no matches",
                         jobs = mapOf("naiveBayes" to emptyList())
+                )
+            }
+
+        })
+    }
+
+    @GetMapping("reindex")
+    @ResponseBody
+    fun reindex(): CruncherResponse {
+        return reCrunchAllJobs.process(object :ReCrunchAllJobsObserver<CruncherResponse>{
+            override fun onSuccess(numberScheduled: Int): CruncherResponse {
+                return CruncherResponse(
+                        resultCode = ResultCodes.SUCCESS,
+                        message = "Going to reindex $numberScheduled jobs"
                 )
             }
 
