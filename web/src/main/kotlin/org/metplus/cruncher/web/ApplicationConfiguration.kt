@@ -9,6 +9,7 @@ import org.metplus.cruncher.job.CreateJob
 import org.metplus.cruncher.job.Job
 import org.metplus.cruncher.job.JobsRepository
 import org.metplus.cruncher.job.MatchWithResume
+import org.metplus.cruncher.job.ReCrunchAllJobs
 import org.metplus.cruncher.job.UpdateJob
 import org.metplus.cruncher.persistence.model.JobRepositoryImpl
 import org.metplus.cruncher.persistence.model.JobRepositoryMongo
@@ -21,6 +22,7 @@ import org.metplus.cruncher.rating.CrunchJobProcess
 import org.metplus.cruncher.rating.CrunchResumeProcess
 import org.metplus.cruncher.rating.CruncherList
 import org.metplus.cruncher.rating.Matcher
+import org.metplus.cruncher.rating.ProcessCruncher
 import org.metplus.cruncher.rating.TrainCruncher
 import org.metplus.cruncher.rating.TrainCruncherObserver
 import org.metplus.cruncher.resume.DownloadResume
@@ -98,6 +100,12 @@ open class ApplicationConfiguration {
             @Autowired jobsRepository: JobsRepository,
             @Autowired crunchJobProcess: CrunchJobProcess
     ): UpdateJob = UpdateJob(jobsRepository, crunchJobProcess)
+
+
+    @Bean
+    open fun reCrunchAllJobs(
+            jobsRepository: JobsRepository,
+            jobProcess: ProcessCruncher<Job>) = ReCrunchAllJobs(jobsRepository, jobProcess)
 
     @Bean
     open fun matchWithResume(@Autowired resumeRepository: ResumeRepository,
