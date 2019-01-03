@@ -13,6 +13,10 @@ class JobRepositoryImpl(
     override fun getById(id: String): Job? {
         return jobRepository.getById(id)?.toJob()
     }
+
+    override fun getAll(): List<Job> {
+        return jobRepository.findAll().map { it.toJob() }
+    }
 }
 
 private fun JobMongo.toJob(): Job {
