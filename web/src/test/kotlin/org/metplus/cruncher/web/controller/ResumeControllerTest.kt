@@ -221,4 +221,27 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
                         )
                 ))
     }
+
+    @ParameterizedTest(name = "{index} => API Version: {0}")
+    @ValueSource(strings = ["v1", "v2"])
+    fun `when reindexing resumes, it returns information about of resumes to be processed`(versionId: String) {
+        resumeRepository.save(Resume("filename", "user-id", "pdf", emptyMetaData()))
+        resumeRepository.save(Resume("filename", "other-user-id", "pdf", emptyMetaData()))
+        mvc.perform(get("/api/$versionId/resume/reindex")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .header("X-Auth-Token", token))
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
+                .andExpect(jsonPath("$.resultCode", Matchers.equalTo(ResultCodes.SUCCESS.toString())))
+                .andExpect(jsonPath("$.message", Matchers.equalTo("Going to reindex 2 resumes")))
+                .andDo(document("job/match-not-found/$versionId",
+                        requestHeaders(headerWithName("X-Auth-Token")
+                                .description("Authentication token retrieved from the authentication")),
+                        responseFields(
+                                fieldWithPath("resultCode").type(ResultCodes::class.java).description("Result code"),
+                                fieldWithPath("message").description("Message associated with the result code")
+                        )
+                ))
+    }
 }
