@@ -13,6 +13,10 @@ class ResumeRepositoryFake: ResumeRepository {
         return allResumes[userId]
     }
 
+    override fun getAll(): List<Resume> {
+        return allResumes.values.toList()
+    }
+
     fun removeAll() {
         allResumes.clear()
     }
