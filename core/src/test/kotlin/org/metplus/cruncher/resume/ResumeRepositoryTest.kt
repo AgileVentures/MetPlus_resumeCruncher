@@ -56,4 +56,25 @@ abstract class ResumeRepositoryTest {
 
         assertThat(afterSave).isNull()
     }
+    @Test
+    fun `when retrieving all resumes and 2 resumes are present, it return an array with the 2`() {
+        val resume1 = Resume(
+                "some_file_name.io",
+                "someUserId",
+                "io-file",
+                cruncherData = CruncherMetaData(metaData = hashMapOf())
+        )
+        getRepository().save(resume1)
+        val resume2 = Resume(
+                "some_file_name1.io",
+                "someUserId1",
+                "io-file",
+                cruncherData = CruncherMetaData(metaData = hashMapOf())
+        )
+        getRepository().save(resume2)
+
+        val allResumes = getRepository().getAll()
+
+        assertThat(allResumes).isEqualTo(listOf(resume1, resume2))
+    }
 }

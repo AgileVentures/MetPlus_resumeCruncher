@@ -15,4 +15,8 @@ class ResumeRepositoryStub : ResumeRepository {
     override fun getByUserId(userId: String): Resume? {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
+
+    override fun getAll(): List<Resume> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }

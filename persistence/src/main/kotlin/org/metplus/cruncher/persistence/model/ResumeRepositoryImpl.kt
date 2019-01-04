@@ -14,6 +14,10 @@ class ResumeRepositoryImpl(
     override fun getByUserId(userId: String): Resume? {
         return resumeRepositoryMongo.getById(userId)?.toResume()
     }
+
+    override fun getAll(): List<Resume> {
+        return resumeRepositoryMongo.findAll().map { it.toResume() }
+    }
 }
 
 private fun ResumeMongo.toResume(): Resume {
