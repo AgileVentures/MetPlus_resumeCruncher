@@ -14,6 +14,7 @@ import org.metplus.cruncher.rating.MatcherStub
 import org.metplus.cruncher.rating.ProcessCruncher
 import org.metplus.cruncher.resume.DownloadResume
 import org.metplus.cruncher.resume.MatchWithJob
+import org.metplus.cruncher.resume.ReCrunchAllResumes
 import org.metplus.cruncher.resume.Resume
 import org.metplus.cruncher.resume.ResumeFileRepository
 import org.metplus.cruncher.resume.ResumeFileRepositoryFake
@@ -104,4 +105,9 @@ open class TestConfiguration {
     open fun reCrunchAllJobs(
             jobsRepository: JobsRepository,
             jobProcess: ProcessCruncher<Job>) = ReCrunchAllJobs(jobsRepository, jobProcess)
+
+    @Bean
+    open fun reCrunchAllResumes(
+            resumeRepository: ResumeRepository,
+            resumeProcess: ProcessCruncher<Resume>) = ReCrunchAllResumes(resumeRepository, resumeProcess)
 }
