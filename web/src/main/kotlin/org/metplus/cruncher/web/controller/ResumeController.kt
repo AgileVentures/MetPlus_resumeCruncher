@@ -4,6 +4,8 @@ import org.metplus.cruncher.resume.DownloadResumeObserver
 import org.metplus.cruncher.resume.DownloadResume
 import org.metplus.cruncher.resume.MatchWithJob
 import org.metplus.cruncher.resume.MatchWithJobObserver
+import org.metplus.cruncher.resume.ReCrunchAllResumes
+import org.metplus.cruncher.resume.ReCrunchAllResumesObserver
 import org.metplus.cruncher.resume.Resume
 import org.metplus.cruncher.resume.ResumeFile
 import org.metplus.cruncher.resume.UploadResume
@@ -15,6 +17,7 @@ import org.springframework.util.FileCopyUtils
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
@@ -31,7 +34,8 @@ import javax.servlet.http.HttpServletResponse
 class ResumeController(
         @Autowired private val uploadResume: UploadResume,
         @Autowired private val downloadResume: DownloadResume,
-        @Autowired private val matchWithJob: MatchWithJob
+        @Autowired private val matchWithJob: MatchWithJob,
+        @Autowired private val reCrunchAllResumes: ReCrunchAllResumes
 ) {
 
     @PostMapping("upload")
@@ -126,6 +130,19 @@ class ResumeController(
                         message = "Job matches ${matchedResumes.size} resumes",
                         resumes = mapOf("naiveBayes" to matchedResumes.map { it.toResumeAnswer() })
                 ), HttpStatus.OK)
+            }
+        })
+    }
+
+    @GetMapping("/reindex")
+    @ResponseBody
+    fun reindex(): CruncherResponse {
+        return reCrunchAllResumes.process(object: ReCrunchAllResumesObserver<CruncherResponse>{
+            override fun onSuccess(numberScheduled: Int): CruncherResponse {
+                return CruncherResponse(
+                        resultCode = ResultCodes.SUCCESS,
+                        message = "Going to reindex $numberScheduled resumes"
+                )
             }
         })
     }
