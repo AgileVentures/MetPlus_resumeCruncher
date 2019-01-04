@@ -1,11 +1,17 @@
 package org.metplus.cruncher.web.controller
 
 import org.hamcrest.Matchers
+import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import org.metplus.cruncher.job.Job
+import org.metplus.cruncher.job.JobsRepository
 import org.metplus.cruncher.rating.CruncherMetaData
+import org.metplus.cruncher.rating.Matcher
+import org.metplus.cruncher.rating.MatcherStub
+import org.metplus.cruncher.rating.emptyMetaData
 import org.metplus.cruncher.resume.Resume
 import org.metplus.cruncher.resume.ResumeFile
 import org.metplus.cruncher.resume.ResumeFileRepository
@@ -26,6 +32,7 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.fil
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.payload.PayloadDocumentation.responseFields
+import org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
 import org.springframework.restdocs.request.RequestDocumentation.pathParameters
 import org.springframework.restdocs.request.RequestDocumentation.requestParameters
@@ -48,6 +55,10 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
     lateinit var resumeRepository: ResumeRepository
     @Autowired
     lateinit var resumeFileRepository: ResumeFileRepository
+    @Autowired
+    lateinit var jobRepository: JobsRepository
+    @Autowired
+    lateinit var matcher: Matcher<Resume, Job>
 
     @Autowired
     lateinit var tokenService: TokenService
@@ -142,5 +153,72 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
                         )
                 ))
                 .andReturn().getResponse()
+    }
+
+    @ParameterizedTest(name = "{index} => API Version: {0}")
+    @ValueSource(strings = ["v1", "v2"])
+    @Throws(Exception::class)
+    fun `when matching resumes with a job that does not exist, it returns an error`(versionId: String) {
+        mvc.perform(get("/api/$versionId/resume/match/{jobId}", "asdasdasd")
+                .header("X-Auth-Token", token))
+                .andExpect(status().is4xxClientError)
+                .andExpect(jsonPath("$.resultCode", Matchers.equalTo(ResultCodes.JOB_NOT_FOUND.toString())))
+                .andDo(document("resume/match-job-not-found/v1",
+                        requestHeaders(headerWithName("X-Auth-Token")
+                                .description("Authentication token retrieved from the authentication")),
+                        pathParameters(
+                                parameterWithName("jobId").description("Job Identifier to retrieve the Resumes that match the job")
+                        ),
+                        responseFields(
+                                fieldWithPath("resultCode").type(ResultCodes::class.java).description("Result code"),
+                                fieldWithPath("message").description("Message associated with the result code")
+                        )
+                ))
+    }
+
+    @ParameterizedTest(name = "{index} => API Version: {0}")
+    @ValueSource(strings = ["v1", "v2"])
+    @Throws(Exception::class)
+    fun `when matching resumes with a job that has multiple matches, it returns all the resumes that match`(versionId: String) {
+        val resume1 = resumeRepository.save(Resume(
+                userId = "resume-1",
+                filename = "line_with_bold.pdf",
+                fileType = "pdf",
+                cruncherData = CruncherMetaData(mutableMapOf())
+        ))
+        resumeRepository.save(Resume(
+                userId = "resume-2",
+                filename = "line_with_bold.pdf",
+                fileType = "pdf",
+                cruncherData = CruncherMetaData(mutableMapOf())
+        ))
+        val resume2 = resumeRepository.save(Resume(
+                userId = "resume-2",
+                filename = "line_with_bold.pdf",
+                fileType = "pdf",
+                cruncherData = CruncherMetaData(mutableMapOf())
+        ))
+        jobRepository.save(Job("job-id", "title", "description", emptyMetaData(), emptyMetaData()))
+        (matcher as MatcherStub).matchInverseReturnValue = listOf(resume2.copy(starRating = 1.0), resume1.copy(starRating = .1))
+
+        mvc.perform(get("/api/$versionId/resume/match/{jobId}", "job-id")
+                .header("X-Auth-Token", token))
+                .andExpect(jsonPath("$.resultCode", Matchers.equalTo(ResultCodes.SUCCESS.toString())))
+                .andExpect(jsonPath("$.resumes.naiveBayes[0].userId", Matchers.equalTo("resume-2")))
+                .andExpect(jsonPath("$.resumes.naiveBayes[0].stars", Matchers.equalTo(1.0)))
+                .andExpect(jsonPath("$.resumes.naiveBayes[1].userId", Matchers.equalTo("resume-1")))
+                .andExpect(jsonPath("$.resumes.naiveBayes[1].stars", Matchers.equalTo(.1)))
+                .andDo(document("resume/match-job-not-found/v1",
+                        requestHeaders(headerWithName("X-Auth-Token")
+                                .description("Authentication token retrieved from the authentication")),
+                        pathParameters(
+                                parameterWithName("jobId").description("Job Identifier to retrieve the Resumes that match the job")
+                        ),
+                        responseFields(
+                                fieldWithPath("resultCode").type(ResultCodes::class.java).description("Result code"),
+                                fieldWithPath("message").description("Message associated with the result code"),
+                                subsectionWithPath("resumes").description("List with the identifiers of the resumes matched for each cruncher")
+                        )
+                ))
     }
 }
