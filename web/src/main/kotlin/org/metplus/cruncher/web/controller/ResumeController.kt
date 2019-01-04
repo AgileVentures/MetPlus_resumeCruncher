@@ -2,11 +2,15 @@ package org.metplus.cruncher.web.controller
 
 import org.metplus.cruncher.resume.DownloadResumeObserver
 import org.metplus.cruncher.resume.DownloadResume
+import org.metplus.cruncher.resume.MatchWithJob
+import org.metplus.cruncher.resume.MatchWithJobObserver
 import org.metplus.cruncher.resume.Resume
 import org.metplus.cruncher.resume.ResumeFile
 import org.metplus.cruncher.resume.UploadResume
 import org.metplus.cruncher.resume.UploadResumeObserver
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.util.FileCopyUtils
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -26,7 +30,8 @@ import javax.servlet.http.HttpServletResponse
 ])
 class ResumeController(
         @Autowired private val uploadResume: UploadResume,
-        @Autowired private val downloadResume: DownloadResume
+        @Autowired private val downloadResume: DownloadResume,
+        @Autowired private val matchWithJob: MatchWithJob
 ) {
 
     @PostMapping("upload")
@@ -95,4 +100,57 @@ class ResumeController(
 
         })
     }
+
+    @GetMapping("/match/{jobId}")
+    @ResponseBody
+    fun downloadResumeEndpoint(@PathVariable("jobId") id: String): ResponseEntity<CruncherResponse> {
+        return matchWithJob.process(jobId = id, observer = object : MatchWithJobObserver<ResponseEntity<CruncherResponse>> {
+            override fun jobNotFound(jobId: String): ResponseEntity<CruncherResponse> {
+                return ResponseEntity(CruncherResponse(
+                        resultCode = ResultCodes.JOB_NOT_FOUND,
+                        message = "Job with id '$jobId' was not found"
+                ), HttpStatus.NOT_FOUND)
+            }
+
+            override fun noMatchFound(jobId: String): ResponseEntity<CruncherResponse> {
+                return ResponseEntity(ResumeMatchedAnswer(
+                        resultCode = ResultCodes.SUCCESS,
+                        message = "Job with id '$jobId' was not matches",
+                        resumes = mapOf("naiveBayes" to emptyList<ResumeAnswer>())
+                ), HttpStatus.OK)
+            }
+
+            override fun success(matchedResumes: List<Resume>): ResponseEntity<CruncherResponse> {
+                return ResponseEntity(ResumeMatchedAnswer(
+                        resultCode = ResultCodes.SUCCESS,
+                        message = "Job matches ${matchedResumes.size} resumes",
+                        resumes = mapOf("naiveBayes" to matchedResumes.map { it.toResumeAnswer() })
+                ), HttpStatus.OK)
+            }
+        })
+    }
 }
+
+private fun Resume.toResumeAnswer(): ResumeAnswer {
+    return ResumeAnswer(
+            filename,
+            userId,
+            fileType,
+            starRating
+    )
+}
+
+class ResumeMatchedAnswer(
+        resultCode: ResultCodes,
+        message: String,
+        val resumes: Map<String, List<ResumeAnswer>>
+) : CruncherResponse(
+        resultCode,
+        message)
+
+data class ResumeAnswer(
+        val filename: String,
+        val userId: String,
+        val fileType: String,
+        val stars: Double
+)

@@ -26,6 +26,7 @@ import org.metplus.cruncher.rating.ProcessCruncher
 import org.metplus.cruncher.rating.TrainCruncher
 import org.metplus.cruncher.rating.TrainCruncherObserver
 import org.metplus.cruncher.resume.DownloadResume
+import org.metplus.cruncher.resume.MatchWithJob
 import org.metplus.cruncher.resume.Resume
 import org.metplus.cruncher.resume.ResumeFileRepository
 import org.metplus.cruncher.resume.ResumeRepository
@@ -126,6 +127,12 @@ open class ApplicationConfiguration {
             @Autowired resumeRepository: ResumeRepository,
             @Autowired resumeFileRepository: ResumeFileRepository
     ): DownloadResume = DownloadResume(resumeRepository, resumeFileRepository)
+
+    @Bean
+    open fun matchWithJob(@Autowired resumeRepository: ResumeRepository,
+                          @Autowired jobsRepository: JobsRepository,
+                          @Autowired matcher: Matcher<Resume, Job>
+    ): MatchWithJob = MatchWithJob(resumeRepository, jobsRepository, matcher)
 
     @Bean
     open fun allCrunchers(

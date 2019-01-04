@@ -13,6 +13,7 @@ import org.metplus.cruncher.rating.Matcher
 import org.metplus.cruncher.rating.MatcherStub
 import org.metplus.cruncher.rating.ProcessCruncher
 import org.metplus.cruncher.resume.DownloadResume
+import org.metplus.cruncher.resume.MatchWithJob
 import org.metplus.cruncher.resume.Resume
 import org.metplus.cruncher.resume.ResumeFileRepository
 import org.metplus.cruncher.resume.ResumeFileRepositoryFake
@@ -83,6 +84,12 @@ open class TestConfiguration {
             @Autowired resumeRepository: ResumeRepository,
             @Autowired resumeFileRepository: ResumeFileRepository
     ): DownloadResume = DownloadResume(resumeRepository, resumeFileRepository)
+
+    @Bean
+    open fun matchWithJob(@Autowired resumeRepository: ResumeRepository,
+                             @Autowired jobsRepository: JobsRepository,
+                             @Autowired matcher: Matcher<Resume, Job>
+    ): MatchWithJob = MatchWithJob(resumeRepository, jobsRepository, matcher)
 
     @Bean
     open fun crunchResumeProcess(): ProcessCruncher<Resume> = CrunchResumeProcessSpy()
