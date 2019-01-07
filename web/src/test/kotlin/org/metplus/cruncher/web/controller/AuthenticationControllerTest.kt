@@ -59,7 +59,7 @@ class AuthenticationControllerTest(@Autowired private val mvc: MockMvc) {
                 .header("X-Auth-Username", "backend_admin1")
                 .header("X-Auth-Password", "backendpassword"))
                 .andExpect(status().isUnauthorized)
-                .andDo(document("authentication/userPassword-error",
+                .andDo(document("authentication/userPassword-error/$versionNumber",
                         requestHeaders(headerWithName("X-Auth-Username")
                                 .description("Username user to authenticate the client"),
                                 headerWithName("X-Auth-Password")
@@ -75,7 +75,7 @@ class AuthenticationControllerTest(@Autowired private val mvc: MockMvc) {
                 .header("X-Auth-Username", backendAdminUsername)
                 .header("X-Auth-Password", backendAdminPassword))
                 .andExpect(status().is2xxSuccessful)
-                .andDo(document("authentication/userPassword",
+                .andDo(document("authentication/userPassword/$versionNumber",
                         requestHeaders(headerWithName("X-Auth-Username")
                                 .description("Username user to authenticate the client"),
                                 headerWithName("X-Auth-Password")

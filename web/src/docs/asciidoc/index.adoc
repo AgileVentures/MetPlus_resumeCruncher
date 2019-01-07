@@ -1,9 +1,9 @@
 = PETS Resume cruncher API Documentation
 Joao Pereira <joaopapereira@gmail.com> {localdate}
-:revnumber: 0.2.0
+:revnumber: 0.2.1
 :example-caption!:
 ifndef::imagesdir[:imagesdir: images]
-ifndef::sourcedir[:sourcedir: ../java]
+ifndef::sourcedir[:sourcedir: ../kotlin]
 
 This is a user manual for an MetPlus Resume cruncher project.
 
