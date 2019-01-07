@@ -17,6 +17,6 @@ class MatcherStub(
     }
 
     override fun similarityRating(left: Resume, right: Job): Double {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return similarityRatingReturnValue
     }
 }
