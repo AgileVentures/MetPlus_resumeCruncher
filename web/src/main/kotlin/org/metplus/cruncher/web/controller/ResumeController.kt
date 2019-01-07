@@ -1,7 +1,9 @@
 package org.metplus.cruncher.web.controller
 
-import org.metplus.cruncher.resume.DownloadResumeObserver
+import org.metplus.cruncher.rating.CompareResumeWithJob
+import org.metplus.cruncher.rating.CompareResumeWithJobObserver
 import org.metplus.cruncher.resume.DownloadResume
+import org.metplus.cruncher.resume.DownloadResumeObserver
 import org.metplus.cruncher.resume.MatchWithJob
 import org.metplus.cruncher.resume.MatchWithJobObserver
 import org.metplus.cruncher.resume.ReCrunchAllResumes
@@ -17,7 +19,6 @@ import org.springframework.util.FileCopyUtils
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
@@ -35,7 +36,8 @@ class ResumeController(
         @Autowired private val uploadResume: UploadResume,
         @Autowired private val downloadResume: DownloadResume,
         @Autowired private val matchWithJob: MatchWithJob,
-        @Autowired private val reCrunchAllResumes: ReCrunchAllResumes
+        @Autowired private val reCrunchAllResumes: ReCrunchAllResumes,
+        @Autowired private val compareResumeWithJob: CompareResumeWithJob
 ) {
 
     @PostMapping("upload")
@@ -134,10 +136,35 @@ class ResumeController(
         })
     }
 
+    @GetMapping("{resumeId}/compare/{jobId}")
+    @ResponseBody
+    fun compare(@PathVariable("resumeId") resumeId: String, @PathVariable("jobId") jobId: String): ResponseEntity<CruncherResponse> {
+        return compareResumeWithJob.process(resumeId, jobId, object : CompareResumeWithJobObserver<ResponseEntity<CruncherResponse>> {
+            override fun onJobNotFound(jobId: String): ResponseEntity<CruncherResponse> {
+                return ResponseEntity.ok(CruncherResponse(
+                        resultCode = ResultCodes.JOB_NOT_FOUND,
+                        message = "Job $jobId was not found"))
+            }
+
+            override fun onResumeNotFound(resumeId: String): ResponseEntity<CruncherResponse> {
+                return ResponseEntity(CruncherResponse(
+                        resultCode = ResultCodes.RESUME_NOT_FOUND,
+                        message = "Resume $resumeId was not found"), HttpStatus.NOT_FOUND)
+            }
+
+            override fun onSuccess(starsRating: Double): ResponseEntity<CruncherResponse> {
+                return ResponseEntity.ok(ComparisonMatchAnswer(
+                        message = "Job and Resume match",
+                        stars = mapOf("naiveBayes" to starsRating)
+                ))
+            }
+        })
+    }
+
     @GetMapping("/reindex")
     @ResponseBody
     fun reindex(): CruncherResponse {
-        return reCrunchAllResumes.process(object: ReCrunchAllResumesObserver<CruncherResponse>{
+        return reCrunchAllResumes.process(object : ReCrunchAllResumesObserver<CruncherResponse> {
             override fun onSuccess(numberScheduled: Int): CruncherResponse {
                 return CruncherResponse(
                         resultCode = ResultCodes.SUCCESS,
@@ -171,3 +198,10 @@ data class ResumeAnswer(
         val fileType: String,
         val stars: Double
 )
+
+class ComparisonMatchAnswer(
+        message: String,
+        val stars: Map<String, Double>
+) : CruncherResponse(
+        ResultCodes.SUCCESS,
+        message)
