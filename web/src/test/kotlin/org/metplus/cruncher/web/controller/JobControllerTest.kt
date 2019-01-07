@@ -81,7 +81,7 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                 .andExpect(jsonPath("$.resultCode", equalTo(ResultCodes.JOB_ID_EXISTS.toString())))
-                .andDo(document("job/create-already-exists",
+                .andDo(document("job/create-already-exists/$versionId",
                         requestHeaders(headerWithName("X-Auth-Token")
                                 .description("Authentication token retrieved from the authentication")),
                         requestParameters(
@@ -104,7 +104,7 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                 .andExpect(jsonPath("$.resultCode", equalTo(ResultCodes.SUCCESS.toString())))
-                .andDo(document("job/create-success",
+                .andDo(document("job/create-success/$versionId",
                         requestHeaders(headerWithName("X-Auth-Token")
                                 .description("Authentication token retrieved from the authentication")),
                         requestParameters(
@@ -142,7 +142,7 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                 .andExpect(jsonPath("$.resultCode", equalTo(ResultCodes.JOB_NOT_FOUND.toString())))
-                .andDo(document("job/update-not-exists",
+                .andDo(document("job/update-not-exists/$versionId",
                         requestHeaders(headerWithName("X-Auth-Token")
                                 .description("Authentication token retrieved from the authentication")),
                         pathParameters(parameterWithName("jobId").description("Job Identifier to create")),
@@ -169,7 +169,7 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                 .andExpect(jsonPath("$.resultCode", equalTo(ResultCodes.SUCCESS.toString())))
-                .andDo(document("job/update-success",
+                .andDo(document("job/update-success/$versionId",
                         requestHeaders(headerWithName("X-Auth-Token")
                                 .description("Authentication token retrieved from the authentication")),
                         pathParameters(parameterWithName("jobId").description("Job Identifier to create")),
@@ -259,7 +259,7 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
                 .andExpect(jsonPath("$.resultCode", equalTo(ResultCodes.SUCCESS.toString())))
                 .andExpect(jsonPath("$.jobs.naiveBayes[0].id", equalTo("1")))
                 .andExpect(jsonPath("$.jobs.naiveBayes[0].stars", equalTo(3.1)))
-                .andDo(document("job/match-not-found/$versionId",
+                .andDo(document("job/match-success/$versionId",
                         requestHeaders(headerWithName("X-Auth-Token")
                                 .description("Authentication token retrieved from the authentication")),
                         pathParameters(parameterWithName("resumeId").description("User identifier of the resume")),

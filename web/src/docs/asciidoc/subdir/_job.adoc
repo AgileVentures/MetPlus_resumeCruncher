@@ -3,99 +3,65 @@
 == HTTP Request
 
 Request
-include::{snippets}/job/create-success/http-request.adoc[]
+include::{snippets}/job/create-success/v2/http-request.adoc[]
 Headers
-include::{snippets}/job/create-success/request-headers.adoc[]
+include::{snippets}/job/create-success/v2/request-headers.adoc[]
 Parameters
-include::{snippets}/job/create-success/request-parameters.adoc[]
+include::{snippets}/job/create-success/v2/request-parameters.adoc[]
 
 == HTTP Answers
 
 === Success
 
 Response
-include::{snippets}/job/create-success/http-response.adoc[]
+include::{snippets}/job/create-success/v2/http-response.adoc[]
 Parameters on response
-include::{snippets}/job/create-success/response-fields.adoc[]
+include::{snippets}/job/create-success/v2/response-fields.adoc[]
 
 '''
 
 === Create job with ID that already exists
 
 Response
-include::{snippets}/job/create-already-exists/http-response.adoc[]
+include::{snippets}/job/create-already-exists/v2/http-response.adoc[]
 Parameters on response
-include::{snippets}/job/create-already-exists/response-fields.adoc[]
+include::{snippets}/job/create-already-exists/v2/response-fields.adoc[]
 
 = Update a job
 
 == HTTP Request
 
 Request
-include::{snippets}/job/update-success/http-request.adoc[]
+include::{snippets}/job/update-success/v2/http-request.adoc[]
 Headers
-include::{snippets}/job/update-success/request-headers.adoc[]
+include::{snippets}/job/update-success/v2/request-headers.adoc[]
 Parameters
-include::{snippets}/job/update-success/path-parameters.adoc[]
+include::{snippets}/job/update-success/v2/path-parameters.adoc[]
 Parameters
-include::{snippets}/job/update-success/request-parameters.adoc[]
+include::{snippets}/job/update-success/v2/request-parameters.adoc[]
 
 == HTTP Answers
 
 === Example: Update the Job Successfully
 
 Response
-include::{snippets}/job/update-success/http-response.adoc[]
+include::{snippets}/job/update-success/v2/http-response.adoc[]
 Parameters on response
-include::{snippets}/job/update-success/response-fields.adoc[]
+include::{snippets}/job/update-success/v2/response-fields.adoc[]
 
 '''
 
 ==== Example: Update job that do not exist
 
 Response
-include::{snippets}/job/update-not-exists/http-response.adoc[]
+include::{snippets}/job/update-not-exists/v2/http-response.adoc[]
 Parameters on response
-include::{snippets}/job/update-not-exists/response-fields.adoc[]
+include::{snippets}/job/update-not-exists/v2/response-fields.adoc[]
 
 = Match jobs with resume
 
 == API Version 1
-
-=== HTTP Request
-
-Request
-include::{snippets}/job/match-success/v1/http-request.adoc[]
-Headers
-include::{snippets}/job/match-success/v1/request-headers.adoc[]
-Path Parameters
-include::{snippets}/job/match-success/v1/path-parameters.adoc[]
-
-=== HTTP Answers
-
-==== Success
-
-Response
-include::{snippets}/job/match-success/v1/http-response.adoc[]
-Parameters on response
-include::{snippets}/job/match-success/v1/response-fields.adoc[]
-
-'''
-
-===== Example: Cannot find the Resume to match jobs against
-
-Response
-include::{snippets}/job/match-not-exists/v1/http-response.adoc[]
-Parameters on response
-include::{snippets}/job/match-not-exists/v1/response-fields.adoc[]
-
-
-===== Example: Unable to find Job that match the Resume
-
-Response
-include::{snippets}/job/match-not-found/v1/http-response.adoc[]
-Parameters on response
-include::{snippets}/job/match-not-found/v1/response-fields.adoc[]
+-- Deprecated
 
 == API Version 2
 
