@@ -1,6 +1,7 @@
 package org.metplus.cruncher.web.controller
 
 import org.hamcrest.Matchers
+import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
@@ -49,13 +50,14 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @AutoConfigureMockMvc
 @WebMvcTest(ResumeController::class)
 internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
-
     @Autowired
     lateinit var resumeRepository: ResumeRepository
     @Autowired
     lateinit var resumeFileRepository: ResumeFileRepository
+
     @Autowired
     lateinit var jobRepository: JobsRepository
+
     @Autowired
     lateinit var matcher: Matcher<Resume, Job>
 
@@ -87,7 +89,7 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode", Matchers.equalTo(ResultCodes.SUCCESS.toString())))
-                .andDo(document("resume/upload",
+                .andDo(document("resume/upload/$versionId",
                         requestHeaders(headerWithName("X-Auth-Token")
                                 .description("Authentication token retrieved from the authentication")),
                         requestParameters(
@@ -125,13 +127,11 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
                         .header("X-Auth-Token", token))
                 .andExpect(status().isOk)
                 .andExpect(content().contentType("application/octet-stream"))
-                .andDo(document("resume/download",
+                .andDo(document("resume/download/$versionId",
                         pathParameters(parameterWithName("userId").description("Resume identification")),
                         requestHeaders(headerWithName("X-Auth-Token")
                                 .description("Authentication token retrieved from the authentication"))
                 ))
-                .andReturn()
-
     }
 
     @ParameterizedTest(name = "{index} => API Version: {0}")
@@ -142,7 +142,7 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
                 .header("X-Auth-Token", token))
                 .andExpect(status().isOk)
                 .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode", Matchers.equalTo(ResultCodes.FATAL_ERROR.toString())))
-                .andDo(document("resume/download-error",
+                .andDo(document("resume/download-error/$versionId",
                         pathParameters(parameterWithName("userId").description("Resume identification")),
                         requestHeaders(headerWithName("X-Auth-Token")
                                 .description("Authentication token retrieved from the authentication")),
@@ -151,7 +151,6 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
                                 fieldWithPath("message").description("Message associated with the result code")
                         )
                 ))
-                .andReturn().getResponse()
     }
 
     @ParameterizedTest(name = "{index} => API Version: {0}")
@@ -162,7 +161,7 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
                 .header("X-Auth-Token", token))
                 .andExpect(status().is4xxClientError)
                 .andExpect(jsonPath("$.resultCode", Matchers.equalTo(ResultCodes.JOB_NOT_FOUND.toString())))
-                .andDo(document("resume/match-job-not-found/v1",
+                .andDo(document("resume/match-job-not-found/$versionId",
                         requestHeaders(headerWithName("X-Auth-Token")
                                 .description("Authentication token retrieved from the authentication")),
                         pathParameters(
@@ -171,6 +170,31 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
                         responseFields(
                                 fieldWithPath("resultCode").type(ResultCodes::class.java).description("Result code"),
                                 fieldWithPath("message").description("Message associated with the result code")
+                        )
+                ))
+    }
+
+    @ParameterizedTest(name = "{index} => API Version: {0}")
+    @ValueSource(strings = ["v1", "v2"])
+    @Throws(Exception::class)
+    fun `when matching resumes with a job that has no matches, it returns all and empty list of resumes`(versionId: String) {
+        jobRepository.save(Job("job-id", "title", "description", emptyMetaData(), emptyMetaData()))
+
+        mvc.perform(get("/api/$versionId/resume/match/{jobId}", "job-id")
+                .header("X-Auth-Token", token))
+                .andExpect(jsonPath("$.resultCode", Matchers.equalTo(ResultCodes.SUCCESS.toString())))
+                .andExpect(jsonPath("$.resumes.naiveBayes.*", Matchers.hasSize<Map<String, Resume>>(0)))
+                .andDo(document("resume/match-no-resumes-job-id/$versionId",
+                        requestHeaders(headerWithName("X-Auth-Token")
+                                .description("Authentication token retrieved from the authentication")),
+                        pathParameters(
+                                parameterWithName("jobId").description("Job Identifier to retrieve the Resumes that match the job")
+                        ),
+                        responseFields(
+                                fieldWithPath("resultCode").type(ResultCodes::class.java).description("Result code"),
+                                fieldWithPath("message").description("Message associated with the result code"),
+                                subsectionWithPath("resumes").description("Hash with Naive Bayes results"),
+                                fieldWithPath("resumes.naiveBayes").description("Empty list")
                         )
                 ))
     }
@@ -207,7 +231,7 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
                 .andExpect(jsonPath("$.resumes.naiveBayes[0].stars", Matchers.equalTo(1.0)))
                 .andExpect(jsonPath("$.resumes.naiveBayes[1].userId", Matchers.equalTo("resume-1")))
                 .andExpect(jsonPath("$.resumes.naiveBayes[1].stars", Matchers.equalTo(.1)))
-                .andDo(document("resume/match-job-not-found/v1",
+                .andDo(document("resume/multiple-match-resumes-job-id/$versionId",
                         requestHeaders(headerWithName("X-Auth-Token")
                                 .description("Authentication token retrieved from the authentication")),
                         pathParameters(
@@ -258,6 +282,10 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
                 .andDo(document("resume/compare-job-not-found/$versionId",
                         requestHeaders(headerWithName("X-Auth-Token")
                                 .description("Authentication token retrieved from the authentication")),
+                        pathParameters(
+                                parameterWithName("resumeId").description("Resume Identifier to compare against the Job"),
+                                parameterWithName("jobId").description("Job Identifier compare against the Resume")
+                        ),
                         responseFields(
                                 fieldWithPath("resultCode").type(ResultCodes::class.java).description("Result code"),
                                 fieldWithPath("message").description("Message associated with the result code")
@@ -281,6 +309,10 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
                 .andDo(document("resume/compare-resume-not-found/$versionId",
                         requestHeaders(headerWithName("X-Auth-Token")
                                 .description("Authentication token retrieved from the authentication")),
+                        pathParameters(
+                                parameterWithName("resumeId").description("Resume Identifier to compare against the Job"),
+                                parameterWithName("jobId").description("Job Identifier compare against the Resume")
+                        ),
                         responseFields(
                                 fieldWithPath("resultCode").type(ResultCodes::class.java).description("Result code"),
                                 fieldWithPath("message").description("Message associated with the result code")
@@ -306,6 +338,10 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
                 .andDo(document("resume/compare-success/$versionId",
                         requestHeaders(headerWithName("X-Auth-Token")
                                 .description("Authentication token retrieved from the authentication")),
+                        pathParameters(
+                                parameterWithName("resumeId").description("Resume Identifier to compare against the Job"),
+                                parameterWithName("jobId").description("Job Identifier compare against the Resume")
+                        ),
                         responseFields(
                                 fieldWithPath("resultCode").type(ResultCodes::class.java).description("Result code"),
                                 fieldWithPath("message").description("Message associated with the result code"),
