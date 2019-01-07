@@ -1,7 +1,6 @@
 package org.metplus.cruncher.web.controller
 
 import org.hamcrest.Matchers
-import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
@@ -235,12 +234,83 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                 .andExpect(jsonPath("$.resultCode", Matchers.equalTo(ResultCodes.SUCCESS.toString())))
                 .andExpect(jsonPath("$.message", Matchers.equalTo("Going to reindex 2 resumes")))
-                .andDo(document("job/match-not-found/$versionId",
+                .andDo(document("resume/reindex/$versionId",
                         requestHeaders(headerWithName("X-Auth-Token")
                                 .description("Authentication token retrieved from the authentication")),
                         responseFields(
                                 fieldWithPath("resultCode").type(ResultCodes::class.java).description("Result code"),
                                 fieldWithPath("message").description("Message associated with the result code")
+                        )
+                ))
+    }
+
+    @ParameterizedTest(name = "{index} => API Version: {0}")
+    @ValueSource(strings = ["v1", "v2"])
+    fun `when comparing a job that does not exist with a resume, it returns an error`(versionId: String) {
+        mvc.perform(get("/api/$versionId/resume/{resumeId}/compare/{jobId}", "someResumeId", "notFound")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .header("X-Auth-Token", token))
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
+                .andExpect(jsonPath("$.resultCode", Matchers.equalTo(ResultCodes.JOB_NOT_FOUND.toString())))
+                .andExpect(jsonPath("$.message", Matchers.equalTo("Job notFound was not found")))
+                .andDo(document("resume/compare-job-not-found/$versionId",
+                        requestHeaders(headerWithName("X-Auth-Token")
+                                .description("Authentication token retrieved from the authentication")),
+                        responseFields(
+                                fieldWithPath("resultCode").type(ResultCodes::class.java).description("Result code"),
+                                fieldWithPath("message").description("Message associated with the result code")
+                        )
+                ))
+    }
+
+    @ParameterizedTest(name = "{index} => API Version: {0}")
+    @ValueSource(strings = ["v1", "v2"])
+    fun `when comparing a resume that does not exist with a job, it returns an error`(versionId: String) {
+        jobRepository.save(Job("job-id", "some title", "some description", emptyMetaData(), emptyMetaData()))
+
+        mvc.perform(get("/api/$versionId/resume/{resumeId}/compare/{jobId}", "notFound", "job-id")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .header("X-Auth-Token", token))
+                .andExpect(status().isNotFound)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
+                .andExpect(jsonPath("$.resultCode", Matchers.equalTo(ResultCodes.RESUME_NOT_FOUND.toString())))
+                .andExpect(jsonPath("$.message", Matchers.equalTo("Resume notFound was not found")))
+                .andDo(document("resume/compare-resume-not-found/$versionId",
+                        requestHeaders(headerWithName("X-Auth-Token")
+                                .description("Authentication token retrieved from the authentication")),
+                        responseFields(
+                                fieldWithPath("resultCode").type(ResultCodes::class.java).description("Result code"),
+                                fieldWithPath("message").description("Message associated with the result code")
+                        )
+                ))
+    }
+
+    @ParameterizedTest(name = "{index} => API Version: {0}")
+    @ValueSource(strings = ["v1", "v2"])
+    fun `when comparing a job with a resume, it returns the amount of star`(versionId: String) {
+        jobRepository.save(Job("job-id", "some title", "some description", emptyMetaData(), emptyMetaData()))
+        resumeRepository.save(Resume("filename", "resume-id", "pdf", emptyMetaData()))
+        (matcher as MatcherStub).similarityRatingReturnValue = 1.5
+
+        mvc.perform(get("/api/$versionId/resume/{resumeId}/compare/{jobId}", "resume-id", "job-id")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .header("X-Auth-Token", token))
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
+                .andExpect(jsonPath("$.resultCode", Matchers.equalTo(ResultCodes.SUCCESS.toString())))
+                .andExpect(jsonPath("$.stars.naiveBayes", Matchers.equalTo(1.5)))
+                .andDo(document("resume/compare-success/$versionId",
+                        requestHeaders(headerWithName("X-Auth-Token")
+                                .description("Authentication token retrieved from the authentication")),
+                        responseFields(
+                                fieldWithPath("resultCode").type(ResultCodes::class.java).description("Result code"),
+                                fieldWithPath("message").description("Message associated with the result code"),
+                                subsectionWithPath("stars").description("Hash with the star rating per cruncher"),
+                                subsectionWithPath("stars.naiveBayes").description("Star rating for naive bayes cruncher")
                         )
                 ))
     }
