@@ -18,6 +18,7 @@ import org.metplus.cruncher.persistence.model.ResumeRepositoryImpl
 import org.metplus.cruncher.persistence.model.ResumeRepositoryMongo
 import org.metplus.cruncher.persistence.model.SettingsRepositoryImpl
 import org.metplus.cruncher.persistence.model.SettingsRepositoryMongo
+import org.metplus.cruncher.rating.CompareResumeWithJob
 import org.metplus.cruncher.rating.CrunchJobProcess
 import org.metplus.cruncher.rating.CrunchResumeProcess
 import org.metplus.cruncher.rating.CruncherList
@@ -177,6 +178,14 @@ open class ApplicationConfiguration {
             @Autowired cruncherImpl: CruncherImpl,
             @Autowired cruncherConfiguration: CruncherConfiguration
     ) = TrainCruncher(settingsRepository, cruncherImpl, cruncherConfiguration.cruncherSettings)
+
+
+    @Bean
+    open fun compareResumeWithJob(
+            jobsRepository: JobsRepository,
+            resumeRepository: ResumeRepository,
+            matcher: Matcher<Resume, Job>
+    ) = CompareResumeWithJob(jobsRepository, resumeRepository, matcher)
 }
 
 @Configuration
