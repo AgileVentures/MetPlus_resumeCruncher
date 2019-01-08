@@ -63,3 +63,7 @@ subprojects{
         useJUnitPlatform()
     }
 }
+
+task stage{
+  dependsOn(project(":web").build)
+}
