@@ -6,6 +6,7 @@ import com.mongodb.MongoCredential
 import com.mongodb.ServerAddress
 import com.mongodb.WriteConcern
 import org.metplus.cruncher.canned.job.MatchWithResumeCanned
+import org.metplus.cruncher.canned.resume.MatchWithJobCanned
 import org.metplus.cruncher.job.CreateJob
 import org.metplus.cruncher.job.Job
 import org.metplus.cruncher.job.JobsRepository
@@ -144,6 +145,10 @@ open class ApplicationConfiguration {
                           @Autowired jobsRepository: JobsRepository,
                           @Autowired matcher: Matcher<Resume, Job>
     ): MatchWithJob = MatchWithJob(resumeRepository, jobsRepository, matcher)
+
+    @Bean
+    open fun matchWithJobCanned(@Autowired resumeRepository: ResumeRepository
+    ): MatchWithJobCanned = MatchWithJobCanned(resumeRepository)
 
     @Bean
     open fun allCrunchers(
