@@ -6,6 +6,7 @@ import com.mongodb.MongoCredential
 import com.mongodb.ServerAddress
 import com.mongodb.WriteConcern
 import org.metplus.cruncher.canned.job.MatchWithResumeCanned
+import org.metplus.cruncher.canned.rating.CompareResumeWithJobCanned
 import org.metplus.cruncher.canned.resume.MatchWithJobCanned
 import org.metplus.cruncher.job.CreateJob
 import org.metplus.cruncher.job.Job
@@ -188,13 +189,17 @@ open class ApplicationConfiguration {
             @Autowired cruncherConfiguration: CruncherConfiguration
     ) = TrainCruncher(settingsRepository, cruncherImpl, cruncherConfiguration.cruncherSettings)
 
-
     @Bean
     open fun compareResumeWithJob(
             jobsRepository: JobsRepository,
             resumeRepository: ResumeRepository,
             matcher: Matcher<Resume, Job>
     ) = CompareResumeWithJob(jobsRepository, resumeRepository, matcher)
+
+    @Bean
+    open fun compareResumeWithJobCanned(
+            compareResumeWithJob: CompareResumeWithJob
+    ) = CompareResumeWithJobCanned(compareResumeWithJob)
 }
 
 @Configuration
