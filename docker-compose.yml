@@ -22,5 +22,6 @@ services:
     environment:
       - PORT=8080
       - MONGOLAB_URI=mongodb://cruncher_user:cruncher_password@db:27017/resumeCruncher
+      - MONGODB_URI=mongodb://cruncher_user:cruncher_password@db:27017/resumeCruncher
       - APP_USERNAME=cruncher_user
       - APP_PASSWORD=cruncher_password
