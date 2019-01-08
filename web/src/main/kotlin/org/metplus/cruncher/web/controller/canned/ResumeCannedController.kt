@@ -1,10 +1,8 @@
-package org.metplus.cruncher.web.controller
+package org.metplus.cruncher.web.controller.canned
 
-import org.metplus.cruncher.rating.CompareResumeWithJob
-import org.metplus.cruncher.rating.CompareResumeWithJobObserver
+import org.metplus.cruncher.canned.resume.MatchWithJobCanned
 import org.metplus.cruncher.resume.DownloadResume
 import org.metplus.cruncher.resume.DownloadResumeObserver
-import org.metplus.cruncher.resume.MatchWithJob
 import org.metplus.cruncher.resume.MatchWithJobObserver
 import org.metplus.cruncher.resume.ReCrunchAllResumes
 import org.metplus.cruncher.resume.ReCrunchAllResumesObserver
@@ -12,6 +10,11 @@ import org.metplus.cruncher.resume.Resume
 import org.metplus.cruncher.resume.ResumeFile
 import org.metplus.cruncher.resume.UploadResume
 import org.metplus.cruncher.resume.UploadResumeObserver
+import org.metplus.cruncher.web.controller.CruncherResponse
+import org.metplus.cruncher.web.controller.ResultCodes
+import org.metplus.cruncher.web.controller.ResumeAnswer
+import org.metplus.cruncher.web.controller.ResumeMatchedAnswer
+import org.metplus.cruncher.web.controller.toResumeAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -29,17 +32,14 @@ import javax.servlet.http.HttpServletResponse
 
 @RestController
 @RequestMapping(value = [
-    "/api/v1/resume",
-    "/api/v2/resume"
+    "/api/v99999/resume"
 ])
-class ResumeController(
+class ResumeCannedController (
         @Autowired private val uploadResume: UploadResume,
         @Autowired private val downloadResume: DownloadResume,
-        @Autowired private val matchWithJob: MatchWithJob,
-        @Autowired private val reCrunchAllResumes: ReCrunchAllResumes,
-        @Autowired private val compareResumeWithJob: CompareResumeWithJob
+        @Autowired private val matchWithJob: MatchWithJobCanned,
+        @Autowired private val reCrunchAllResumes: ReCrunchAllResumes
 ) {
-
     @PostMapping("upload")
     @ResponseBody
     fun uploadResumeEndpoint(@RequestParam("userId") id: String,
@@ -136,31 +136,6 @@ class ResumeController(
         })
     }
 
-    @GetMapping("{resumeId}/compare/{jobId}")
-    @ResponseBody
-    fun compare(@PathVariable("resumeId") resumeId: String, @PathVariable("jobId") jobId: String): ResponseEntity<CruncherResponse> {
-        return compareResumeWithJob.process(resumeId, jobId, object : CompareResumeWithJobObserver<ResponseEntity<CruncherResponse>> {
-            override fun onJobNotFound(jobId: String): ResponseEntity<CruncherResponse> {
-                return ResponseEntity.ok(CruncherResponse(
-                        resultCode = ResultCodes.JOB_NOT_FOUND,
-                        message = "Job $jobId was not found"))
-            }
-
-            override fun onResumeNotFound(resumeId: String): ResponseEntity<CruncherResponse> {
-                return ResponseEntity(CruncherResponse(
-                        resultCode = ResultCodes.RESUME_NOT_FOUND,
-                        message = "Resume $resumeId was not found"), HttpStatus.NOT_FOUND)
-            }
-
-            override fun onSuccess(starsRating: Double): ResponseEntity<CruncherResponse> {
-                return ResponseEntity.ok(ComparisonMatchAnswer(
-                        message = "Job and Resume match",
-                        stars = mapOf("naiveBayes" to starsRating)
-                ))
-            }
-        })
-    }
-
     @GetMapping("/reindex")
     @ResponseBody
     fun reindex(): CruncherResponse {
@@ -174,34 +149,3 @@ class ResumeController(
         })
     }
 }
-
-fun Resume.toResumeAnswer(): ResumeAnswer {
-    return ResumeAnswer(
-            filename,
-            userId,
-            fileType,
-            starRating
-    )
-}
-
-class ResumeMatchedAnswer(
-        resultCode: ResultCodes,
-        message: String,
-        val resumes: Map<String, List<ResumeAnswer>>
-) : CruncherResponse(
-        resultCode,
-        message)
-
-data class ResumeAnswer(
-        val filename: String,
-        val userId: String,
-        val fileType: String,
-        val stars: Double
-)
-
-class ComparisonMatchAnswer(
-        message: String,
-        val stars: Map<String, Double>
-) : CruncherResponse(
-        ResultCodes.SUCCESS,
-        message)
