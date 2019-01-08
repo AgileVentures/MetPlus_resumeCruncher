@@ -5,7 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/v1/admin/settings")
+@RequestMapping(
+        "/api/v1/admin/settings",
+        "/api/v2/admin/settings",
+        "/api/v99999/admin/settings"
+)
 class SettingsController(
         @Autowired private var getSettings: GetSettings,
         @Autowired private var saveSettings: SaveSettings

@@ -1,5 +1,6 @@
-package org.metplus.cruncher.web.controller
+package org.metplus.cruncher.web.controller.canned
 
+import org.metplus.cruncher.canned.job.MatchWithResumeCanned
 import org.metplus.cruncher.job.CreateJob
 import org.metplus.cruncher.job.CreateJobObserver
 import org.metplus.cruncher.job.Job
@@ -10,6 +11,10 @@ import org.metplus.cruncher.job.ReCrunchAllJobsObserver
 import org.metplus.cruncher.job.UpdateJob
 import org.metplus.cruncher.job.UpdateJobObserver
 import org.metplus.cruncher.rating.CruncherMetaData
+import org.metplus.cruncher.web.controller.CruncherResponse
+import org.metplus.cruncher.web.controller.JobsMatchedAnswer
+import org.metplus.cruncher.web.controller.ResultCodes
+import org.metplus.cruncher.web.controller.toJobAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -22,16 +27,14 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping(value = [
-    "/api/v1/job",
-    "/api/v2/job"
+    "/api/v99999/job"
 ])
-class JobController(
+class JobCannedController(
         @Autowired private val createJob: CreateJob,
         @Autowired private val updateJob: UpdateJob,
-        @Autowired private val matchWithResume: MatchWithResume,
+        @Autowired private val matchWithResume: MatchWithResumeCanned,
         @Autowired private val reCrunchAllJobs: ReCrunchAllJobs
 ) {
-
     @PostMapping("create")
     @ResponseBody
     fun create(@RequestParam("jobId") id: String,
@@ -111,7 +114,7 @@ class JobController(
     @GetMapping("reindex")
     @ResponseBody
     fun reindex(): CruncherResponse {
-        return reCrunchAllJobs.process(object :ReCrunchAllJobsObserver<CruncherResponse>{
+        return reCrunchAllJobs.process(object : ReCrunchAllJobsObserver<CruncherResponse> {
             override fun onSuccess(numberScheduled: Int): CruncherResponse {
                 return CruncherResponse(
                         resultCode = ResultCodes.SUCCESS,
@@ -122,27 +125,3 @@ class JobController(
         })
     }
 }
-
-fun Job.toJobAnswer(): JobAnswer {
-    return JobAnswer(
-            id,
-            title,
-            description,
-            starRating
-    )
-}
-
-class JobsMatchedAnswer(
-        resultCode: ResultCodes,
-        message: String,
-        val jobs: Map<String, List<JobAnswer>>
-) : CruncherResponse(
-        resultCode,
-        message)
-
-data class JobAnswer(
-        val id: String,
-        val title: String,
-        val description: String,
-        val stars: Double
-)

@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping(value = [
     "/api/v1",
-    "/api/v2"
+    "/api/v2",
+    "/api/v99999"
 ])
 class AuthenticationController {
 
