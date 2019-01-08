@@ -1,0 +1,23 @@
+language: java
+jdk:
+  - oraclejdk8
+os:
+  - linux
+services:
+  - mongodb
+env:
+  global:
+    - SPRING_PROFILES_ACTIVE="unit-database"
+before_install:
+  - mongo resumeCruncher --eval 'db.createUser({user:"testing_user",pwd:"testing_user",roles:["readWrite"]});'
+  - chmod +x gradlew
+install: "./gradlew :web:assemble"
+before_cache:
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+cache:
+  directories:
+    - "$HOME/.gradle/caches/"
+    - "$HOME/.gradle/wrapper/"
+notifications:
+  slack:
+    secure: mh9wbK5q5Sb2tB6WqHJrLadlweqZn2pspCIipn2ecVfmlXiL9xCxRH8nXNvEEIfaRquQv3ak/l6RH2qYm0auyS6mhDKK/IKUDgRTIBCSfTyr9dSRaHVjD+YT3ZLFfdr5RJc3wbEyC8hjuSU8Fih+OP8a3rjfj/8BxhRHS2Prgk7QcyW2E2W8IfmbkFYUmMDvDN6WQ3tf6wVf+lmOJenjZTSXw+YPys2LMlIFPAZubqhdO6rlUIxNJdtUxWJrkGINMvl7YQOHGf90hDZ7KAmA9h0WpdZnF1iGncYIjoTMgl7Xj1zjnggI1wx/+B0cqjIfNUfEaTa3YdFKhmN2wqhGqvKShjODUSd25O9KPPEHDGyAXPsqsrqVx4rj1217Fo2MbdglmwtxWqr/8IzMb44q/nBMVWlb89O+s3Xe1GpPyuMRwrUxP/dQXSGIONznyzbjYW5pPFcSDEg675CiYUZShqHka2zq/MGiY5PDxBpHsL7wqCpHoWG8NFbIO7MShiLq6h7fy1+T+p3h0lu3/8N8aqGgvEiPAwlySkEaYgw27l5QQx4mJZstB9Dt0Pd1BgTB19VenHl5gp5iNayb7RLs4y/Ufgso/P+YuM3kRi9vn5YmeAKV2RRNKSR7e8iyjekUBHvggulF2SCBpcJnlPoRQlDvoIT1HlC/73jTB567/4s=
