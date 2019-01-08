@@ -3,4 +3,5 @@ rootProject.name = 'org.metplus.cruncher'
 include 'core'
 include 'persistence'
 include 'web'
-include 'crunchers/naiveBayes'
+include 'naiveBayes'
+project(":naiveBayes").projectDir = file("crunchers/naiveBayes")
