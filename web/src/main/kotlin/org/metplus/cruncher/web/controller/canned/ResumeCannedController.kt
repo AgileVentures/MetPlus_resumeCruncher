@@ -1,6 +1,8 @@
 package org.metplus.cruncher.web.controller.canned
 
+import org.metplus.cruncher.canned.rating.CompareResumeWithJobCanned
 import org.metplus.cruncher.canned.resume.MatchWithJobCanned
+import org.metplus.cruncher.rating.CompareResumeWithJobObserver
 import org.metplus.cruncher.resume.DownloadResume
 import org.metplus.cruncher.resume.DownloadResumeObserver
 import org.metplus.cruncher.resume.MatchWithJobObserver
@@ -10,6 +12,7 @@ import org.metplus.cruncher.resume.Resume
 import org.metplus.cruncher.resume.ResumeFile
 import org.metplus.cruncher.resume.UploadResume
 import org.metplus.cruncher.resume.UploadResumeObserver
+import org.metplus.cruncher.web.controller.ComparisonMatchAnswer
 import org.metplus.cruncher.web.controller.CruncherResponse
 import org.metplus.cruncher.web.controller.ResultCodes
 import org.metplus.cruncher.web.controller.ResumeAnswer
@@ -38,7 +41,8 @@ class ResumeCannedController (
         @Autowired private val uploadResume: UploadResume,
         @Autowired private val downloadResume: DownloadResume,
         @Autowired private val matchWithJob: MatchWithJobCanned,
-        @Autowired private val reCrunchAllResumes: ReCrunchAllResumes
+        @Autowired private val reCrunchAllResumes: ReCrunchAllResumes,
+        @Autowired private val compareResumeWithJob: CompareResumeWithJobCanned
 ) {
     @PostMapping("upload")
     @ResponseBody
@@ -132,6 +136,31 @@ class ResumeCannedController (
                         message = "Job matches ${matchedResumes.size} resumes",
                         resumes = mapOf("naiveBayes" to matchedResumes.map { it.toResumeAnswer() })
                 ), HttpStatus.OK)
+            }
+        })
+    }
+
+    @GetMapping("{resumeId}/compare/{jobId}")
+    @ResponseBody
+    fun compare(@PathVariable("resumeId") resumeId: String, @PathVariable("jobId") jobId: String): ResponseEntity<CruncherResponse> {
+        return compareResumeWithJob.process(resumeId, jobId, object : CompareResumeWithJobObserver<ResponseEntity<CruncherResponse>> {
+            override fun onJobNotFound(jobId: String): ResponseEntity<CruncherResponse> {
+                return ResponseEntity.ok(CruncherResponse(
+                        resultCode = ResultCodes.JOB_NOT_FOUND,
+                        message = "Job $jobId was not found"))
+            }
+
+            override fun onResumeNotFound(resumeId: String): ResponseEntity<CruncherResponse> {
+                return ResponseEntity(CruncherResponse(
+                        resultCode = ResultCodes.RESUME_NOT_FOUND,
+                        message = "Resume $resumeId was not found"), HttpStatus.NOT_FOUND)
+            }
+
+            override fun onSuccess(starsRating: Double): ResponseEntity<CruncherResponse> {
+                return ResponseEntity.ok(ComparisonMatchAnswer(
+                        message = "Job and Resume match",
+                        stars = mapOf("naiveBayes" to starsRating)
+                ))
             }
         })
     }
