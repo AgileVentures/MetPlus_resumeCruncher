@@ -191,6 +191,9 @@ naive-bayes:
 
 spring:
   profiles: development
+  data:
+    mongodb:
+      uri: mongodb://testing_user:testing_user@localhost:27017/resumeCruncher
 
 logging.level.org.metplus: DEBUG
 
@@ -201,13 +204,6 @@ backend:
   admin:
     username: backend_admin
     password: backendpassword
-
-database-pets:
-  username: testing_user
-  password: testing_user
-  name: resumeCruncher
-  host: localhost
-  port: 27017
 
 
 ---
