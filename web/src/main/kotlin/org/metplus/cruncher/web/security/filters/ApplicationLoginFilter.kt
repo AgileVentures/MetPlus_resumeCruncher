@@ -27,6 +27,7 @@ class ApplicationLoginFilter(@field:Autowired
         } else {
             logger.info("Invalid credentials on request from '{}'", request.remoteAddr)
             response!!.status = 401
+            response.outputStream.print("{\"error\": \"the username `${username}` and password provided do not match\"}")
         }
         return false
     }
