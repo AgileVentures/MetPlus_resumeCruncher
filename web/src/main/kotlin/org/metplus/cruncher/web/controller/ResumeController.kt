@@ -121,7 +121,7 @@ class ResumeController(
             override fun noMatchFound(jobId: String): ResponseEntity<CruncherResponse> {
                 return ResponseEntity(ResumeMatchedAnswer(
                         resultCode = ResultCodes.SUCCESS,
-                        message = "Job with id '$jobId' was not matches",
+                        message = "Job with id '$jobId' has no matches",
                         resumes = mapOf("naiveBayes" to emptyList<ResumeAnswer>())
                 ), HttpStatus.OK)
             }
