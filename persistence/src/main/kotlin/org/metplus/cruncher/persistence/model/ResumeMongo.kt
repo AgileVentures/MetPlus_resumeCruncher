@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Field
 @Document
 @TypeAlias("resume")
 data class ResumeMongo(
-        @Field("jobId")
+        @Field("id")
         @Id val id: String,
         @Field
         var filename: String,
