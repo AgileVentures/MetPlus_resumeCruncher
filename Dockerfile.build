@@ -1,0 +1,12 @@
+FROM openjdk:8-jdk as builder
+RUN mkdir -p /cruncher/app
+WORKDIR /cruncher
+COPY . /cruncher/app
+RUN cd /cruncher/app && ./gradlew stage
+RUN mv /cruncher/app/app/build/libs/app.jar /cruncher/cruncher.jar
+
+FROM openjdk:8u181-jre-alpine3.8
+RUN mkdir /cruncher/
+COPY --from=builder /cruncher/app/launch_cruncher.sh /cruncher/
+COPY --from=builder /cruncher/cruncher.jar /cruncher/
+CMD /cruncher/launch_cruncher.sh

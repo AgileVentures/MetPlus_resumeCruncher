@@ -10,7 +10,11 @@ services:
       # if you wish to setup additional user accounts specific per DB or with different roles you can use following entry point
       - "$PWD/mongo-entrypoint/:/docker-entrypoint-initdb.d/"
   cruncher:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.build
+      args:
+        buildno: 1
     volumes:
       - .:/tmp/cruncher
     ports:
