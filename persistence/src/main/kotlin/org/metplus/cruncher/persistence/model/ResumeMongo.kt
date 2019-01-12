@@ -5,8 +5,7 @@ import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 
-@Document
-@TypeAlias("resume")
+@Document(collection = "resume")
 data class ResumeMongo(
         @Field("id")
         @Id val id: String,
