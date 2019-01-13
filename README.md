@@ -53,6 +53,22 @@ To accomplish that connect to the Mongo instance using mongo CLI or a a visual a
  db.createUser({user: 'testing_user', pwd: 'testing_user', roles: [{role: 'readWrite', db: 'resumeCruncher'}]});
 ```
 
+# Use Docker to standup mongo and the application in 2 steps
+
+It is possible to use docker compose to start a mongo db instance and the application with the current code base. The steps to do it are the following:
+
+1 - Create the container images
+```bash
+docker-compose build
+```
+
+2 - Run the application
+```bash
+docker-compose up
+```
+
+This will instantiate the mongo DB in the local port `27017` and the application will be listening in port `8080`. If you changed something in the code base and want it reflected you need to re-execute both the command above.
+
 # Configuration files
 
 - app/src/main/resources/application.yml
