@@ -151,8 +151,8 @@ In this section it is possible to change the username and password used to conne
 ```
 backend:
   admin:
-    username: backend_admin     # Username that should be provided in the HTTP parameter X-Auth-Username
-    password: backendpassword   # Password that should be provided in the HTTP parameter X-Auth-Password 
+    username: cruncher_user       # Username that should be provided in the HTTP parameter X-Auth-Username
+    password: cruncher_password   # Password that should be provided in the HTTP parameter X-Auth-Password
 ```
 
 ### Cunchers default configuration
@@ -215,8 +215,8 @@ To start you need to authenticate:
 ```
 POST /api/v1/authenticate HTTP/1.1
 Accept: application/json
-X-Auth-Username: backend_admin
-X-Auth-Password: backendpassword
+X-Auth-Username: cruncher_user
+X-Auth-Password: cruncher_password
 Host: localhost
 ```
 

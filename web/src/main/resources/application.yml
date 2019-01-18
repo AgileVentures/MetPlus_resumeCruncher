@@ -198,12 +198,12 @@ spring:
 logging.level.org.metplus: DEBUG
 
 server:
-  port: 8443
+  port: 8080
 
 backend:
   admin:
-    username: backend_admin
-    password: backendpassword
+    username: cruncher_user
+    password: cruncher_password
 
 
 ---
