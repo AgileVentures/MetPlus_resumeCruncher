@@ -1,7 +1,6 @@
 package org.metplus.curriculum.cruncher.naivebayes
 
 import de.daslaboratorium.machinelearning.classifier.Classification
-import de.daslaboratorium.machinelearning.classifier.bayes.BayesClassifier
 import org.metplus.cruncher.rating.Cruncher
 import org.metplus.cruncher.rating.CruncherMetaData
 import org.slf4j.LoggerFactory
@@ -12,7 +11,7 @@ class CruncherImpl(
 ) : Cruncher {
     private val logger = LoggerFactory.getLogger(CruncherImpl::class.java)
     private val name = "NaiveBayes"
-    val classifier = BayesClassifier<String, String>()
+    val classifier = BayesClassifierWithSmoothing<String, String>()
 
     override fun crunch(data: String): CruncherMetaData {
         logger.trace("crunch($data)")
@@ -82,8 +81,17 @@ class CruncherImpl(
         for (expression in newText.split("\\s".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()) {
             if (expression.trim { it <= ' ' }.isEmpty())
                 continue
-            val token = expression.replace("@@@@".toRegex(), " ").replace("[^a-z0-9 ]".toRegex(), "")
-            if (token.trim { it <= ' ' }.isEmpty())
+            var token = expression.replace("@@@@".toRegex(), " ").replace("[^a-z0-9 ]".toRegex(), "")
+            token = token.trim { it <= ' ' }
+            var number = false
+            try {
+                token.toLong()
+                number = true
+
+            } catch (_: NumberFormatException) {
+
+            }
+            if (token.isEmpty() || token.length == 1 || number)
                 continue
             result.add(token)
         }

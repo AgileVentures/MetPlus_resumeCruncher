@@ -180,7 +180,7 @@ open class ApplicationConfiguration {
     open fun matcher(): Matcher<Resume, Job> = MatcherImpl()
 
     @Bean
-    open fun naiveBayesImpl() = CruncherImpl()
+    open fun naiveBayesImpl(@Autowired cruncherConfiguration: CruncherConfiguration) = CruncherImpl(cruncherConfiguration.cleanExpressions)
 
     @Bean
     open fun cruncherTrainer(
