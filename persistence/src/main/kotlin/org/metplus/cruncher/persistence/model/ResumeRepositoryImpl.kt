@@ -22,7 +22,7 @@ class ResumeRepositoryImpl(
 
 private fun ResumeMongo.toResume(): Resume {
     val data = mutableMapOf<String, Double>()
-    cruncherData.dataFields.forEach {
+    cruncherData?.dataFields?.forEach {
         data[it.key] = it.value.data as Double
     }
 
