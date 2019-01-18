@@ -11,7 +11,7 @@ class JobMongo(
         @Field("jobId")
         @Id val id: String,
         val title: String,
-        val titleMetadata: CruncherMetaData,
+        val titleMetadata: CruncherMetaData?,
         val description: String,
-        val descriptionMetadata: CruncherMetaData
+        val descriptionMetadata: CruncherMetaData?
 )
