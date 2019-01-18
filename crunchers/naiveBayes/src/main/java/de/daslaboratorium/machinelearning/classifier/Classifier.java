@@ -1,6 +1,7 @@
 package de.daslaboratorium.machinelearning.classifier;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -254,6 +255,19 @@ public abstract class Classifier<T, K> implements IFeatureProbability<T, K> {
             return 0;
         Integer count = features.get(feature);
         return (count == null) ? 0 : count.intValue();
+    }
+
+    public int featureCount(T feature) {
+        int total = 0;
+        for(Dictionary<T, Integer> a : Collections.list(this.featureCountPerCategory.elements())) {
+            try {
+                int totalInCategory = a.get(feature);
+                total += totalInCategory;
+            } catch(NullPointerException p) {
+
+            }
+        }
+        return total;
     }
 
     /**
