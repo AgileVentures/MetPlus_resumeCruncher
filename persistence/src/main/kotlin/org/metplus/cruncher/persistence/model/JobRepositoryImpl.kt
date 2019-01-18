@@ -2,6 +2,7 @@ package org.metplus.cruncher.persistence.model
 
 import org.metplus.cruncher.job.Job
 import org.metplus.cruncher.job.JobsRepository
+import org.metplus.cruncher.rating.CruncherMetaData
 
 class JobRepositoryImpl(
         private val jobRepository: JobRepositoryMongo
@@ -20,12 +21,14 @@ class JobRepositoryImpl(
 }
 
 private fun JobMongo.toJob(): Job {
+    val titledata = titleMetadata ?: CruncherMetaData(mutableMapOf())
+    val descdata = titleMetadata ?: CruncherMetaData(mutableMapOf())
     return Job(
             id = id,
             title = title,
-            titleMetaData = titleMetadata,
+            titleMetaData = titledata,
             description = description,
-            descriptionMetaData = descriptionMetadata
+            descriptionMetaData = descdata
     )
 }
 
