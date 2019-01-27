@@ -12,7 +12,7 @@ interface Cruncher {
 }
 
 open class CruncherList(
-    private var allCrunchers: List<Cruncher> = mutableListOf()
+        private var allCrunchers: List<Cruncher> = mutableListOf()
 ) {
     fun getCrunchers(): List<Cruncher> {
         return allCrunchers
@@ -20,9 +20,9 @@ open class CruncherList(
 }
 
 open class MatcherList(
-        private var allMatchers: List<Matcher<*,*>> = mutableListOf()
+        private var allMatchers: List<Matcher<*, *>> = mutableListOf()
 ) {
-    fun getMatchers(): List<Matcher<*,*>> {
+    fun getMatchers(): List<Matcher<*, *>> {
         return allMatchers
     }
 }

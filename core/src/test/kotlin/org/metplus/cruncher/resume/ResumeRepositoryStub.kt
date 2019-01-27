@@ -6,7 +6,7 @@ class ResumeRepositoryStub : ResumeRepository {
     var throwOnSave: Exception? = null
 
     override fun save(resume: Resume): Resume {
-        if(throwOnSave != null)
+        if (throwOnSave != null)
             throw(throwOnSave!!)
 
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.

@@ -1,9 +1,9 @@
 package org.metplus.cruncher.utilities
 
 import org.apache.tika.exception.TikaException
+import org.apache.tika.metadata.Metadata
 import org.apache.tika.parser.AutoDetectParser
 import org.apache.tika.sax.BodyContentHandler
-import org.apache.tika.metadata.Metadata
 import org.metplus.cruncher.error.DocumentParseException
 import org.slf4j.LoggerFactory
 import org.xml.sax.SAXException

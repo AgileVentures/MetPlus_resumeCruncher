@@ -56,6 +56,7 @@ abstract class ResumeRepositoryTest {
 
         assertThat(afterSave).isNull()
     }
+
     @Test
     fun `when retrieving all resumes and 2 resumes are present, it return an array with the 2`() {
         val resume1 = Resume(
