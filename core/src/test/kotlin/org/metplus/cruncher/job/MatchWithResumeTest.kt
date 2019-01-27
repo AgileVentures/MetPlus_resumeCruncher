@@ -60,8 +60,8 @@ internal class MatchWithResumeTest {
                 "jobId",
                 "job title",
                 "job description",
-                emptyMetaData(),
-                emptyMetaData()
+                mapOf(),
+                mapOf()
         ))
 
         matcher.matchReturnValue = emptyList()
@@ -100,23 +100,23 @@ internal class MatchWithResumeTest {
                 "jobId",
                 "job title",
                 "job description",
-                emptyMetaData(),
-                emptyMetaData()
+                mapOf(),
+                mapOf()
         ))
         val job = Job(
                 "jobId1",
                 "some job title",
                 "some job description",
-                emptyMetaData(),
-                emptyMetaData()
+                mapOf(),
+                mapOf()
         )
         jobRepositoryFake.save(job)
         jobRepositoryFake.save(Job(
                 "jobId2",
                 "some other job title",
                 "some other job description",
-                emptyMetaData(),
-                emptyMetaData()
+                mapOf(),
+                mapOf()
         ))
 
         matcher.matchReturnValue = listOf(job.copy(starRating = 3.1))

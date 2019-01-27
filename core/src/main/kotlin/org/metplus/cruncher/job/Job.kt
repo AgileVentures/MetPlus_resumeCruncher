@@ -6,7 +6,7 @@ data class Job(
         val id: String,
         val title: String,
         val description: String,
-        val titleMetaData: CruncherMetaData,
-        val descriptionMetaData: CruncherMetaData,
+        val titleMetaData: Map<String, CruncherMetaData>,
+        val descriptionMetaData: Map<String, CruncherMetaData>,
         val starRating: Double = 0.0
 )

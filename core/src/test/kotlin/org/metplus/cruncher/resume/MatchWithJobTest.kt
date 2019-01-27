@@ -49,7 +49,7 @@ internal class MatchWithJobTest {
     @Test
     fun `when job exists but have no match, it calls noMatchFound callback with the job id provided`() {
         var wasCalledWith = ""
-        jobRepositoryFake.save(Job("some-job-id", "some title", "some description", emptyMetaData(), emptyMetaData()))
+        jobRepositoryFake.save(Job("some-job-id", "some title", "some description", mapOf(), mapOf()))
 
         matchWithJob.process("some-job-id", observer = object : MatchWithJobObserver<Boolean> {
             override fun success(matchedResumes: Map<String, List<Resume>>): Boolean {
@@ -74,7 +74,7 @@ internal class MatchWithJobTest {
     @Test
     fun `when job exists and matches two resumes, it calls success callback with the two matched resumes`() {
         var wasCalledWith = mapOf<String, List<Resume>>()
-        jobRepositoryFake.save(Job("some-job-id", "some title", "some description", emptyMetaData(), emptyMetaData()))
+        jobRepositoryFake.save(Job("some-job-id", "some title", "some description", mapOf(), mapOf()))
         val resume1 = Resume("some-file", "some-user-id", "pdf", mapOf())
         resumeRepositoryFake.save(resume1)
         resumeRepositoryFake.save(Resume("some-other-file", "yet-other-user-id", "pdf", mapOf()))

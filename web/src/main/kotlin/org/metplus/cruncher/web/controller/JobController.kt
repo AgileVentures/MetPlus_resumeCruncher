@@ -1,24 +1,8 @@
 package org.metplus.cruncher.web.controller
 
-import org.metplus.cruncher.job.CreateJob
-import org.metplus.cruncher.job.CreateJobObserver
-import org.metplus.cruncher.job.Job
-import org.metplus.cruncher.job.MatchWithResume
-import org.metplus.cruncher.job.MatchWithResumeObserver
-import org.metplus.cruncher.job.ReCrunchAllJobs
-import org.metplus.cruncher.job.ReCrunchAllJobsObserver
-import org.metplus.cruncher.job.UpdateJob
-import org.metplus.cruncher.job.UpdateJobObserver
-import org.metplus.cruncher.rating.CruncherMetaData
+import org.metplus.cruncher.job.*
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PatchMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping(value = [
@@ -38,7 +22,7 @@ class JobController(
                @RequestParam("title") title: String,
                @RequestParam("description") description: String): CruncherResponse {
         var cruncherResponse: CruncherResponse? = null
-        val jobToBeCreated = Job(id, title, description, CruncherMetaData(mutableMapOf()), CruncherMetaData(mutableMapOf()))
+        val jobToBeCreated = Job(id, title, description, mapOf(), mapOf())
         createJob.process(jobToBeCreated, observer = object : CreateJobObserver {
             override fun onSuccess(job: Job) {
                 cruncherResponse = CruncherResponse(ResultCodes.SUCCESS, "Job added successfully")
@@ -111,7 +95,7 @@ class JobController(
     @GetMapping("reindex")
     @ResponseBody
     fun reindex(): CruncherResponse {
-        return reCrunchAllJobs.process(object :ReCrunchAllJobsObserver<CruncherResponse>{
+        return reCrunchAllJobs.process(object : ReCrunchAllJobsObserver<CruncherResponse> {
             override fun onSuccess(numberScheduled: Int): CruncherResponse {
                 return CruncherResponse(
                         resultCode = ResultCodes.SUCCESS,

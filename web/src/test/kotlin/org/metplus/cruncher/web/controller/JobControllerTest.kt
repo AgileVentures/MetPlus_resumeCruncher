@@ -25,22 +25,14 @@ import org.springframework.http.MediaType
 import org.springframework.restdocs.headers.HeaderDocumentation.headerWithName
 import org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post
-import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
-import org.springframework.restdocs.payload.PayloadDocumentation.responseFields
-import org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath
-import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
-import org.springframework.restdocs.request.RequestDocumentation.pathParameters
-import org.springframework.restdocs.request.RequestDocumentation.requestParameters
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*
+import org.springframework.restdocs.payload.PayloadDocumentation.*
+import org.springframework.restdocs.request.RequestDocumentation.*
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActions
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [TestConfiguration::class, JobController::class], inheritLocations = true)
@@ -71,7 +63,7 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
     @ParameterizedTest(name = "{index} => API Version: {0}")
     @ValueSource(strings = ["v1", "v2"])
     fun `When a job exists, it returns error and do not update the values`(versionId: String) {
-        val job = Job("1", "some title", "some description", emptyMetaData(), emptyMetaData())
+        val job = Job("1", "some title", "some description", mapOf(), mapOf())
         jobsRepository.save(job)
 
         createNewJob(
@@ -100,7 +92,7 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
     @ParameterizedTest(name = "{index} => API Version: {0}")
     @ValueSource(strings = ["v1", "v2"])
     fun `when creating a job that does not exist, it returns success`(versionId: String) {
-        createNewJob(versionId, Job("Job Identifier to create", "Title of the job", "Description of the job", emptyMetaData(), emptyMetaData()))
+        createNewJob(versionId, Job("Job Identifier to create", "Title of the job", "Description of the job", mapOf(), mapOf()))
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                 .andExpect(jsonPath("$.resultCode", equalTo(ResultCodes.SUCCESS.toString())))
@@ -160,7 +152,7 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
     @ParameterizedTest(name = "{index} => API Version: {0}")
     @ValueSource(strings = ["v1", "v2"])
     fun `when update a job that exists, it returns success`(versionId: String) {
-        val job = Job("1", "My current title", "My current description", emptyMetaData(), emptyMetaData())
+        val job = Job("1", "My current title", "My current description", mapOf(), mapOf())
         jobsRepository.save(job)
 
         updateJob(versionId,
@@ -247,10 +239,10 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
                 "pdf",
                 mapOf("naiveBayes" to emptyMetaData())
         ))
-        val job = Job("1", "My current title", "My current description", emptyMetaData(), emptyMetaData())
+        val job = Job("1", "My current title", "My current description", mapOf(), mapOf())
         jobsRepository.save(job)
-        jobsRepository.save(Job("2", "My other current title", "My other current description", emptyMetaData(), emptyMetaData()))
-        jobsRepository.save(Job("3", "Another current title", "Another current description", emptyMetaData(), emptyMetaData()))
+        jobsRepository.save(Job("2", "My other current title", "My other current description", mapOf(), mapOf()))
+        jobsRepository.save(Job("3", "Another current title", "Another current description", mapOf(), mapOf()))
         (matcher as MatcherStub).matchReturnValue = listOf(job.copy(starRating = 3.1))
 
         matchJob(versionId, "1")
@@ -283,8 +275,8 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
     @ParameterizedTest(name = "{index} => API Version: {0}")
     @ValueSource(strings = ["v1", "v2"])
     fun `when reindexing jobs, it returns information about of jobs to be processed`(versionId: String) {
-        jobsRepository.save(Job("2", "My other current title", "My other current description", emptyMetaData(), emptyMetaData()))
-        jobsRepository.save(Job("3", "Another current title", "Another current description", emptyMetaData(), emptyMetaData()))
+        jobsRepository.save(Job("2", "My other current title", "My other current description", mapOf(), mapOf()))
+        jobsRepository.save(Job("3", "Another current title", "Another current description", mapOf(), mapOf()))
         mvc.perform(get("/api/$versionId/job/reindex")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.MULTIPART_FORM_DATA)

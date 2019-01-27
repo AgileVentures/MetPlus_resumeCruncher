@@ -24,8 +24,8 @@ internal class CreateJobTest {
                 "someid",
                 "some title",
                 "some description",
-                emptyMetaData(),
-                emptyMetaData())
+                mapOf(),
+                mapOf())
         var wasObserverCalled = false
 
         createJob.process(newJob, object : CreateJobObserver {
@@ -51,8 +51,8 @@ internal class CreateJobTest {
                 "someid",
                 "some title",
                 "some description",
-                emptyMetaData(),
-                emptyMetaData())
+                mapOf(),
+                mapOf())
         var wasObserverCalled = false
         jobsRepository.save(existingJob)
 
