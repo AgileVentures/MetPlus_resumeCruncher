@@ -21,8 +21,8 @@ class JobRepositoryImpl(
 }
 
 private fun JobMongo.toJob(): Job {
-    val titledata = titleMetadata ?: CruncherMetaData(mutableMapOf())
-    val descdata = titleMetadata ?: CruncherMetaData(mutableMapOf())
+    val titledata = titleMetadata ?: mutableMapOf()
+    val descdata = titleMetadata ?: mutableMapOf()
     return Job(
             id = id,
             title = title,
