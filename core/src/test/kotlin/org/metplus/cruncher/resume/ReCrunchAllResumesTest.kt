@@ -11,9 +11,9 @@ internal class ReCrunchAllResumesTest {
         val resumeRepository = ResumeRepositoryFake()
         val cruncherProcess = CrunchResumeProcessSpy()
 
-        resumeRepository.save(Resume("filename", "user-id", "pdf", emptyMetaData()))
-        resumeRepository.save(Resume("filename", "other-user-id", "pdf", emptyMetaData()))
-        resumeRepository.save(Resume("filename", "yet-other-user-id", "pdf", emptyMetaData()))
+        resumeRepository.save(Resume("filename", "user-id", "pdf", mapOf()))
+        resumeRepository.save(Resume("filename", "other-user-id", "pdf", mapOf()))
+        resumeRepository.save(Resume("filename", "yet-other-user-id", "pdf", mapOf()))
 
         val subject = ReCrunchAllResumes(resumeRepository, cruncherProcess)
         var numberJobsScheduled: Int = 100000

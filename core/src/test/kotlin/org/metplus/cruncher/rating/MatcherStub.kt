@@ -8,6 +8,10 @@ class MatcherStub(
         var matchInverseReturnValue: List<Resume> = emptyList(),
         var similarityRatingReturnValue: Double = 99999999.0
 ) : Matcher<Resume, Job> {
+    override fun getName(): String {
+        return "matcher-1"
+    }
+
     override fun match(from: Resume, allList: List<Job>): List<Job> {
         return matchReturnValue
     }

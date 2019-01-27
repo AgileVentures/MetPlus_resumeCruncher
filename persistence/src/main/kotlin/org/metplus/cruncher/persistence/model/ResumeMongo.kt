@@ -12,6 +12,6 @@ data class ResumeMongo(
         var filename: String,
         @Field
         var fileType: String,
-        @Field("metadata")
-        var cruncherData: MetaData?
+        @Field("cruncherData")
+        var cruncherData: Map<String, MetaData>?
 )

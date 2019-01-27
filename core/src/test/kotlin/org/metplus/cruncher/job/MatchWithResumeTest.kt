@@ -54,7 +54,7 @@ internal class MatchWithResumeTest {
                 "filename",
                 "user-id",
                 "pdf",
-                emptyMetaData()
+                mapOf()
         ))
         jobRepositoryFake.save(Job(
                 "jobId",
@@ -94,7 +94,7 @@ internal class MatchWithResumeTest {
                 "filename",
                 "user-id",
                 "pdf",
-                emptyMetaData()
+                mapOf()
         ))
         jobRepositoryFake.save(Job(
                 "jobId",

@@ -27,7 +27,7 @@ internal class UploadResumeTest {
                 userId = "someUserId",
                 fileType = "pdf",
                 filename = "some_file_name.pdf",
-                cruncherData = CruncherMetaData(metaData = hashMapOf())
+                cruncherData = mapOf()
         )
         val fileInputStream = FileInputStreamFake("some content")
         assertThat(uploadResume.process(userId = "someUserId",
@@ -64,14 +64,14 @@ internal class UploadResumeTest {
                 filename = "some_file_name.pdf",
                 fileType = "pdf",
                 userId = "someUserId",
-                cruncherData = CruncherMetaData(metaData = hashMapOf())
+                cruncherData = mapOf("cruncher1" to CruncherMetaData(metaData = hashMapOf()))
         ))
 
         val newResume = Resume(
                 userId = "someUserId",
                 fileType = "doc",
                 filename = "some_other_file.doc",
-                cruncherData = CruncherMetaData(metaData = hashMapOf())
+                cruncherData = mapOf()
         )
 
         val fileInputStream = FileInputStreamFake("some content")
