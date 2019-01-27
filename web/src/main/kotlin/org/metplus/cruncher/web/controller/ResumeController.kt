@@ -2,27 +2,12 @@ package org.metplus.cruncher.web.controller
 
 import org.metplus.cruncher.rating.CompareResumeWithJob
 import org.metplus.cruncher.rating.CompareResumeWithJobObserver
-import org.metplus.cruncher.resume.DownloadResume
-import org.metplus.cruncher.resume.DownloadResumeObserver
-import org.metplus.cruncher.resume.MatchWithJob
-import org.metplus.cruncher.resume.MatchWithJobObserver
-import org.metplus.cruncher.resume.ReCrunchAllResumes
-import org.metplus.cruncher.resume.ReCrunchAllResumesObserver
-import org.metplus.cruncher.resume.Resume
-import org.metplus.cruncher.resume.ResumeFile
-import org.metplus.cruncher.resume.UploadResume
-import org.metplus.cruncher.resume.UploadResumeObserver
+import org.metplus.cruncher.resume.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.util.FileCopyUtils
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.io.ByteArrayOutputStream
 import javax.servlet.http.HttpServletResponse
@@ -175,7 +160,7 @@ class ResumeController(
     }
 }
 
-fun Map<String, List<Resume>>.toAllCrunchedResumesAnswer(): Map<String, List<ResumeAnswer>>{
+fun Map<String, List<Resume>>.toAllCrunchedResumesAnswer(): Map<String, List<ResumeAnswer>> {
     val response = mutableMapOf<String, List<ResumeAnswer>>()
     keys.forEach {
         response[it] = get(it)!!.map { it.toResumeAnswer() }
