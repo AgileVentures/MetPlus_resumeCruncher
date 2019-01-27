@@ -81,7 +81,7 @@ internal class CompareResumeWithJobTest {
     fun `when job exist and resume found, it calls onSuccess callback with the amount of stars`() {
         var wasCalledWith = -10.0
         jobRepositoryFake.save(Job("job-id", "some title", "some description", emptyMetaData(), emptyMetaData()))
-        resumeRepositoryFake.save(Resume("filename", "resume-id", "pdf", emptyMetaData()))
+        resumeRepositoryFake.save(Resume("filename", "resume-id", "pdf", mapOf()))
         matcherStub.similarityRatingReturnValue = 1.5
 
         compareResumeWithJob.process(

@@ -13,7 +13,7 @@ abstract class ResumeRepositoryTest {
                 "some_file_name.io",
                 "someUserId",
                 "io-file",
-                cruncherData = CruncherMetaData(metaData = hashMapOf())
+                cruncherData = mapOf()
         )
         val afterSave = getRepository().save(beforeSave)
         assertThat(afterSave).isEqualToComparingFieldByField(beforeSave)
@@ -25,7 +25,7 @@ abstract class ResumeRepositoryTest {
                 "some_file_name.io",
                 "someUserId",
                 "io-file",
-                cruncherData = CruncherMetaData(metaData = hashMapOf())
+                cruncherData = mapOf()
         )
         getRepository().save(beforeSave)
 
@@ -41,7 +41,7 @@ abstract class ResumeRepositoryTest {
                 "some_file_name.io",
                 "someUserId",
                 "io-file",
-                cruncherData = CruncherMetaData(metaData = hashMapOf())
+                cruncherData = mapOf()
         )
         getRepository().save(beforeSave)
 
@@ -62,14 +62,14 @@ abstract class ResumeRepositoryTest {
                 "some_file_name.io",
                 "someUserId",
                 "io-file",
-                cruncherData = CruncherMetaData(metaData = hashMapOf())
+                cruncherData = mapOf()
         )
         getRepository().save(resume1)
         val resume2 = Resume(
                 "some_file_name1.io",
                 "someUserId1",
                 "io-file",
-                cruncherData = CruncherMetaData(metaData = hashMapOf())
+                cruncherData = mapOf()
         )
         getRepository().save(resume2)
 

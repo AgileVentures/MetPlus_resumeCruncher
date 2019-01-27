@@ -41,7 +41,7 @@ internal class DownloadResumeTest {
                 filename = "some_file_name.pdf",
                 userId = "someUserId",
                 fileType = "pdf",
-                cruncherData = CruncherMetaData(metaData = hashMapOf())
+                cruncherData = mapOf()
         )
         val resumeFileSaved = ResumeFile(
                 filename = "some_file_name.pdf",
@@ -73,7 +73,7 @@ internal class DownloadResumeTest {
                 filename = "some_file_name.pdf",
                 userId = "someUserId",
                 fileType = "pdf",
-                cruncherData = CruncherMetaData(metaData = hashMapOf())
+                cruncherData = mapOf()
         )
         resumeRepository.save(resumeSaved)
 

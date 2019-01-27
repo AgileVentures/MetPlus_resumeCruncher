@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.metplus.cruncher.job.Job
 import org.metplus.cruncher.job.JobRepositoryFake
+import org.metplus.cruncher.rating.MatcherList
 import org.metplus.cruncher.rating.MatcherStub
 import org.metplus.cruncher.rating.emptyMetaData
 
@@ -19,19 +20,19 @@ internal class MatchWithJobTest {
         jobRepositoryFake = JobRepositoryFake()
         resumeRepositoryFake = ResumeRepositoryFake()
         matcherStub = MatcherStub()
-        matchWithJob = MatchWithJob(resumeRepositoryFake, jobRepositoryFake, matcherStub)
+        matchWithJob = MatchWithJob(resumeRepositoryFake, jobRepositoryFake, MatcherList(listOf(matcherStub)))
     }
 
     @Test
     fun `when job does not exist, it calls jobNotFound callback with the job id provided`() {
         var wasCalledWith = ""
         matchWithJob.process("not-found", observer = object : MatchWithJobObserver<Boolean> {
-            override fun success(matchedResumes: List<Resume>): Boolean {
+            override fun success(matchedResumes: Map<String, List<Resume>>): Boolean {
                 fail("Should have called jobNotFound")
                 return false
             }
 
-            override fun noMatchFound(jobId: String): Boolean {
+            override fun noMatchFound(jobId: String, matchers: Map<String, List<Resume>>): Boolean {
                 fail("Should have called jobNotFound")
                 return false
             }
@@ -51,12 +52,12 @@ internal class MatchWithJobTest {
         jobRepositoryFake.save(Job("some-job-id", "some title", "some description", emptyMetaData(), emptyMetaData()))
 
         matchWithJob.process("some-job-id", observer = object : MatchWithJobObserver<Boolean> {
-            override fun success(matchedResumes: List<Resume>): Boolean {
+            override fun success(matchedResumes: Map<String, List<Resume>>): Boolean {
                 fail("Should have called noMatchFound")
                 return false
             }
 
-            override fun noMatchFound(jobId: String): Boolean {
+            override fun noMatchFound(jobId: String, matchers: Map<String, List<Resume>>): Boolean {
                 wasCalledWith = jobId
                 return true
             }
@@ -72,23 +73,23 @@ internal class MatchWithJobTest {
 
     @Test
     fun `when job exists and matches two resumes, it calls success callback with the two matched resumes`() {
-        var wasCalledWith = emptyList<Resume>()
+        var wasCalledWith = mapOf<String, List<Resume>>()
         jobRepositoryFake.save(Job("some-job-id", "some title", "some description", emptyMetaData(), emptyMetaData()))
-        val resume1 = Resume("some-file", "some-user-id", "pdf", emptyMetaData())
+        val resume1 = Resume("some-file", "some-user-id", "pdf", mapOf())
         resumeRepositoryFake.save(resume1)
-        resumeRepositoryFake.save(Resume("some-other-file", "yet-other-user-id", "pdf", emptyMetaData()))
-        val resume2 = Resume("some-other-file", "some-other-user-id", "pdf", emptyMetaData())
+        resumeRepositoryFake.save(Resume("some-other-file", "yet-other-user-id", "pdf", mapOf()))
+        val resume2 = Resume("some-other-file", "some-other-user-id", "pdf", mapOf())
         resumeRepositoryFake.save(resume2)
 
         matcherStub.matchInverseReturnValue = listOf(resume2.copy(starRating = 4.1), resume1.copy(starRating = 0.1))
 
         matchWithJob.process("some-job-id", observer = object : MatchWithJobObserver<Boolean> {
-            override fun success(matchedResumes: List<Resume>): Boolean {
+            override fun success(matchedResumes: Map<String, List<Resume>>): Boolean {
                 wasCalledWith = matchedResumes
                 return true
             }
 
-            override fun noMatchFound(jobId: String): Boolean {
+            override fun noMatchFound(jobId: String, matchers: Map<String, List<Resume>>): Boolean {
                 fail("Should have called success")
                 return false
             }
@@ -99,6 +100,6 @@ internal class MatchWithJobTest {
             }
         })
 
-        assertThat(wasCalledWith).isEqualTo(listOf(resume2.copy(starRating = 4.1), resume1.copy(starRating = 0.1)))
+        assertThat(wasCalledWith).isEqualTo(mapOf("matcher-1" to listOf(resume2.copy(starRating = 4.1), resume1.copy(starRating = 0.1))))
     }
 }

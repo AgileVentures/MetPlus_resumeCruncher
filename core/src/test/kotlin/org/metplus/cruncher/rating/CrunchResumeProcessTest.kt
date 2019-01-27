@@ -46,7 +46,7 @@ class CrunchResumeProcessTest {
                         filename = "some-file-name.pdf",
                         userId = "some-user-id",
                         fileType = "pdf",
-                        cruncherData = CruncherMetaData(mutableMapOf()))
+                        cruncherData = mutableMapOf())
         )
         resumeFileRepository.save(ResumeFile(
                 filename = "some-file-name.pdf",
@@ -65,7 +65,7 @@ class CrunchResumeProcessTest {
         assertThat(cruncherImpl.crunchWasCalledWith.size).isEqualTo(1)
         assertThat(cruncherImpl.crunchWasCalledWith.first()).contains("Some text in the file")
         val cruncherResume = resumeRepository.getByUserId("some-user-id")!!
-        assertThat(cruncherResume.cruncherData.metaData["some-key"]).isEqualTo(10.0)
+        assertThat(cruncherResume.cruncherData["some-cruncher"]!!.metaData["some-key"]).isEqualTo(10.0)
     }
 
     @Test
@@ -75,7 +75,7 @@ class CrunchResumeProcessTest {
                         filename = "some-file-name.pdf",
                         userId = "some-user-id",
                         fileType = "pdf",
-                        cruncherData = CruncherMetaData(mutableMapOf()))
+                        cruncherData = mutableMapOf())
         )
         resumeFileRepository.save(ResumeFile(
                 filename = "some-file-name.pdf",
@@ -90,7 +90,7 @@ class CrunchResumeProcessTest {
                         filename = "some-other-file-name.pdf",
                         userId = "some-other-user-id",
                         fileType = "pdf",
-                        cruncherData = CruncherMetaData(mutableMapOf("the-key" to 99.0)))
+                        cruncherData = mutableMapOf("some-cruncher" to CruncherMetaData(mutableMapOf("the-key" to 99.0))))
         )
 
         resumeFileRepository.save(ResumeFile(
@@ -111,12 +111,10 @@ class CrunchResumeProcessTest {
         assertThat(cruncherImpl.crunchWasCalledWith[1]).contains("Some other text in the file")
 
         val cruncherResumeUser1 = resumeRepository.getByUserId("some-user-id")!!
-        println(cruncherResumeUser1.cruncherData)
-        assertThat(cruncherResumeUser1.cruncherData.metaData["some-key"]).isEqualTo(10.0)
+        assertThat(cruncherResumeUser1.cruncherData["some-cruncher"]!!.metaData["some-key"]).isEqualTo(10.0)
 
         val cruncherResumeUser2 = resumeRepository.getByUserId("some-other-user-id")!!
-        println(cruncherResumeUser2.cruncherData)
-        assertThat(cruncherResumeUser2.cruncherData.metaData["some-other-key"]).isEqualTo(9.0)
+        assertThat(cruncherResumeUser2.cruncherData["some-cruncher"]!!.metaData["some-other-key"]).isEqualTo(9.0)
     }
 
     @Test
@@ -126,7 +124,7 @@ class CrunchResumeProcessTest {
                         filename = "some-file-name.pdf",
                         userId = "some-user-id",
                         fileType = "pdf",
-                        cruncherData = CruncherMetaData(mutableMapOf()))
+                        cruncherData = mapOf())
         )
         cruncher.start()
         cruncher.addWork(resumeUser1)

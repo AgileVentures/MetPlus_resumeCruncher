@@ -29,9 +29,11 @@ open class CrunchResumeProcess(
             val docParser = DocumentParserImpl(outputFile)
             docParser.parse()
             logger.info("Document: " + docParser.getDocument()?.replace("\n", "\\\\n")?.replace("\t", " "))
-            val allMetaData: CruncherMetaData
-            val metaData = allCrunchers.getCrunchers().first().crunch(docParser.getDocument()!!)
-            allMetaData = metaData
+            val allMetaData = mutableMapOf<String, CruncherMetaData>()
+            allCrunchers.getCrunchers().forEach {
+                val metaData = it.crunch(docParser.getDocument()!!)
+                allMetaData[it.getCruncherName()] = metaData
+            }
 
             resumeRepository.save(resume.copy(cruncherData = allMetaData))
             logger.info("Done processing resume for: " + resume.userId)

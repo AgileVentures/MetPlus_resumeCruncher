@@ -1,6 +1,5 @@
 package org.metplus.cruncher.resume
 
-import org.metplus.cruncher.rating.CrunchResumeProcess
 import org.metplus.cruncher.rating.CruncherMetaData
 import org.metplus.cruncher.rating.ProcessCruncher
 import java.io.InputStream
@@ -16,7 +15,7 @@ class UploadResume(
                 userId = userId,
                 filename = resumeName,
                 fileType = fileType,
-                cruncherData = CruncherMetaData(hashMapOf())
+                cruncherData = mutableMapOf()
         )
 
         if (size == 0.toLong())
