@@ -88,12 +88,13 @@ open class ApplicationConfiguration {
     @Bean
     open fun matchWithResume(@Autowired resumeRepository: ResumeRepository,
                              @Autowired jobsRepository: JobsRepository,
-                             @Autowired matcher: Matcher<Resume, Job>
-    ): MatchWithResume = MatchWithResume(resumeRepository, jobsRepository, matcher)
+                             @Autowired matchers: MatcherList
+    ): MatchWithResume = MatchWithResume(resumeRepository, jobsRepository, matchers)
 
     @Bean
-    open fun matchWithResumeCanned(@Autowired jobsRepository: JobsRepository):
-            MatchWithResumeCanned = MatchWithResumeCanned(jobsRepository)
+    open fun matchWithResumeCanned(@Autowired jobsRepository: JobsRepository,
+                                   @Autowired matchers: MatcherList):
+            MatchWithResumeCanned = MatchWithResumeCanned(jobsRepository, matchers)
 
     @Bean
     open fun uploadResume(
