@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.metplus.cruncher.rating.MatcherList
 import org.metplus.cruncher.rating.MatcherStub
 import org.metplus.cruncher.rating.emptyMetaData
 import org.metplus.cruncher.resume.Resume
@@ -20,7 +21,7 @@ internal class MatchWithResumeTest {
         resumeRepositoryFake = ResumeRepositoryFake()
         jobRepositoryFake = JobRepositoryFake()
         matcher = MatcherStub()
-        subject = MatchWithResume(resumeRepositoryFake, jobRepositoryFake, matcher)
+        subject = MatchWithResume(resumeRepositoryFake, jobRepositoryFake, MatcherList(listOf(matcher)))
     }
 
     @Test
@@ -28,12 +29,12 @@ internal class MatchWithResumeTest {
         var wasCalledWith = ""
 
         subject.process("999", object : MatchWithResumeObserver<Boolean> {
-            override fun success(matchedJobs: List<Job>): Boolean {
+            override fun success(matchedJobs: Map<String, List<Job>>): Boolean {
                 fail("Should have called 'resumeNotFound' method")
                 return false
             }
 
-            override fun noMatches(resumeId: String): Boolean {
+            override fun noMatches(resumeId: String, matchers: List<String>): Boolean {
                 fail("Should have called 'resumeNotFound' method")
                 return false
             }
@@ -67,12 +68,12 @@ internal class MatchWithResumeTest {
         matcher.matchReturnValue = emptyList()
 
         subject.process("user-id", object : MatchWithResumeObserver<Boolean> {
-            override fun success(matchedJobs: List<Job>): Boolean {
+            override fun success(matchedJobs: Map<String, List<Job>>): Boolean {
                 fail("Should have called 'noMatch' method")
                 return true
             }
 
-            override fun noMatches(resumeId: String): Boolean {
+            override fun noMatches(resumeId: String, matchers: List<String>): Boolean {
                 wasCalledWith = resumeId
                 return true
             }
@@ -89,7 +90,7 @@ internal class MatchWithResumeTest {
 
     @Test
     fun `when resume does match with one job, it calls success callback with job`() {
-        var wasCalledWith = listOf<Job>()
+        var wasCalledWith = mapOf<String, List<Job>>()
         resumeRepositoryFake.save(Resume(
                 "filename",
                 "user-id",
@@ -122,12 +123,12 @@ internal class MatchWithResumeTest {
         matcher.matchReturnValue = listOf(job.copy(starRating = 3.1))
 
         subject.process("user-id", object : MatchWithResumeObserver<Boolean> {
-            override fun success(matchedJobs: List<Job>): Boolean {
+            override fun success(matchedJobs: Map<String, List<Job>>): Boolean {
                 wasCalledWith = matchedJobs
                 return true
             }
 
-            override fun noMatches(resumeId: String): Boolean {
+            override fun noMatches(resumeId: String, matchers: List<String>): Boolean {
                 fail("Should have called 'success' method")
                 return true
             }
@@ -138,6 +139,6 @@ internal class MatchWithResumeTest {
             }
         })
 
-        assertThat(wasCalledWith).isEqualTo(listOf(job.copy(starRating = 3.1)))
+        assertThat(wasCalledWith.get("matcher-1")).isEqualTo(listOf(job.copy(starRating = 3.1)))
     }
 }

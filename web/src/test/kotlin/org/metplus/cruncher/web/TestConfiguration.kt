@@ -49,8 +49,8 @@ open class TestConfiguration {
     @Bean
     open fun matchWithResume(@Autowired resumeRepository: ResumeRepository,
                              @Autowired jobsRepository: JobsRepository,
-                             @Autowired matcher: Matcher<Resume, Job>
-    ): MatchWithResume = MatchWithResume(resumeRepository, jobsRepository, matcher)
+                             @Autowired matchers: MatcherList
+    ): MatchWithResume = MatchWithResume(resumeRepository, jobsRepository, matchers)
 
     @Bean
     open fun allMatchers(
