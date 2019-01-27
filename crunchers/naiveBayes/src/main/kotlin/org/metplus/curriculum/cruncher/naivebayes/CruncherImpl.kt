@@ -11,7 +11,7 @@ class CruncherImpl(
         private var cleanExpressions: List<String> = mutableListOf()
 ) : Cruncher {
     private val logger = LoggerFactory.getLogger(CruncherImpl::class.java)
-    private val name = "NaiveBayes"
+    private val name = "naiveBayes"
     val classifier = BayesClassifier<String, String>()
 
     override fun crunch(data: String): CruncherMetaData {

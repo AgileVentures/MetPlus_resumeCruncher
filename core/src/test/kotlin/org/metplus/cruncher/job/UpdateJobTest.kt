@@ -36,7 +36,7 @@ internal class UpdateJobTest {
 
     @Test
     fun `when job being updated can be found, it calls the onSuccess observer and update the job and job is marked to be crunched`() {
-        jobsRepository.save(Job("1", "Some title", "Some description", emptyMetaData(), emptyMetaData()))
+        jobsRepository.save(Job("1", "Some title", "Some description", mapOf(), mapOf()))
 
         var wasOnSuccessCalled = false
         updateJob.process("1", "Some other title", "Some other description", object : UpdateJobObserver {
@@ -52,12 +52,12 @@ internal class UpdateJobTest {
             }
         })
         assertThat(wasOnSuccessCalled).isTrue()
-        assertThat(crunchJobProcess.nextWorkInQueue()).isEqualTo(Job("1", "Some other title", "Some other description", emptyMetaData(), emptyMetaData()))
+        assertThat(crunchJobProcess.nextWorkInQueue()).isEqualTo(Job("1", "Some other title", "Some other description", mapOf(), mapOf()))
     }
 
     @Test
     fun `when job being updated can be found and only title is present, it calls the onSuccess observer and only update the title job and job is marked to be crunched`() {
-        jobsRepository.save(Job("1", "Some title", "Some description", emptyMetaData(), emptyMetaData()))
+        jobsRepository.save(Job("1", "Some title", "Some description", mapOf(), mapOf()))
 
         var wasOnSuccessCalled = false
         updateJob.process("1", "Some other title", null, object : UpdateJobObserver {
@@ -73,12 +73,12 @@ internal class UpdateJobTest {
             }
         })
         assertThat(wasOnSuccessCalled).isTrue()
-        assertThat(crunchJobProcess.nextWorkInQueue()).isEqualTo(Job("1", "Some other title", "Some description", emptyMetaData(), emptyMetaData()))
+        assertThat(crunchJobProcess.nextWorkInQueue()).isEqualTo(Job("1", "Some other title", "Some description", mapOf(), mapOf()))
     }
 
     @Test
     fun `when job being updated can be found and only description is present, it calls the onSuccess observer and only update the description job and job is marked to be crunched`() {
-        jobsRepository.save(Job("1", "Some title", "Some description", emptyMetaData(), emptyMetaData()))
+        jobsRepository.save(Job("1", "Some title", "Some description", mapOf(), mapOf()))
 
         var wasOnSuccessCalled = false
         updateJob.process("1", null, "Some other description", object : UpdateJobObserver {
@@ -94,6 +94,6 @@ internal class UpdateJobTest {
             }
         })
         assertThat(wasOnSuccessCalled).isTrue()
-        assertThat(crunchJobProcess.nextWorkInQueue()).isEqualTo(Job("1", "Some title", "Some other description", emptyMetaData(), emptyMetaData()))
+        assertThat(crunchJobProcess.nextWorkInQueue()).isEqualTo(Job("1", "Some title", "Some other description", mapOf(), mapOf()))
     }
 }

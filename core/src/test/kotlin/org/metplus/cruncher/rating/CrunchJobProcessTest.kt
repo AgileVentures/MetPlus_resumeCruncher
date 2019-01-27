@@ -37,8 +37,8 @@ class JobCruncherTests {
         val job = Job("job-id",
                 "some title",
                 "some description",
-                emptyMetaData(),
-                emptyMetaData())
+                mapOf(),
+                mapOf())
         jobRepository.save(job)
 
         cruncherImpl.crunchReturn = mutableListOf(CruncherMetaData(
@@ -55,8 +55,8 @@ class JobCruncherTests {
         assertThat(cruncherImpl.crunchWasCalledWith.size).isEqualTo(2)
         assertThat(cruncherImpl.crunchWasCalledWith).isEqualTo(listOf("some title", "some description"))
         val crunchedJob = jobRepository.getById("job-id")!!
-        assertThat(crunchedJob.titleMetaData.metaData["some-key"]).isEqualTo(0.1)
-        assertThat(crunchedJob.descriptionMetaData.metaData["some-other-key"]).isEqualTo(1.0)
+        assertThat(crunchedJob.titleMetaData["some-cruncher"]!!.metaData["some-key"]).isEqualTo(0.1)
+        assertThat(crunchedJob.descriptionMetaData["some-cruncher"]!!.metaData["some-other-key"]).isEqualTo(1.0)
     }
 
     @Test
@@ -64,14 +64,14 @@ class JobCruncherTests {
         val job = Job("job-id",
                 "some title",
                 "some description",
-                emptyMetaData(),
-                emptyMetaData())
+                mapOf(),
+                mapOf())
         jobRepository.save(job)
         val secondJob = Job("other-job-id",
                 "some other title",
                 "some other description",
-                emptyMetaData(),
-                emptyMetaData())
+                mapOf(),
+                mapOf())
         jobRepository.save(secondJob)
 
         cruncherImpl.crunchReturn = mutableListOf(CruncherMetaData(
@@ -96,10 +96,10 @@ class JobCruncherTests {
                         "some title", "some description",
                         "some other title", "some other description"))
         val crunchedJob = jobRepository.getById("job-id")!!
-        assertThat(crunchedJob.titleMetaData.metaData["some-key"]).isEqualTo(0.1)
-        assertThat(crunchedJob.descriptionMetaData.metaData["some-other-key"]).isEqualTo(1.0)
+        assertThat(crunchedJob.titleMetaData["some-cruncher"]!!.metaData["some-key"]).isEqualTo(0.1)
+        assertThat(crunchedJob.descriptionMetaData["some-cruncher"]!!.metaData["some-other-key"]).isEqualTo(1.0)
         val otherCruncherJob = jobRepository.getById("other-job-id")!!
-        assertThat(otherCruncherJob.titleMetaData.metaData["second-some-key"]).isEqualTo(99.0)
-        assertThat(otherCruncherJob.descriptionMetaData.metaData["second-some-other-key"]).isEqualTo(.01)
+        assertThat(otherCruncherJob.titleMetaData["some-cruncher"]!!.metaData["second-some-key"]).isEqualTo(99.0)
+        assertThat(otherCruncherJob.descriptionMetaData["some-cruncher"]!!.metaData["second-some-other-key"]).isEqualTo(.01)
     }
 }

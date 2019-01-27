@@ -25,17 +25,17 @@ open class Base {
                 "some-filename",
                 "some-other-user-id",
                 "pdf",
-                mapOf("NaiveBayes" to CruncherMetaData(mutableMapOf("cat_1_job" to 1.0))))
+                mapOf("naiveBayes" to CruncherMetaData(mutableMapOf("cat_1_job" to 1.0))))
 
         resumeCategoryOneAndTwo = Resume(
                 "filename",
                 "some-user-id",
                 "pdf",
-                mapOf("NaiveBayes" to CruncherMetaData(mutableMapOf("cat_1_job" to 1.0,
+                mapOf("naiveBayes" to CruncherMetaData(mutableMapOf("cat_1_job" to 1.0,
                         "cat_2_job" to .9))))
 
-        var titleData = CruncherMetaData(mutableMapOf("cat_1_job" to 1.0))
-        var descriptionData = CruncherMetaData(mutableMapOf("cat_2_job" to 1.0))
+        var titleData = mapOf("naiveBayes" to CruncherMetaData(mutableMapOf("cat_1_job" to 1.0)))
+        var descriptionData = mapOf("naiveBayes" to CruncherMetaData(mutableMapOf("cat_2_job" to 1.0)))
         jobTitleCat1DescCat2 = Job(
                 "cat-1 and cat-2",
                 "some title",
@@ -43,8 +43,8 @@ open class Base {
                 titleData,
                 descriptionData)
 
-        titleData = CruncherMetaData(mutableMapOf("cat_3_job" to 1.0))
-        descriptionData = CruncherMetaData(mutableMapOf("cat_4_job" to 1.0))
+        titleData = mapOf("naiveBayes" to CruncherMetaData(mutableMapOf("cat_3_job" to 1.0)))
+        descriptionData = mapOf("naiveBayes" to CruncherMetaData(mutableMapOf("cat_4_job" to 1.0)))
         jobTitleCat3DescCat4 = Job(
                 "cat-3 and cat-4",
                 "some other title",
@@ -58,18 +58,18 @@ open class Base {
 class MatchAgainstResume : Base() {
     @Test
     fun `when matching a resume with no categories, it return a empty list of jobs`() {
-        val resume = Resume("some_file.pdf", "user-id", "pdf", mapOf("NaiveBayes" to CruncherMetaData(mutableMapOf())))
+        val resume = Resume("some_file.pdf", "user-id", "pdf", mapOf("naiveBayes" to CruncherMetaData(mutableMapOf())))
         val allJobs = listOf(
                 Job("1",
                         "some title",
                         "some description",
-                        CruncherMetaData(mutableMapOf("some-title-feature" to 1.0)),
-                        CruncherMetaData(mutableMapOf("some-desc-feature" to 1.0))),
+                        mapOf("naiveBayes" to CruncherMetaData(mutableMapOf("some-title-feature" to 1.0))),
+                        mapOf("naiveBayes" to CruncherMetaData(mutableMapOf("some-desc-feature" to 1.0)))),
                 Job("2",
                         "some other title",
                         "some other description",
-                        CruncherMetaData(mutableMapOf("some-other-title-feature" to 1.0)),
-                        CruncherMetaData(mutableMapOf("some-other-desc-feature" to 1.0))))
+                        mapOf("naiveBayes" to CruncherMetaData(mutableMapOf("some-other-title-feature" to 1.0))),
+                        mapOf("naiveBayes" to CruncherMetaData(mutableMapOf("some-other-desc-feature" to 1.0)))))
         assertThat(matcher.match(resume, allJobs)).hasSize(0)
     }
 
@@ -104,7 +104,7 @@ class MatchAgainstResume : Base() {
                 "filename",
                 "some-user-id",
                 "pdf",
-                mapOf("NaiveBayes" to CruncherMetaData(mutableMapOf(
+                mapOf("naiveBayes" to CruncherMetaData(mutableMapOf(
                         "cat_1_job" to 1.0,
                         "cat_2_job" to .9,
                         "cat_5_job" to .8,
@@ -120,14 +120,14 @@ class MatchAgainstResume : Base() {
 
     @Test
     fun `when resume with one category matches with job description category in the sixth position it should not return as a match`() {
-        val titleData = CruncherMetaData(mutableMapOf(
+        val titleData = mapOf("naiveBayes" to CruncherMetaData(mutableMapOf(
                 "cat_2_job" to 1.0,
-                "cat_3_job" to 0.9))
-        val descriptionData = CruncherMetaData(mutableMapOf(
+                "cat_3_job" to 0.9)))
+        val descriptionData = mapOf("naiveBayes" to CruncherMetaData(mutableMapOf(
                 "cat_4_job" to 1.0,
                 "cat_5_job" to .9,
                 "cat_6_job" to .8,
-                "cat_1_job" to .7))
+                "cat_1_job" to .7)))
         val job = Job(
                 "cat-3 and cat-4",
                 "some other title",
@@ -142,14 +142,14 @@ class MatchAgainstResume : Base() {
 
     @Test
     fun `when resume has 1 category and matches the third Job Title category it returns no match`() {
-        val titleData = CruncherMetaData(mutableMapOf(
+        val titleData = mapOf("naiveBayes" to CruncherMetaData(mutableMapOf(
                 "cat_2_job" to 1.0,
                 "cat_3_job" to 0.9,
-                "cat_1_job" to .7))
-        val descriptionData = CruncherMetaData(mutableMapOf(
+                "cat_1_job" to .7)))
+        val descriptionData = mapOf("naiveBayes" to CruncherMetaData(mutableMapOf(
                 "cat_4_job" to 1.0,
                 "cat_5_job" to .9,
-                "cat_6_job" to .8))
+                "cat_6_job" to .8)))
         val job = Job(
                 "cat-3 and cat-4",
                 "some other title",
@@ -164,10 +164,10 @@ class MatchAgainstResume : Base() {
 
     @Test
     fun `when resume as the same category twice with different suffix and Job Title matches, it matches with 285 star rating`() {
-        val titleData = CruncherMetaData(mutableMapOf(
-                "cat_1_job" to .7))
-        val descriptionData = CruncherMetaData(mutableMapOf(
-                "cat_4_job" to 1.0))
+        val titleData = mapOf("naiveBayes" to CruncherMetaData(mutableMapOf(
+                "cat_1_job" to .7)))
+        val descriptionData = mapOf("naiveBayes" to CruncherMetaData(mutableMapOf(
+                "cat_4_job" to 1.0)))
         val job = Job(
                 "cat-3 and cat-4",
                 "some other title",
@@ -185,7 +185,7 @@ class MatchAgainstResume : Base() {
                 "some-filename",
                 "some-other-user-id",
                 "pdf",
-                mapOf("NaiveBayes" to CruncherMetaData(mutableMapOf(
+                mapOf("naiveBayes" to CruncherMetaData(mutableMapOf(
                         "cat_1_resume" to 1.0,
                         "cat_1_job" to .9
                 ))))
@@ -206,8 +206,8 @@ class MatchAgainstJob : Base() {
                 "some-id",
                 "some title",
                 "some description",
-                CruncherMetaData(mutableMapOf()),
-                CruncherMetaData(mutableMapOf())
+                mapOf("naiveBayes" to CruncherMetaData(mutableMapOf())),
+                mapOf("naiveBayes" to CruncherMetaData(mutableMapOf()))
         )
 
         assertThat(matcher.matchInverse(job, listOf(resumeCategoryOne))).isEmpty()
@@ -236,7 +236,7 @@ class MatchAgainstJob : Base() {
                 "some-filename",
                 "some-other-user-id",
                 "pdf",
-                mapOf("NaiveBayes" to CruncherMetaData(mutableMapOf(
+                mapOf("naiveBayes" to CruncherMetaData(mutableMapOf(
                         "cat_1_job" to 1.0,
                         "cat_2_job" to .9,
                         "cat_5_job" to .8,
@@ -253,16 +253,16 @@ class MatchAgainstJob : Base() {
                 "job-id",
                 "job title",
                 "job description",
-                CruncherMetaData(mutableMapOf(
+                mapOf("naiveBayes" to CruncherMetaData(mutableMapOf(
                         "cat_2_job" to 1.0,
                         "cat_3_job" to 0.9
-                )),
-                CruncherMetaData(mutableMapOf(
+                ))),
+                mapOf("naiveBayes" to CruncherMetaData(mutableMapOf(
                         "cat_4_job" to 1.0,
                         "cat_5_job" to 0.9,
                         "cat_6_job" to 0.8,
                         "cat_1_job" to 0.7
-                ))
+                )))
         )
 
         assertThat(matcher.matchInverse(job, listOf(resumeCategoryOne))).isEmpty()
@@ -274,16 +274,16 @@ class MatchAgainstJob : Base() {
                 "job-id",
                 "job title",
                 "job description",
-                CruncherMetaData(mutableMapOf(
+                mapOf("naiveBayes" to CruncherMetaData(mutableMapOf(
                         "cat_2_job" to 1.0,
                         "cat_3_job" to 0.9,
                         "cat_1_job" to 0.7
-                )),
-                CruncherMetaData(mutableMapOf(
+                ))),
+                mapOf("naiveBayes" to CruncherMetaData(mutableMapOf(
                         "cat_4_job" to 1.0,
                         "cat_5_job" to 0.9,
                         "cat_6_job" to 0.8
-                ))
+                )))
         )
 
         assertThat(matcher.matchInverse(job, listOf(resumeCategoryOne))).isEmpty()
@@ -295,16 +295,16 @@ class MatchAgainstJob : Base() {
                 "job-id",
                 "job title",
                 "job description",
-                CruncherMetaData(mutableMapOf(
+                mapOf("naiveBayes" to CruncherMetaData(mutableMapOf(
                         "cat_2_job" to 1.0,
                         "cat_2_resume" to 0.9,
                         "cat_1_job" to 0.7
-                )),
-                CruncherMetaData(mutableMapOf(
+                ))),
+                mapOf("naiveBayes" to CruncherMetaData(mutableMapOf(
                         "cat_4_job" to 1.0,
                         "cat_5_job" to 0.9,
                         "cat_6_job" to 0.8
-                ))
+                )))
         )
 
         val expectedResults = ArrayList<Resume>()
@@ -322,15 +322,15 @@ class MatchAgainstJob : Base() {
                 "job-id",
                 "job title",
                 "job description",
-                CruncherMetaData(mutableMapOf(
+                mapOf("naiveBayes" to CruncherMetaData(mutableMapOf(
                         "cat_2_job" to 1.0,
                         "cat_1_job" to 0.9
-                )),
-                CruncherMetaData(mutableMapOf(
+                ))),
+                mapOf("naiveBayes" to CruncherMetaData(mutableMapOf(
                         "cat_4_job" to 1.0,
                         "cat_1_resume" to 0.9,
                         "cat_5_job" to 0.8
-                ))
+                )))
         )
 
         val results = matcher.matchInverse(job, listOf(resumeCategoryOne))
@@ -347,7 +347,7 @@ class MatchSimilarity : Base() {
                 "filename",
                 "some-user-id",
                 "pdf",
-                mapOf("NaiveBayes" to CruncherMetaData(mutableMapOf())))
+                mapOf("naiveBayes" to CruncherMetaData(mutableMapOf())))
         assertThat(matcher.similarityRating(resume, jobTitleCat3DescCat4)).isEqualTo(.0)
     }
 
@@ -357,8 +357,8 @@ class MatchSimilarity : Base() {
                 "job-id",
                 "job title",
                 "job description",
-                CruncherMetaData(mutableMapOf()),
-                CruncherMetaData(mutableMapOf())
+                mapOf("naiveBayes" to CruncherMetaData(mutableMapOf())),
+                mapOf("naiveBayes" to CruncherMetaData(mutableMapOf()))
         )
         assertThat(matcher.similarityRating(resumeCategoryOne, job)).isEqualTo(.0)
     }

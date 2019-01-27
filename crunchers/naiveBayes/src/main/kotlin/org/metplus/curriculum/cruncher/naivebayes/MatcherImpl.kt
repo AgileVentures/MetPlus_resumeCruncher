@@ -57,8 +57,8 @@ class MatcherImpl : Matcher<Resume, Job> {
     }
 
     private fun getJobCategories(job: Job): List<String> {
-        val jobCategories = getCategoryListFromMetaData(job.titleMetaData, 2)
-        jobCategories.addAll(getCategoryListFromMetaData(job.descriptionMetaData, MAX_NUMBER_CATEGORIES - jobCategories.size))
+        val jobCategories = getCategoryListFromMetaData(job.titleMetaData.getOrDefault(getName(), CruncherMetaData(mutableMapOf())), 2)
+        jobCategories.addAll(getCategoryListFromMetaData(job.descriptionMetaData.getOrDefault(getName(), CruncherMetaData(mutableMapOf())), MAX_NUMBER_CATEGORIES - jobCategories.size))
         return jobCategories
     }
 
