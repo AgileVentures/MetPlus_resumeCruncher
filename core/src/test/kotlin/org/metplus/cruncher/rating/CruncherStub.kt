@@ -1,6 +1,6 @@
 package org.metplus.cruncher.rating
 
-class CruncherStub: Cruncher {
+class CruncherStub : Cruncher {
     private var cruncherName = "some-cruncher"
     var crunchReturn: MutableList<CruncherMetaData> = mutableListOf()
     var crunchWasCalledWith: MutableList<String> = mutableListOf()
@@ -10,7 +10,7 @@ class CruncherStub: Cruncher {
     }
 
     override fun crunch(data: String): CruncherMetaData {
-        if(crunchReturn.size == 0)
+        if (crunchReturn.size == 0)
             throw Exception("Stub called when it was not expected")
         crunchWasCalledWith.add(data)
         return crunchReturn[crunchWasCalledWith.size - 1]
