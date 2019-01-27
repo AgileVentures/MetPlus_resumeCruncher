@@ -1,22 +1,16 @@
 package org.metplus.cruncher.web.controller
 
 import org.hamcrest.Matchers
-import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.metplus.cruncher.job.Job
 import org.metplus.cruncher.job.JobsRepository
-import org.metplus.cruncher.rating.CruncherMetaData
 import org.metplus.cruncher.rating.Matcher
 import org.metplus.cruncher.rating.MatcherStub
 import org.metplus.cruncher.rating.emptyMetaData
-import org.metplus.cruncher.resume.Resume
-import org.metplus.cruncher.resume.ResumeFile
-import org.metplus.cruncher.resume.ResumeFileRepository
-import org.metplus.cruncher.resume.ResumeRepository
-import org.metplus.cruncher.resume.ResumeRepositoryFake
+import org.metplus.cruncher.resume.*
 import org.metplus.cruncher.web.TestConfiguration
 import org.metplus.cruncher.web.security.services.TokenService
 import org.springframework.beans.factory.annotation.Autowired
@@ -30,19 +24,13 @@ import org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.fileUpload
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get
-import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
-import org.springframework.restdocs.payload.PayloadDocumentation.responseFields
-import org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath
-import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
-import org.springframework.restdocs.request.RequestDocumentation.pathParameters
-import org.springframework.restdocs.request.RequestDocumentation.requestParameters
+import org.springframework.restdocs.payload.PayloadDocumentation.*
+import org.springframework.restdocs.request.RequestDocumentation.*
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [TestConfiguration::class, ResumeController::class], inheritLocations = true)
@@ -178,7 +166,7 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
     @ValueSource(strings = ["v1", "v2"])
     @Throws(Exception::class)
     fun `when matching resumes with a job that has no matches, it returns all and empty list of resumes`(versionId: String) {
-        jobRepository.save(Job("job-id", "title", "description", emptyMetaData(), emptyMetaData()))
+        jobRepository.save(Job("job-id", "title", "description", mapOf(), mapOf()))
 
         mvc.perform(get("/api/$versionId/resume/match/{jobId}", "job-id")
                 .header("X-Auth-Token", token))
@@ -221,7 +209,7 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
                 fileType = "pdf",
                 cruncherData = mutableMapOf()
         ))
-        jobRepository.save(Job("job-id", "title", "description", emptyMetaData(), emptyMetaData()))
+        jobRepository.save(Job("job-id", "title", "description", mapOf(), mapOf()))
         (matcher as MatcherStub).matchInverseReturnValue = listOf(resume2.copy(starRating = 1.0), resume1.copy(starRating = .1))
 
         mvc.perform(get("/api/$versionId/resume/match/{jobId}", "job-id")
@@ -296,7 +284,7 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
     @ParameterizedTest(name = "{index} => API Version: {0}")
     @ValueSource(strings = ["v1", "v2"])
     fun `when comparing a resume that does not exist with a job, it returns an error`(versionId: String) {
-        jobRepository.save(Job("job-id", "some title", "some description", emptyMetaData(), emptyMetaData()))
+        jobRepository.save(Job("job-id", "some title", "some description", mapOf(), mapOf()))
 
         mvc.perform(get("/api/$versionId/resume/{resumeId}/compare/{jobId}", "notFound", "job-id")
                 .accept(MediaType.APPLICATION_JSON)
@@ -323,7 +311,7 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
     @ParameterizedTest(name = "{index} => API Version: {0}")
     @ValueSource(strings = ["v1", "v2"])
     fun `when comparing a job with a resume, it returns the amount of star`(versionId: String) {
-        jobRepository.save(Job("job-id", "some title", "some description", emptyMetaData(), emptyMetaData()))
+        jobRepository.save(Job("job-id", "some title", "some description", mapOf(), mapOf()))
         resumeRepository.save(Resume("filename", "resume-id", "pdf", mutableMapOf()))
         (matcher as MatcherStub).similarityRatingReturnValue = 1.5
 

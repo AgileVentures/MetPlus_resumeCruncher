@@ -11,9 +11,9 @@ internal class ReCrunchAllJobsTest {
         val jobsRepository = JobRepositoryFake()
         val cruncherProcess = CrunchJobProcessSpy()
 
-        jobsRepository.save(Job("job1", "some title", "some description", emptyMetaData(), emptyMetaData()))
-        jobsRepository.save(Job("job2", "some other title", "some other description", emptyMetaData(), emptyMetaData()))
-        jobsRepository.save(Job("job3", "yet some other title", "yet some other description", emptyMetaData(), emptyMetaData()))
+        jobsRepository.save(Job("job1", "some title", "some description", mapOf(), mapOf()))
+        jobsRepository.save(Job("job2", "some other title", "some other description", mapOf(), mapOf()))
+        jobsRepository.save(Job("job3", "yet some other title", "yet some other description", mapOf(), mapOf()))
 
         val subject = ReCrunchAllJobs(jobsRepository, cruncherProcess)
         var numberJobsScheduled: Int = 100000
