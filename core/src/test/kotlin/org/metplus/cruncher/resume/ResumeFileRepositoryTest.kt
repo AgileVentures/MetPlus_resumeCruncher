@@ -21,9 +21,9 @@ abstract class ResumeFileRepositoryTest {
         assertThat(resumeFileAfter).isNotNull
         assertThat(resumeFileAfter!!.userId).isEqualTo("someUserId")
         var contentSave = ""
-        while(true) {
+        while (true) {
             val stuff = resumeFileAfter.fileStream.read()
-            if(stuff == -1)
+            if (stuff == -1)
                 break
             contentSave += stuff.toChar()
         }

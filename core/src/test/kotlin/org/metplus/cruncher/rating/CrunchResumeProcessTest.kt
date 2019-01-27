@@ -99,7 +99,7 @@ class CrunchResumeProcessTest {
                 fileStream = FileInputStreamFake("Some other text in the file")
         ))
         cruncherImpl.crunchReturn.add(CruncherMetaData(
-                        metaData = mutableMapOf("some-other-key" to 9.0)))
+                metaData = mutableMapOf("some-other-key" to 9.0)))
 
         cruncher.start()
         cruncher.addWork(resumeUser1)

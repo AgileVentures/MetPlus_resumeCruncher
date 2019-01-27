@@ -9,13 +9,13 @@ class CompareResumeWithJobCanned(
     fun <T> process(resumeId: String, jobId: String, observer: CompareResumeWithJobObserver<T>): T {
         try {
             jobId.toInt()
-        } catch(_: NumberFormatException) {
+        } catch (_: NumberFormatException) {
             observer.onJobNotFound(jobId)
         }
 
         try {
             resumeId.toInt()
-        } catch(_: java.lang.NumberFormatException) {
+        } catch (_: java.lang.NumberFormatException) {
             observer.onResumeNotFound(resumeId)
         }
 

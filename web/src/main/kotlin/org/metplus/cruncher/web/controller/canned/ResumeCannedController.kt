@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletResponse
 @RequestMapping(value = [
     "/api/v99999/resume"
 ])
-class ResumeCannedController (
+class ResumeCannedController(
         @Autowired private val uploadResume: UploadResume,
         @Autowired private val downloadResume: DownloadResume,
         @Autowired private val matchWithJob: MatchWithJobCanned,
