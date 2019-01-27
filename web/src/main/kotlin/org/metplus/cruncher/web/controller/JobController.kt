@@ -66,11 +66,11 @@ class JobController(
     @ResponseBody
     fun match(@PathVariable("resumeId") resumeId: String): CruncherResponse {
         return matchWithResume.process(resumeId, object : MatchWithResumeObserver<CruncherResponse> {
-            override fun success(matchedJobs: List<Job>): CruncherResponse {
+            override fun success(matchedJobs: Map<String, List<Job>>): CruncherResponse {
                 return JobsMatchedAnswer(
                         resultCode = ResultCodes.SUCCESS,
                         message = "Resume $resumeId matches ${matchedJobs.size} jobs",
-                        jobs = mapOf("naiveBayes" to matchedJobs.map { it.toJobAnswer() })
+                        jobs = matchedJobs.toAllCrunchedJobsAnswer()
                 )
             }
 
@@ -81,11 +81,11 @@ class JobController(
                 )
             }
 
-            override fun noMatches(resumeId: String): CruncherResponse {
+            override fun noMatches(resumeId: String, crunchers: List<String>): CruncherResponse {
                 return JobsMatchedAnswer(
                         resultCode = ResultCodes.SUCCESS,
                         message = "Resume $resumeId as no matches",
-                        jobs = mapOf("naiveBayes" to emptyList())
+                        jobs = crunchers.map { it to emptyList<Job>() }.toMap().toAllCrunchedJobsAnswer()
                 )
             }
 
@@ -105,6 +105,14 @@ class JobController(
 
         })
     }
+}
+
+fun Map<String, List<Job>>.toAllCrunchedJobsAnswer(): Map<String, List<JobAnswer>> {
+    val response = mutableMapOf<String, List<JobAnswer>>()
+    keys.forEach {
+        response[it] = get(it)!!.map { it.toJobAnswer() }
+    }
+    return response
 }
 
 fun Job.toJobAnswer(): JobAnswer {

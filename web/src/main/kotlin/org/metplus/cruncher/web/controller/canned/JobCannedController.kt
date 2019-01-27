@@ -5,7 +5,7 @@ import org.metplus.cruncher.job.*
 import org.metplus.cruncher.web.controller.CruncherResponse
 import org.metplus.cruncher.web.controller.JobsMatchedAnswer
 import org.metplus.cruncher.web.controller.ResultCodes
-import org.metplus.cruncher.web.controller.toJobAnswer
+import org.metplus.cruncher.web.controller.toAllCrunchedJobsAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 
@@ -69,11 +69,11 @@ class JobCannedController(
     @ResponseBody
     fun match(@PathVariable("resumeId") resumeId: String): CruncherResponse {
         return matchWithResume.process(resumeId, object : MatchWithResumeObserver<CruncherResponse> {
-            override fun success(matchedJobs: List<Job>): CruncherResponse {
+            override fun success(matchedJobs: Map<String, List<Job>>): CruncherResponse {
                 return JobsMatchedAnswer(
                         resultCode = ResultCodes.SUCCESS,
                         message = "Resume $resumeId matches ${matchedJobs.size} jobs",
-                        jobs = mapOf("naiveBayes" to matchedJobs.map { it.toJobAnswer() })
+                        jobs = matchedJobs.toAllCrunchedJobsAnswer()
                 )
             }
 
@@ -84,11 +84,11 @@ class JobCannedController(
                 )
             }
 
-            override fun noMatches(resumeId: String): CruncherResponse {
+            override fun noMatches(resumeId: String, crunchers: List<String>): CruncherResponse {
                 return JobsMatchedAnswer(
                         resultCode = ResultCodes.SUCCESS,
                         message = "Resume $resumeId as no matches",
-                        jobs = mapOf("naiveBayes" to emptyList())
+                        jobs = crunchers.map { it to emptyList<Job>() }.toMap().toAllCrunchedJobsAnswer()
                 )
             }
 

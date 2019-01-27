@@ -211,13 +211,13 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
                 "filename",
                 "1",
                 "pdf",
-                mapOf("naiveBayes" to emptyMetaData())
+                mapOf("matcher-1" to emptyMetaData())
         ))
         matchJob(versionId, "1")
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                 .andExpect(jsonPath("$.resultCode", equalTo(ResultCodes.SUCCESS.toString())))
-                .andExpect(jsonPath("$.jobs", equalTo(mapOf("naiveBayes" to emptyList<Job>()))))
+                .andExpect(jsonPath("$.jobs", equalTo(mapOf("matcher-1" to emptyList<Job>()))))
                 .andDo(document("job/match-not-found/$versionId",
                         requestHeaders(headerWithName("X-Auth-Token")
                                 .description("Authentication token retrieved from the authentication")),
@@ -237,7 +237,7 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
                 "filename",
                 "1",
                 "pdf",
-                mapOf("naiveBayes" to emptyMetaData())
+                mapOf("matcher-1" to emptyMetaData())
         ))
         val job = Job("1", "My current title", "My current description", mapOf(), mapOf())
         jobsRepository.save(job)
@@ -249,8 +249,8 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"))
                 .andExpect(jsonPath("$.resultCode", equalTo(ResultCodes.SUCCESS.toString())))
-                .andExpect(jsonPath("$.jobs.naiveBayes[0].id", equalTo("1")))
-                .andExpect(jsonPath("$.jobs.naiveBayes[0].stars", equalTo(3.1)))
+                .andExpect(jsonPath("$.jobs.matcher-1[0].id", equalTo("1")))
+                .andExpect(jsonPath("$.jobs.matcher-1[0].stars", equalTo(3.1)))
                 .andDo(document("job/match-success/$versionId",
                         requestHeaders(headerWithName("X-Auth-Token")
                                 .description("Authentication token retrieved from the authentication")),
