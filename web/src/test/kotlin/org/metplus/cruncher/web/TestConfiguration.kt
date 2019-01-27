@@ -1,27 +1,8 @@
 package org.metplus.cruncher.web
 
-import org.metplus.cruncher.job.CreateJob
-import org.metplus.cruncher.job.Job
-import org.metplus.cruncher.job.JobRepositoryFake
-import org.metplus.cruncher.job.JobsRepository
-import org.metplus.cruncher.job.MatchWithResume
-import org.metplus.cruncher.job.ReCrunchAllJobs
-import org.metplus.cruncher.job.UpdateJob
-import org.metplus.cruncher.rating.CompareResumeWithJob
-import org.metplus.cruncher.rating.CrunchJobProcessSpy
-import org.metplus.cruncher.rating.CrunchResumeProcessSpy
-import org.metplus.cruncher.rating.Matcher
-import org.metplus.cruncher.rating.MatcherStub
-import org.metplus.cruncher.rating.ProcessCruncher
-import org.metplus.cruncher.resume.DownloadResume
-import org.metplus.cruncher.resume.MatchWithJob
-import org.metplus.cruncher.resume.ReCrunchAllResumes
-import org.metplus.cruncher.resume.Resume
-import org.metplus.cruncher.resume.ResumeFileRepository
-import org.metplus.cruncher.resume.ResumeFileRepositoryFake
-import org.metplus.cruncher.resume.ResumeRepository
-import org.metplus.cruncher.resume.ResumeRepositoryFake
-import org.metplus.cruncher.resume.UploadResume
+import org.metplus.cruncher.job.*
+import org.metplus.cruncher.rating.*
+import org.metplus.cruncher.resume.*
 import org.metplus.cruncher.settings.GetSettings
 import org.metplus.cruncher.settings.SaveSettings
 import org.metplus.cruncher.settings.SettingsRepository
@@ -72,6 +53,13 @@ open class TestConfiguration {
     ): MatchWithResume = MatchWithResume(resumeRepository, jobsRepository, matcher)
 
     @Bean
+    open fun allMatchers(
+            @Autowired matcherStub: Matcher<Resume, Job>
+    ): MatcherList {
+        return MatcherList(listOf(matcherStub))
+    }
+
+    @Bean
     open fun tokenService(): TokenService = LocalTokenService()
 
     @Bean
@@ -89,9 +77,9 @@ open class TestConfiguration {
 
     @Bean
     open fun matchWithJob(@Autowired resumeRepository: ResumeRepository,
-                             @Autowired jobsRepository: JobsRepository,
-                             @Autowired matcher: Matcher<Resume, Job>
-    ): MatchWithJob = MatchWithJob(resumeRepository, jobsRepository, matcher)
+                          @Autowired jobsRepository: JobsRepository,
+                          @Autowired matcherList: MatcherList
+    ): MatchWithJob = MatchWithJob(resumeRepository, jobsRepository, matcherList)
 
     @Bean
     open fun crunchResumeProcess(): ProcessCruncher<Resume> = CrunchResumeProcessSpy()

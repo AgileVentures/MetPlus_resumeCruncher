@@ -18,3 +18,11 @@ open class CruncherList(
         return allCrunchers
     }
 }
+
+open class MatcherList(
+        private var allMatchers: List<Matcher<*,*>> = mutableListOf()
+) {
+    fun getMatchers(): List<Matcher<*,*>> {
+        return allMatchers
+    }
+}

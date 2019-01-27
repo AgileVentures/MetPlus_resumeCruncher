@@ -219,7 +219,7 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
                 "filename",
                 "1",
                 "pdf",
-                emptyMetaData()
+                mapOf("naiveBayes" to emptyMetaData())
         ))
         matchJob(versionId, "1")
                 .andExpect(status().isOk)
@@ -245,7 +245,7 @@ internal class JobControllerTest(@Autowired private val mvc: MockMvc) {
                 "filename",
                 "1",
                 "pdf",
-                emptyMetaData()
+                mapOf("naiveBayes" to emptyMetaData())
         ))
         val job = Job("1", "My current title", "My current description", emptyMetaData(), emptyMetaData())
         jobsRepository.save(job)

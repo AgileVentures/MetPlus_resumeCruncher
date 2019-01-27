@@ -20,7 +20,6 @@ class UserTokenAuthenticationTest {
             tokens = arrayOfNulls(2)
             tokens[0] = tokenService.generateToken("1.1.1.1")
             tokens[1] = tokenService.generateToken("2.2.2.2")
-            println(tokens[1])
         }
     }
 

@@ -21,28 +21,38 @@ class ResumeRepositoryImpl(
 }
 
 private fun ResumeMongo.toResume(): Resume {
-    val data = mutableMapOf<String, Double>()
-    cruncherData?.dataFields?.forEach {
-        data[it.key] = it.value.data as Double
+    val data = mutableMapOf<String, CruncherMetaData>()
+    cruncherData?.forEach {
+        val cruncherName = it.key
+        data[cruncherName] = CruncherMetaData(mutableMapOf())
+
+        it.value?.dataFields?.forEach {
+            data[cruncherName]?.metaData?.set(it.key, it.value.data as Double)
+        }
     }
 
     return Resume(
             userId = id,
             fileType = fileType,
             filename = filename,
-            cruncherData = CruncherMetaData(data)
+            cruncherData = data
     )
 }
 
 private fun Resume.toResumeMongo(): ResumeMongo {
-    val data = mutableMapOf<String, MetaDataField<*>>()
-    cruncherData.metaData.forEach {
-        data[it.key] = MetaDataField(it.value)
+    val metaData = mutableMapOf<String, MetaData>()
+    cruncherData.forEach {
+        val cruncherName = it.key
+        val data = mutableMapOf<String, MetaDataField<*>>()
+        it.value.metaData.forEach {
+            data[it.key] = MetaDataField(it.value)
+        }
+        metaData[cruncherName] = MetaData(data as HashMap<String, MetaDataField<*>>)
     }
     return ResumeMongo(
             id = userId,
             filename = filename,
             fileType = fileType,
-            cruncherData = MetaData(data as HashMap<String, MetaDataField<*>>)
+            cruncherData = metaData
     )
 }
