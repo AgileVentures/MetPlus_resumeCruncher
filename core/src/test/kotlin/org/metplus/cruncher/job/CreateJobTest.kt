@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.metplus.cruncher.rating.CrunchJobProcessSpy
-import org.metplus.cruncher.rating.emptyMetaData
 
 internal class CreateJobTest {
     private lateinit var jobsRepository: JobsRepository

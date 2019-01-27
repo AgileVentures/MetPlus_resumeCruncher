@@ -29,6 +29,6 @@ open class CrunchJobProcess(
             }
         }
         jobRepository.save(work.copy(titleMetaData = titleMetaData, descriptionMetaData = descriptionMetaData))
-        logger.debug("Job [${work}] processed successfully")
+        logger.debug("Job [$work] processed successfully")
     }
 }

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.metplus.cruncher.rating.MatcherList
 import org.metplus.cruncher.rating.MatcherStub
-import org.metplus.cruncher.rating.emptyMetaData
 import org.metplus.cruncher.resume.Resume
 import org.metplus.cruncher.resume.ResumeRepositoryFake
 

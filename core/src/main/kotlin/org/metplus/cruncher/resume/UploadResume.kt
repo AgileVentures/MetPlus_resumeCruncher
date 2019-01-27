@@ -1,6 +1,5 @@
 package org.metplus.cruncher.resume
 
-import org.metplus.cruncher.rating.CruncherMetaData
 import org.metplus.cruncher.rating.ProcessCruncher
 import java.io.InputStream
 

@@ -3,7 +3,6 @@ package org.metplus.cruncher.job
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.metplus.cruncher.rating.CrunchJobProcessSpy
-import org.metplus.cruncher.rating.emptyMetaData
 
 internal class ReCrunchAllJobsTest {
     @Test

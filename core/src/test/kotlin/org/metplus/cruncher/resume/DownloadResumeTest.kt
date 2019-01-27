@@ -55,6 +55,7 @@ internal class DownloadResumeTest {
             override fun onError(userId: String, exception: Exception): Boolean {
                 fail("Called onError when onSuccess was expected")
             }
+
             override fun onSuccess(resume: Resume, resumeFile: ResumeFile): Boolean {
                 assertThat(resume).isEqualToComparingFieldByField(resumeSaved)
                 assertThat(resumeFile).isEqualToComparingFieldByField(resumeFileSaved)
@@ -82,6 +83,7 @@ internal class DownloadResumeTest {
                 assertThat(exception.message).isEqualTo("Resume for user 'someUserId' not found")
                 return true
             }
+
             override fun onSuccess(resume: Resume, resumeFile: ResumeFile): Boolean {
                 fail("Called onSuccess when onError was expected")
             }

@@ -1,6 +1,6 @@
 package org.metplus.cruncher.resume
 
-class ResumeRepositoryFake: ResumeRepository {
+class ResumeRepositoryFake : ResumeRepository {
 
     private val allResumes = mutableMapOf<String, Resume>()
 

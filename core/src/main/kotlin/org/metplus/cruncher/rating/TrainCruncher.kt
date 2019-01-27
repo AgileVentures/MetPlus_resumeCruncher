@@ -13,12 +13,12 @@ class TrainCruncher(
 ) {
     private val logger = LoggerFactory.getLogger(TrainCruncher::class.java)
     fun process(observer: TrainCruncherObserver) {
-        logger.debug("going to train cruncher: ${cruncher.getCruncherName()}" )
+        logger.debug("going to train cruncher: ${cruncher.getCruncherName()}")
         var settings = settingsRepository.getAll().firstOrNull()
 
-        if( settings == null) {
+        if (settings == null) {
             logger.warn("Application incorrectly created, going to created new set of settings")
-           settings = settingsRepository.save(Settings(1, ApplicationSettings(hashMapOf()), defaultCruncherSettings))
+            settings = settingsRepository.save(Settings(1, ApplicationSettings(hashMapOf()), defaultCruncherSettings))
         }
 
         cruncher.train(settings.cruncherSettings.database)

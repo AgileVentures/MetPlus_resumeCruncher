@@ -2,7 +2,6 @@ package org.metplus.cruncher.persistence.model
 
 import org.metplus.cruncher.job.Job
 import org.metplus.cruncher.job.JobsRepository
-import org.metplus.cruncher.rating.CruncherMetaData
 
 class JobRepositoryImpl(
         private val jobRepository: JobRepositoryMongo

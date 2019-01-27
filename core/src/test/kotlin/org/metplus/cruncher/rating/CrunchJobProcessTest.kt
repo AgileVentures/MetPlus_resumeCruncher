@@ -8,9 +8,6 @@ import org.metplus.cruncher.job.Job
 import org.metplus.cruncher.job.JobRepositoryFake
 import org.metplus.cruncher.job.JobsRepository
 
-/**
- * Created by joao on 3/28/16.
- */
 class JobCruncherTests {
     private lateinit var jobRepository: JobsRepository
     private lateinit var jobCruncher: CrunchJobProcess

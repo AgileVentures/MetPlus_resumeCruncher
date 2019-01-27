@@ -5,7 +5,6 @@ import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.metplus.cruncher.rating.CrunchJobProcessSpy
-import org.metplus.cruncher.rating.emptyMetaData
 
 internal class UpdateJobTest {
     lateinit var jobsRepository: JobRepositoryFake
