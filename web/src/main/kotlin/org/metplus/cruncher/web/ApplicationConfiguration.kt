@@ -1,41 +1,12 @@
 package org.metplus.cruncher.web
 
-import com.mongodb.MongoClient
-import com.mongodb.MongoClientOptions
-import com.mongodb.MongoCredential
-import com.mongodb.ServerAddress
-import com.mongodb.WriteConcern
 import org.metplus.cruncher.canned.job.MatchWithResumeCanned
 import org.metplus.cruncher.canned.rating.CompareResumeWithJobCanned
 import org.metplus.cruncher.canned.resume.MatchWithJobCanned
-import org.metplus.cruncher.job.CreateJob
-import org.metplus.cruncher.job.Job
-import org.metplus.cruncher.job.JobsRepository
-import org.metplus.cruncher.job.MatchWithResume
-import org.metplus.cruncher.job.ReCrunchAllJobs
-import org.metplus.cruncher.job.UpdateJob
-import org.metplus.cruncher.persistence.model.JobRepositoryImpl
-import org.metplus.cruncher.persistence.model.JobRepositoryMongo
-import org.metplus.cruncher.persistence.model.ResumeFileRepositoryImpl
-import org.metplus.cruncher.persistence.model.ResumeRepositoryImpl
-import org.metplus.cruncher.persistence.model.ResumeRepositoryMongo
-import org.metplus.cruncher.persistence.model.SettingsRepositoryImpl
-import org.metplus.cruncher.persistence.model.SettingsRepositoryMongo
-import org.metplus.cruncher.rating.CompareResumeWithJob
-import org.metplus.cruncher.rating.CrunchJobProcess
-import org.metplus.cruncher.rating.CrunchResumeProcess
-import org.metplus.cruncher.rating.CruncherList
-import org.metplus.cruncher.rating.Matcher
-import org.metplus.cruncher.rating.ProcessCruncher
-import org.metplus.cruncher.rating.TrainCruncher
-import org.metplus.cruncher.rating.TrainCruncherObserver
-import org.metplus.cruncher.resume.DownloadResume
-import org.metplus.cruncher.resume.MatchWithJob
-import org.metplus.cruncher.resume.ReCrunchAllResumes
-import org.metplus.cruncher.resume.Resume
-import org.metplus.cruncher.resume.ResumeFileRepository
-import org.metplus.cruncher.resume.ResumeRepository
-import org.metplus.cruncher.resume.UploadResume
+import org.metplus.cruncher.job.*
+import org.metplus.cruncher.persistence.model.*
+import org.metplus.cruncher.rating.*
+import org.metplus.cruncher.resume.*
 import org.metplus.cruncher.settings.CruncherSettings
 import org.metplus.cruncher.settings.GetSettings
 import org.metplus.cruncher.settings.SaveSettings
@@ -43,7 +14,6 @@ import org.metplus.cruncher.web.rating.AsyncJobProcess
 import org.metplus.cruncher.web.rating.AsyncResumeProcess
 import org.metplus.curriculum.cruncher.naivebayes.CruncherImpl
 import org.metplus.curriculum.cruncher.naivebayes.MatcherImpl
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.SpringBootConfiguration
 import org.springframework.boot.context.properties.ConfigurationProperties
@@ -51,11 +21,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.mongodb.MongoDbFactory
-import org.springframework.data.mongodb.config.AbstractMongoConfiguration
-import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories
-import java.util.*
 
 @SpringBootConfiguration
 @EnableConfigurationProperties
@@ -144,12 +111,13 @@ open class ApplicationConfiguration {
     @Bean
     open fun matchWithJob(@Autowired resumeRepository: ResumeRepository,
                           @Autowired jobsRepository: JobsRepository,
-                          @Autowired matcher: Matcher<Resume, Job>
-    ): MatchWithJob = MatchWithJob(resumeRepository, jobsRepository, matcher)
+                          @Autowired matcherList: MatcherList
+    ): MatchWithJob = MatchWithJob(resumeRepository, jobsRepository, matcherList)
 
     @Bean
-    open fun matchWithJobCanned(@Autowired resumeRepository: ResumeRepository
-    ): MatchWithJobCanned = MatchWithJobCanned(resumeRepository)
+    open fun matchWithJobCanned(@Autowired resumeRepository: ResumeRepository,
+                                @Autowired matcherList: MatcherList
+    ): MatchWithJobCanned = MatchWithJobCanned(resumeRepository, matcherList)
 
     @Bean
     open fun allCrunchers(
@@ -161,6 +129,13 @@ open class ApplicationConfiguration {
             }
         })
         return CruncherList(listOf(naiveBayesCruncherImpl))
+    }
+
+    @Bean
+    open fun allMatchers(
+            naiveBayesMatcherImpl: MatcherImpl
+    ): MatcherList {
+        return MatcherList(listOf(naiveBayesMatcherImpl))
     }
 
     @Bean
@@ -180,7 +155,10 @@ open class ApplicationConfiguration {
     open fun matcher(): Matcher<Resume, Job> = MatcherImpl()
 
     @Bean
-    open fun naiveBayesImpl() = CruncherImpl()
+    open fun naiveBayesCruncherImpl() = CruncherImpl()
+
+    @Bean
+    open fun naiveBayesMatcherImpl() = MatcherImpl()
 
     @Bean
     open fun cruncherTrainer(

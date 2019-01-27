@@ -118,19 +118,19 @@ class ResumeController(
                 ), HttpStatus.NOT_FOUND)
             }
 
-            override fun noMatchFound(jobId: String): ResponseEntity<CruncherResponse> {
+            override fun noMatchFound(jobId: String, matchers: Map<String, List<Resume>>): ResponseEntity<CruncherResponse> {
                 return ResponseEntity(ResumeMatchedAnswer(
                         resultCode = ResultCodes.SUCCESS,
                         message = "Job with id '$jobId' has no matches",
-                        resumes = mapOf("naiveBayes" to emptyList<ResumeAnswer>())
+                        resumes = matchers.toAllCrunchedResumesAnswer()
                 ), HttpStatus.OK)
             }
 
-            override fun success(matchedResumes: List<Resume>): ResponseEntity<CruncherResponse> {
+            override fun success(matchedResumes: Map<String, List<Resume>>): ResponseEntity<CruncherResponse> {
                 return ResponseEntity(ResumeMatchedAnswer(
                         resultCode = ResultCodes.SUCCESS,
                         message = "Job matches ${matchedResumes.size} resumes",
-                        resumes = mapOf("naiveBayes" to matchedResumes.map { it.toResumeAnswer() })
+                        resumes = matchedResumes.toAllCrunchedResumesAnswer()
                 ), HttpStatus.OK)
             }
         })
@@ -173,6 +173,14 @@ class ResumeController(
             }
         })
     }
+}
+
+fun Map<String, List<Resume>>.toAllCrunchedResumesAnswer(): Map<String, List<ResumeAnswer>>{
+    val response = mutableMapOf<String, List<ResumeAnswer>>()
+    keys.forEach {
+        response[it] = get(it)!!.map { it.toResumeAnswer() }
+    }
+    return response
 }
 
 fun Resume.toResumeAnswer(): ResumeAnswer {

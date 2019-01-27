@@ -114,7 +114,7 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
                 userId = "asdasdasd",
                 filename = "line_with_bold.pdf",
                 fileType = "pdf",
-                cruncherData = CruncherMetaData(mutableMapOf())
+                cruncherData = mapOf("naiveBayes" to emptyMetaData())
         ))
         resumeFileRepository.save(ResumeFile(
                 userId = "asdasdasd",
@@ -183,7 +183,7 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
         mvc.perform(get("/api/$versionId/resume/match/{jobId}", "job-id")
                 .header("X-Auth-Token", token))
                 .andExpect(jsonPath("$.resultCode", Matchers.equalTo(ResultCodes.SUCCESS.toString())))
-                .andExpect(jsonPath("$.resumes.naiveBayes.*", Matchers.hasSize<Map<String, Resume>>(0)))
+                .andExpect(jsonPath("$.resumes.matcher-1.*", Matchers.hasSize<Map<String, Resume>>(0)))
                 .andDo(document("resume/match-no-resumes-job-id/$versionId",
                         requestHeaders(headerWithName("X-Auth-Token")
                                 .description("Authentication token retrieved from the authentication")),
@@ -194,7 +194,7 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
                                 fieldWithPath("resultCode").type(ResultCodes::class.java).description("Result code"),
                                 fieldWithPath("message").description("Message associated with the result code"),
                                 subsectionWithPath("resumes").description("Hash with Naive Bayes results"),
-                                fieldWithPath("resumes.naiveBayes").description("Empty list")
+                                fieldWithPath("resumes.matcher-1").description("Empty list")
                         )
                 ))
     }
@@ -207,19 +207,19 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
                 userId = "resume-1",
                 filename = "line_with_bold.pdf",
                 fileType = "pdf",
-                cruncherData = CruncherMetaData(mutableMapOf())
+                cruncherData = mutableMapOf()
         ))
         resumeRepository.save(Resume(
                 userId = "resume-2",
                 filename = "line_with_bold.pdf",
                 fileType = "pdf",
-                cruncherData = CruncherMetaData(mutableMapOf())
+                cruncherData = mutableMapOf()
         ))
         val resume2 = resumeRepository.save(Resume(
                 userId = "resume-2",
                 filename = "line_with_bold.pdf",
                 fileType = "pdf",
-                cruncherData = CruncherMetaData(mutableMapOf())
+                cruncherData = mutableMapOf()
         ))
         jobRepository.save(Job("job-id", "title", "description", emptyMetaData(), emptyMetaData()))
         (matcher as MatcherStub).matchInverseReturnValue = listOf(resume2.copy(starRating = 1.0), resume1.copy(starRating = .1))
@@ -227,10 +227,10 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
         mvc.perform(get("/api/$versionId/resume/match/{jobId}", "job-id")
                 .header("X-Auth-Token", token))
                 .andExpect(jsonPath("$.resultCode", Matchers.equalTo(ResultCodes.SUCCESS.toString())))
-                .andExpect(jsonPath("$.resumes.naiveBayes[0].userId", Matchers.equalTo("resume-2")))
-                .andExpect(jsonPath("$.resumes.naiveBayes[0].stars", Matchers.equalTo(1.0)))
-                .andExpect(jsonPath("$.resumes.naiveBayes[1].userId", Matchers.equalTo("resume-1")))
-                .andExpect(jsonPath("$.resumes.naiveBayes[1].stars", Matchers.equalTo(.1)))
+                .andExpect(jsonPath("$.resumes.matcher-1[0].userId", Matchers.equalTo("resume-2")))
+                .andExpect(jsonPath("$.resumes.matcher-1[0].stars", Matchers.equalTo(1.0)))
+                .andExpect(jsonPath("$.resumes.matcher-1[1].userId", Matchers.equalTo("resume-1")))
+                .andExpect(jsonPath("$.resumes.matcher-1[1].stars", Matchers.equalTo(.1)))
                 .andDo(document("resume/multiple-match-resumes-job-id/$versionId",
                         requestHeaders(headerWithName("X-Auth-Token")
                                 .description("Authentication token retrieved from the authentication")),
@@ -248,8 +248,8 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
     @ParameterizedTest(name = "{index} => API Version: {0}")
     @ValueSource(strings = ["v1", "v2"])
     fun `when reindexing resumes, it returns information about of resumes to be processed`(versionId: String) {
-        resumeRepository.save(Resume("filename", "user-id", "pdf", emptyMetaData()))
-        resumeRepository.save(Resume("filename", "other-user-id", "pdf", emptyMetaData()))
+        resumeRepository.save(Resume("filename", "user-id", "pdf", mutableMapOf()))
+        resumeRepository.save(Resume("filename", "other-user-id", "pdf", mutableMapOf()))
         mvc.perform(get("/api/$versionId/resume/reindex")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -324,7 +324,7 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
     @ValueSource(strings = ["v1", "v2"])
     fun `when comparing a job with a resume, it returns the amount of star`(versionId: String) {
         jobRepository.save(Job("job-id", "some title", "some description", emptyMetaData(), emptyMetaData()))
-        resumeRepository.save(Resume("filename", "resume-id", "pdf", emptyMetaData()))
+        resumeRepository.save(Resume("filename", "resume-id", "pdf", mutableMapOf()))
         (matcher as MatcherStub).similarityRatingReturnValue = 1.5
 
         mvc.perform(get("/api/$versionId/resume/{resumeId}/compare/{jobId}", "resume-id", "job-id")

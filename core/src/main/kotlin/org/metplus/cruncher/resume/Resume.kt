@@ -6,6 +6,6 @@ data class Resume(
         val filename: String,
         val userId: String,
         val fileType: String,
-        val cruncherData: CruncherMetaData,
+        val cruncherData: Map<String, CruncherMetaData>,
         val starRating: Double = 0.0
 )

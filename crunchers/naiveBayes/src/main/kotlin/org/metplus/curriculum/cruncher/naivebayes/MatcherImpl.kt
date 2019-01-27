@@ -7,6 +7,10 @@ import org.metplus.cruncher.resume.Resume
 import kotlin.math.min
 
 class MatcherImpl : Matcher<Resume, Job> {
+    override fun getName(): String {
+        return "naiveBayes"
+    }
+
     private val matchPoints = arrayOf(
             arrayOf(1600.0, 1200.0, 1000.0, 900.0, 850.0),
             arrayOf(750.0, 800.0, 600.0, 500.0, 450.0),
@@ -18,7 +22,7 @@ class MatcherImpl : Matcher<Resume, Job> {
 
     override fun match(from: Resume, allList: List<Job>): List<Job> {
         val processedJobs = mutableListOf<Job>()
-        val resumeCategories = getCategoryListFromMetaData(from.cruncherData, MAX_NUMBER_CATEGORIES)
+        val resumeCategories = getCategoryListFromMetaData(from.cruncherData.getOrDefault(getName(), CruncherMetaData(mutableMapOf())), MAX_NUMBER_CATEGORIES)
         allList.forEach {
             val jobCategories = getJobCategories(it)
             val starRating = calculateStarRating(resumeCategories, jobCategories)
@@ -34,7 +38,7 @@ class MatcherImpl : Matcher<Resume, Job> {
         val jobCategories = getJobCategories(from)
 
         allList.forEach {
-            val resumeCategories = getCategoryListFromMetaData(it.cruncherData, MAX_NUMBER_CATEGORIES)
+            val resumeCategories = getCategoryListFromMetaData(it.cruncherData.getOrDefault(getName(), CruncherMetaData(mutableMapOf())), MAX_NUMBER_CATEGORIES)
 
             val starRating = calculateStarRating(jobCategories, resumeCategories)
             if (starRating > 0) {
@@ -47,7 +51,7 @@ class MatcherImpl : Matcher<Resume, Job> {
 
     override fun similarityRating(left: Resume, right: Job): Double {
         val jobCategories = getJobCategories(right)
-        val resumeCategories = getCategoryListFromMetaData(left.cruncherData, MAX_NUMBER_CATEGORIES)
+        val resumeCategories = getCategoryListFromMetaData(left.cruncherData.getOrDefault(getName(), CruncherMetaData(mutableMapOf())), MAX_NUMBER_CATEGORIES)
 
         return calculateStarRating(resumeCategories, jobCategories)
     }
