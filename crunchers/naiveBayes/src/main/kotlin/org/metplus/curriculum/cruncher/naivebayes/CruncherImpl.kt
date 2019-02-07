@@ -5,7 +5,7 @@ import de.daslaboratorium.machinelearning.classifier.bayes.BayesClassifier
 import org.metplus.cruncher.rating.Cruncher
 import org.metplus.cruncher.rating.CruncherMetaData
 import org.slf4j.LoggerFactory
-import java.util.ArrayList
+import java.lang.Integer.min
 
 class CruncherImpl(
         private var cleanExpressions: List<String> = mutableListOf()
@@ -72,7 +72,7 @@ class CruncherImpl(
     }
 
     private fun tokenize(feature: String, text: String): List<String> {
-        val result = ArrayList<String>()
+        val result = mutableMapOf<String, Int>()
         var newText = text.replace(feature.toRegex(), feature.replace("\\s+".toRegex(), "@@@@")).toLowerCase()
         if (cleanExpressions.isNotEmpty()) {
             for (exp in cleanExpressions) {
@@ -85,8 +85,9 @@ class CruncherImpl(
             val token = expression.replace("@@@@".toRegex(), " ").replace("[^a-z0-9 ]".toRegex(), "")
             if (token.trim { it <= ' ' }.isEmpty())
                 continue
-            result.add(token)
+            result[token] = result.getOrDefault(token, 0) + 1
         }
-        return result
+        val resultList = result.toList().sortedByDescending { (_, value) -> value }.map { (key, _) -> key }
+        return resultList.subList(0, min(resultList.size, 50))
     }
 }
