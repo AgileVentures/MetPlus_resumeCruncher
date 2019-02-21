@@ -25,7 +25,7 @@ class CruncherImpl(
         val allMetaData = NaiveBayesMetaData()
         var maxProbability = 0.0f
         allMetaData.bestMatchCategory = null
-        var output = "Cruncher categories: ["
+        var output = " || Cruncher categories: ["
         for (metaData in classificationResult) {
             if (allMetaData.bestMatchCategory == null)
                 allMetaData.bestMatchCategory = metaData.category
@@ -41,7 +41,7 @@ class CruncherImpl(
             output += "" + metaData.category + ": " + metaData.probability + ", "
         }
         allMetaData.totalProbability = maxProbability.toDouble()
-        logger.debug(output + "], Best Match: " + allMetaData.bestMatchCategory + ": " + allMetaData.totalProbability)
+        logger.debug("Best Match: " + allMetaData.bestMatchCategory + ": " + allMetaData.totalProbability + output + "]")
         return allMetaData
     }
 
