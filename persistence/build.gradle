@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.3.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
     }
 }
 
@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
     compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    compile("org.springframework.data:spring-data-mongodb:2.0.9.RELEASE")
+    compile("org.springframework.data:spring-data-mongodb:2.1.5.RELEASE")
     compile('org.springframework.boot:spring-boot-starter-data-mongodb')
     compile(project(":core"))
     compile("org.jetbrains.kotlin:kotlin-reflect")
