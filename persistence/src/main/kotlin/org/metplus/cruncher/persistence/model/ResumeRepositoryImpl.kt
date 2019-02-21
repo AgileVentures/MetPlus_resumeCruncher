@@ -12,7 +12,7 @@ class ResumeRepositoryImpl(
     }
 
     override fun getByUserId(userId: String): Resume? {
-        return resumeRepositoryMongo.getById(userId)?.toResume()
+        return resumeRepositoryMongo.getByUserId(userId)?.toResume()
     }
 
     override fun getAll(): List<Resume> {
@@ -32,7 +32,7 @@ private fun ResumeMongo.toResume(): Resume {
     }
 
     return Resume(
-            userId = id,
+            userId = userId,
             fileType = fileType,
             filename = filename,
             cruncherData = data
@@ -51,6 +51,7 @@ private fun Resume.toResumeMongo(): ResumeMongo {
     }
     return ResumeMongo(
             id = userId,
+            userId = userId,
             filename = filename,
             fileType = fileType,
             cruncherData = metaData
