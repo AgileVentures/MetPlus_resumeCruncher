@@ -6,8 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Field
 
 @Document(collection = "resume")
 data class ResumeMongo(
-        @Field("id")
-        @Id val id: String,
+        @Id val id: String?,
         @Field
         var filename: String,
         @Field
