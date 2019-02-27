@@ -8,7 +8,8 @@ class ResumeRepositoryImpl(
         private val resumeRepositoryMongo: ResumeRepositoryMongo
 ) : ResumeRepository {
     override fun save(resume: Resume): Resume {
-        return resumeRepositoryMongo.save(resume.toResumeMongo()).toResume()
+        val savedResume = resumeRepositoryMongo.getByUserId(resume.userId)?.id
+        return resumeRepositoryMongo.save(resume.toResumeMongo().copy(id = savedResume)).toResume()
     }
 
     override fun getByUserId(userId: String): Resume? {
@@ -50,7 +51,7 @@ private fun Resume.toResumeMongo(): ResumeMongo {
         metaData[cruncherName] = MetaData(data as HashMap<String, MetaDataField<*>>)
     }
     return ResumeMongo(
-            id = userId,
+            id = null,
             userId = userId,
             filename = filename,
             fileType = fileType,
