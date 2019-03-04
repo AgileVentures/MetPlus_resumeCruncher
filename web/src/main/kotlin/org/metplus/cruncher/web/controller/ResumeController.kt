@@ -187,7 +187,7 @@ class ResumeMatchedAnswer(
 
 data class ResumeAnswer(
         val filename: String,
-        val userId: String,
+        val resumeId: String,
         val fileType: String,
         val stars: Double
 )

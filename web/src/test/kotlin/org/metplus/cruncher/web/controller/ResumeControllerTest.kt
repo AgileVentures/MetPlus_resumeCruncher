@@ -215,9 +215,9 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
         mvc.perform(get("/api/$versionId/resume/match/{jobId}", "job-id")
                 .header("X-Auth-Token", token))
                 .andExpect(jsonPath("$.resultCode", Matchers.equalTo(ResultCodes.SUCCESS.toString())))
-                .andExpect(jsonPath("$.resumes.matcher-1[0].userId", Matchers.equalTo("resume-2")))
+                .andExpect(jsonPath("$.resumes.matcher-1[0].resumeId", Matchers.equalTo("resume-2")))
                 .andExpect(jsonPath("$.resumes.matcher-1[0].stars", Matchers.equalTo(1.0)))
-                .andExpect(jsonPath("$.resumes.matcher-1[1].userId", Matchers.equalTo("resume-1")))
+                .andExpect(jsonPath("$.resumes.matcher-1[1].resumeId", Matchers.equalTo("resume-1")))
                 .andExpect(jsonPath("$.resumes.matcher-1[1].stars", Matchers.equalTo(.1)))
                 .andDo(document("resume/multiple-match-resumes-job-id/$versionId",
                         requestHeaders(headerWithName("X-Auth-Token")
