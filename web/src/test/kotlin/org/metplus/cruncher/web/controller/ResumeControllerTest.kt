@@ -210,7 +210,7 @@ internal class ResumeControllerTest(@Autowired private val mvc: MockMvc) {
                 cruncherData = mutableMapOf()
         ))
         jobRepository.save(Job("job-id", "title", "description", mapOf(), mapOf()))
-        (matcher as MatcherStub).matchInverseReturnValue = listOf(resume2.copy(starRating = 1.0), resume1.copy(starRating = .1))
+        (matcher as MatcherStub).matchInverseReturnValue = listOf(resume2.copy(starRating = 1.0), resume1.copy(starRating = .101322134))
 
         mvc.perform(get("/api/$versionId/resume/match/{jobId}", "job-id")
                 .header("X-Auth-Token", token))
