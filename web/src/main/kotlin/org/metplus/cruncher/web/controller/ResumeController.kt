@@ -10,6 +10,7 @@ import org.springframework.util.FileCopyUtils
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.io.ByteArrayOutputStream
+import java.text.DecimalFormat
 import javax.servlet.http.HttpServletResponse
 
 @RestController
@@ -173,7 +174,7 @@ fun Resume.toResumeAnswer(): ResumeAnswer {
             filename,
             userId,
             fileType,
-            starRating
+            DecimalFormat("#.##").format(starRating).toDouble()
     )
 }
 
