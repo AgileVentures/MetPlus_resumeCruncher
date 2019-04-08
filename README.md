@@ -15,6 +15,21 @@ Resume Processor for the MetPlus project
 
   ```cd resumeCruncher```
 
+
+# Use Docker to standup mongo and the application in 2 steps
+
+It is possible to use docker compose to start a mongo db instance and the application with the current code base. The steps to do it are the following:
+
+1 - Create the container images
+```bash
+docker-compose build
+```
+
+2 - Run the application
+```bash
+docker-compose up
+```
+
 ## Database
 In order to install and run the application you need to have access to one mongo instance to save the cruncher information.
 You can use a Local Mongo instance, a Docker container, a Virtual Machine or a database as a Service like [mlab](http://www.mlab.com)
@@ -53,25 +68,11 @@ To accomplish that connect to the Mongo instance using mongo CLI or a a visual a
  db.createUser({user: 'testing_user', pwd: 'testing_user', roles: [{role: 'readWrite', db: 'resumeCruncher'}]});
 ```
 
-# Use Docker to standup mongo and the application in 2 steps
-
-It is possible to use docker compose to start a mongo db instance and the application with the current code base. The steps to do it are the following:
-
-1 - Create the container images
-```bash
-docker-compose build
-```
-
-2 - Run the application
-```bash
-docker-compose up
-```
-
 This will instantiate the mongo DB in the local port `27017` and the application will be listening in port `8080`. If you changed something in the code base and want it reflected you need to re-execute both the command above.
 
 # Configuration files
 
-- app/src/main/resources/application.yml
+- `web/src/main/resources/application.yml`
  
   In this file the application configuration is stored
 
@@ -159,27 +160,7 @@ backend:
 
 This section of configuration is the section that uses more space, because it contains the initial configuration for all the crunchers.
 
-At this point there are 2 crunchers and they have the following configuration:
-
-#### Expression based cruncher
-This cruncher is a very basic implementation of a word/expression counting algorithm, that adds up all the occurencies of a word/expression and based on the words/expression more common matches documents.
-
-The options for this cruncher looks like this
-
-```
-expression-cruncher:
-    case-sensitive: false                      # Should the matching be case sensitive or not
-    ignoreListWordSearch: true                 # Ignore the words in the ignore list
-    merge-list:                                # List of tokens to be merged, this is a hash that contains
-      "software development":                  # the final name and a list of expressions that will be replace by that final name
-        - "software development"
-        - "software development lifecycle"
-      "cook":
-        - "cook"
-        - "line cook"
-    ignore-list:                               # List of words or expressions that will be ignored when matching
-      - "a"                                    # this is used to archive more accuracy on the matching
-```
+At this point there are 1 cruncher and this is the configuiration:
 
 #### Naive Bayes based cruncher
 This cruncher uses a different approach, based in the Naive Bayes algorithm to match categories. 
